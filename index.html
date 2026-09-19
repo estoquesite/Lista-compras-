@@ -53,7 +53,6 @@
                         <p id="saudacao-usuario" class="text-xs text-gray-500 dark:text-gray-400">Olá!</p>
                     </div>
                     <div class="flex items-center gap-1.5">
-                        <!-- MICROFONE LÁ EM CIMA -->
                         <button onclick="ouvirVoz()" id="btn-voz-topo" class="bg-red-500 hover:bg-red-600 text-white px-3 py-2 rounded-xl text-xs font-medium transition flex items-center gap-1 shadow-sm" title="Falar Produto">
                             🎤 Falar
                         </button>
@@ -69,27 +68,32 @@
                     </div>
                 </div>
 
-                <!-- SELETOR DE MÊS E ANO AUTOMÁTICO -->
-                <div class="flex items-center justify-between bg-blue-50 dark:bg-blue-950/40 border border-blue-100 dark:border-blue-900/50 p-2.5 rounded-2xl">
-                    <span class="text-xs font-semibold text-blue-700 dark:text-blue-300 uppercase px-2">📅 Mês de Referência:</span>
-                    <select id="filtro-mes-ano" onchange="mudarMesReferencia()" class="bg-white dark:bg-gray-900 text-gray-800 dark:text-white px-3 py-1.5 rounded-xl text-xs font-semibold border border-blue-200 dark:border-blue-800 focus:outline-none focus:ring-2 focus:ring-blue-500">
-                        <option value="Setembro_2026">Setembro / 2026</option>
-                        <option value="Outubro_2026">Outubro / 2026</option>
-                        <option value="Novembro_2026">Novembro / 2026</option>
-                        <option value="Dezembro_2026">Dezembro / 2026</option>
-                        <option value="Janeiro_2027">Janeiro / 2027</option>
-                        <option value="Fevereiro_2027">Fevereiro / 2027</option>
-                        <option value="Marco_2027">Março / 2027</option>
-                        <option value="Abril_2027">Abril / 2027</option>
-                        <option value="Maio_2027">Maio / 2027</option>
-                        <option value="Junho_2027">Junho / 2027</option>
-                        <option value="Julho_2027">Julho / 2027</option>
-                        <option value="Agosto_2027">Agosto / 2027</option>
-                        <option value="Setembro_2027">Setembro / 2027</option>
-                        <option value="Outubro_2027">Outubro / 2027</option>
-                        <option value="Novembro_2027">Novembro / 2027</option>
-                        <option value="Dezembro_2027">Dezembro / 2027</option>
-                    </select>
+                <!-- SELETOR DE MÊS E ANO + BOTÃO DE RELATÓRIO ANUAL -->
+                <div class="flex flex-col sm:flex-row items-center justify-between bg-blue-50 dark:bg-blue-950/40 border border-blue-100 dark:border-blue-900/50 p-2.5 rounded-2xl gap-2">
+                    <div class="flex items-center w-full sm:w-auto justify-between sm:justify-start">
+                        <span class="text-xs font-semibold text-blue-700 dark:text-blue-300 uppercase px-2">📅 Mês:</span>
+                        <select id="filtro-mes-ano" onchange="mudarMesReferencia()" class="bg-white dark:bg-gray-900 text-gray-800 dark:text-white px-3 py-1.5 rounded-xl text-xs font-semibold border border-blue-200 dark:border-blue-800 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            <option value="Janeiro">Janeiro</option>
+                            <option value="Fevereiro">Fevereiro</option>
+                            <option value="Marco">Março</option>
+                            <option value="Abril">Abril</option>
+                            <option value="Maio">Maio</option>
+                            <option value="Junho">Junho</option>
+                            <option value="Julho">Julho</option>
+                            <option value="Agosto">Agosto</option>
+                            <option value="Setembro">Setembro</option>
+                            <option value="Outubro">Outubro</option>
+                            <option value="Novembro">Novembro</option>
+                            <option value="Dezembro">Dezembro</option>
+                        </select>
+                        <select id="filtro-ano" onchange="mudarMesReferencia()" class="bg-white dark:bg-gray-900 text-gray-800 dark:text-white px-3 py-1.5 rounded-xl text-xs font-semibold border border-blue-200 dark:border-blue-800 focus:outline-none focus:ring-2 focus:ring-blue-500 ml-1.5">
+                            <option value="2026">2026</option>
+                            <option value="2027">2027</option>
+                        </select>
+                    </div>
+                    <button onclick="abrirRelatorioAnual()" class="w-full sm:w-auto bg-amber-600 hover:bg-amber-700 text-white px-3 py-1.5 rounded-xl text-xs font-medium transition shadow-sm flex items-center justify-center gap-1">
+                        📊 Ver Relatório Anual (Mês a Mês)
+                    </button>
                 </div>
 
                 <!-- 4 CARDS DE RESUMO -->
@@ -102,17 +106,21 @@
                         <p class="text-[10px] font-semibold text-emerald-600 dark:text-emerald-400 uppercase">Carrinho</p>
                         <p id="total-peguei" class="text-base sm:text-lg font-bold text-emerald-600 dark:text-emerald-400 mt-0.5">R$ 0</p>
                     </div>
-                    <div class="bg-gray-50 dark:bg-gray-800 p-3 rounded-xl border border-gray-100 dark:border-gray-700">
-                        <p class="text-[10px] font-semibold text-amber-600 dark:text-amber-400 uppercase">Total do Ano</p>
-                        <p id="total-ano" class="text-base sm:text-lg font-bold text-amber-600 dark:text-amber-400 mt-0.5">R$ 0</p>
-                    </div>
+                    <!-- ORÇAMENTO COMBINADO (TICKET + DINHEIRO) -->
                     <div class="bg-gray-50 dark:bg-gray-800 p-3 rounded-xl border border-gray-100 dark:border-gray-700 relative">
                         <div class="flex justify-between items-center">
-                            <p class="text-[10px] font-semibold text-indigo-600 dark:text-indigo-400 uppercase">Orçamento (T + D)</p>
-                            <button onclick="alterarOrcamento()" class="text-xs text-indigo-500 hover:underline">✏️ Definir</button>
+                            <p class="text-[10px] font-semibold text-indigo-600 dark:text-indigo-400 uppercase">Orçamento (T+D)</p>
+                            <div class="space-x-1">
+                                <button onclick="alterarTicket()" class="text-[10px] text-indigo-500 hover:underline" title="Editar Ticket">💳T</button>
+                                <button onclick="alterarDinheiro()" class="text-[10px] text-amber-500 hover:underline" title="Editar Dinheiro">💵D</button>
+                            </div>
                         </div>
-                        <p id="info-orcamento" class="text-[11px] text-gray-500 dark:text-gray-400 mt-0.5 truncate">Ticket: R$ 0 | Dinheiro: R$ 0</p>
-                        <p id="saldo-restante" class="text-sm sm:text-base font-bold text-indigo-600 dark:text-indigo-400 mt-0.5">Não definido</p>
+                        <p id="info-orcamento" class="text-[10px] text-gray-500 dark:text-gray-400 mt-0.5 truncate">T: R$0 | D: R$0</p>
+                        <p id="saldo-restante" class="text-sm font-bold text-indigo-600 dark:text-indigo-400 mt-0.5">R$ 0</p>
+                    </div>
+                    <div class="bg-gray-50 dark:bg-gray-800 p-3 rounded-xl border border-gray-100 dark:border-gray-700">
+                        <p class="text-[10px] font-semibold text-amber-600 dark:text-amber-400 uppercase">Total Gasto Ano</p>
+                        <p id="total-ano" class="text-base sm:text-lg font-bold text-amber-600 dark:text-amber-400 mt-0.5">R$ 0</p>
                     </div>
                 </div>
 
@@ -189,7 +197,6 @@
             <div class="bg-white dark:bg-gray-800 p-5 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700">
                 <div class="flex justify-between items-center mb-3">
                     <h2 id="form-titulo" class="text-md font-semibold text-gray-900 dark:text-white">Adicionar Novo Produto</h2>
-                    <!-- MICROFONE NO FORMULÁRIO -->
                     <button type="button" onclick="ouvirVoz()" id="btn-voz-form" class="bg-red-500 hover:bg-red-600 text-white px-3 py-1.5 rounded-xl text-xs font-medium transition flex items-center gap-1.5 shadow-sm">
                         🎤 Falar Produto
                     </button>
@@ -267,8 +274,28 @@
         </div>
     </div>
 
-    <!-- MICROFONE FLUTUANTE LÁ EM BAIXO (FIXO NO ECRÃ) -->
-    <button onclick="ouvirVoz()" id="btn-voz-flutuante" class="fixed bottom-6 right-6 z-50 bg-red-600 hover:bg-red-700 text-white w-14 h-14 rounded-full shadow-2xl flex items-center justify-center text-2xl transition transform hover:scale-105 active:scale-95" title="Falar Produto">
+    <!-- MODAL DE RELATÓRIO ANUAL (MÊS A MÊS) -->
+    <div id="modal-relatorio" class="fixed inset-0 z-50 bg-gray-900/80 backdrop-blur-sm hidden flex items-center justify-center p-4">
+        <div class="bg-white dark:bg-gray-800 p-6 rounded-3xl shadow-2xl max-w-lg w-full space-y-4 border border-gray-100 dark:border-gray-700 max-h-[90vh] overflow-y-auto">
+            <div class="flex justify-between items-center border-b pb-3 dark:border-gray-700">
+                <h3 id="titulo-modal-ano" class="text-lg font-bold text-gray-900 dark:text-white">📊 Relatório Mês a Mês</h3>
+                <button onclick="fecharRelatorioAnual()" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 text-lg font-bold">✕</button>
+            </div>
+            <div id="conteudo-relatorio-meses" class="space-y-2 text-sm">
+                <!-- Preenchido via JavaScript -->
+            </div>
+            <div class="border-t pt-3 flex justify-between items-center font-bold text-base dark:border-gray-700 text-gray-900 dark:text-white">
+                <span>Total Acumulado do Ano:</span>
+                <span id="modal-total-ano" class="text-amber-600 dark:text-amber-400">R$ 0,00</span>
+            </div>
+            <button onclick="fecharRelatorioAnual()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2.5 rounded-xl transition text-sm">
+                Fechar Relatório
+            </button>
+        </div>
+    </div>
+
+    <!-- MICROFONE FLUTUANTE LÁ EM BAIXO -->
+    <button onclick="ouvirVoz()" id="btn-voz-flutuante" class="fixed bottom-6 right-6 z-50 bg-red-600 hover:bg-red-700 text-white w-14 h-14 rounded-full shadow-2xl flex items-center justify-center text-2xl transition transform hover:scale-105 active:scale-95" title="Falar e Adicionar Automaticamente">
         🎤
     </button>
 
@@ -279,10 +306,12 @@
         const mesesArray = ['Janeiro', 'Fevereiro', 'Marco', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'];
         const dataHoje = new Date();
         const mesRealAtual = mesesArray[dataHoje.getMonth()];
-        const anoRealAtual = dataHoje.getFullYear();
+        const anoRealAtual = String(dataHoje.getFullYear());
         const mesAnoAutomatico = `${mesRealAtual}_${anoRealAtual}`;
 
-        let mesAtualSelecionado = localStorage.getItem('ultimo_mes_selecionado') || mesAnoAutomatico;
+        let mesSelecionado = localStorage.getItem('ultimo_mes') || mesRealAtual;
+        let anoSelecionado = localStorage.getItem('ultimo_ano') || anoRealAtual;
+        let chaveMesAno = `${mesSelecionado}_${anoSelecionado}`;
 
         window.addEventListener('DOMContentLoaded', () => {
             if (sessionStorage.getItem('autenticado_site') === 'true') {
@@ -317,8 +346,8 @@
             const nomeUser = sessionStorage.getItem('nome_utilizador') || 'Mariana';
             document.getElementById('saudacao-usuario').textContent = `Bem-vinda, ${nomeUser}!`;
 
-            const selectEl = document.getElementById('filtro-mes-ano');
-            selectEl.value = mesAtualSelecionado;
+            document.getElementById('filtro-mes-ano').value = mesSelecionado;
+            document.getElementById('filtro-ano').value = anoSelecionado;
 
             renderizarTabelaCompras();
         }
@@ -338,8 +367,13 @@
         }
 
         function mudarMesReferencia() {
-            mesAtualSelecionado = document.getElementById('filtro-mes-ano').value;
-            localStorage.setItem('ultimo_mes_selecionado', mesAtualSelecionado);
+            mesSelecionado = document.getElementById('filtro-mes-ano').value;
+            anoSelecionado = document.getElementById('filtro-ano').value;
+            chaveMesAno = `${mesSelecionado}_${anoSelecionado}`;
+            
+            localStorage.setItem('ultimo_mes', mesSelecionado);
+            localStorage.setItem('ultimo_ano', anoSelecionado);
+            
             renderizarTabelaCompras();
             cancelarEdicao();
         }
@@ -351,7 +385,22 @@
             icone.textContent = gavetinha.classList.contains('hidden') ? '▼' : '▲';
         }
 
-        // RECONHECIMENTO DE VOZ INTELIGENTE (ATUALIZADO PARA OS BOTÕES TOPO E BAIXO)
+        function formatarValorInput(str) {
+            if (!str) return 0;
+            let limpo = String(str).trim().replace(/\s/g, '').replace('R$', '').replace('r$', '');
+            if (limpo.includes(',')) {
+                limpo = limpo.replace(/\./g, '').replace(',', '.');
+            } else if (limpo.split('.').length > 2) {
+                limpo = limpo.replace(/\./g, (match, offset, string) => {
+                    return offset === string.lastIndexOf('.') ? '.' : '';
+                });
+            } else if (/^\d{1,3}\.\d{3}$/.test(limpo)) {
+                limpo = limpo.replace(/\./g, '');
+            }
+            return parseFloat(limpo) || 0;
+        }
+
+        // RECONHECIMENTO DE VOZ
         function ouvirVoz() {
             const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
             if (!SpeechRecognition) {
@@ -374,9 +423,7 @@
 
             recognition.onresult = (event) => {
                 const texto = event.results[0][0].transcript;
-                processarFalaInteligente(texto);
-                // Levar o ecrã suavemente para o formulário para ver o preenchimento
-                document.getElementById('compra-nome').scrollIntoView({ behavior: 'smooth' });
+                processarFalaEAdicionar(texto);
             };
 
             recognition.onerror = () => { resetarBotoesVoz(); };
@@ -394,7 +441,7 @@
             if (btnFloat) btnFloat.classList.remove('animate-pulse', 'bg-amber-500');
         }
 
-        function processarFalaInteligente(texto) {
+        function processarFalaEAdicionar(texto) {
             let limpo = texto.toLowerCase()
                 .replace(/quantidade/g, '')
                 .replace(/reais/g, '')
@@ -439,67 +486,109 @@
             if (!nomeProduto) nomeProduto = texto;
             nomeProduto = nomeProduto.charAt(0).toUpperCase() + nomeProduto.slice(1);
 
-            document.getElementById('compra-nome').value = nomeProduto;
-            document.getElementById('compra-qtd').value = qtd > 0 ? qtd : 1;
-            if (preco > 0) document.getElementById('compra-preco').value = preco.toFixed(2);
-        }
+            let lista = obterListaDoMes();
+            lista.push({
+                id: Date.now() + Math.random(),
+                nome: nomeProduto,
+                setor: 'Mercearia',
+                qtd: qtd > 0 ? qtd : 1,
+                preco: preco > 0 ? preco : 0,
+                peguei: false
+            });
 
-        // ORÇAMENTO MENSAL (TICKET + DINHEIRO)
-        function obterOrcamentoDoMes() {
-            let cache = JSON.parse(localStorage.getItem('historico_orcamento_mensal') || '{}');
-            return cache[mesAtualSelecionado] || { ticket: null, dinheiro: null };
-        }
-
-        function guardarOrcamentoDoMes(ticket, dinheiro) {
-            let cache = JSON.parse(localStorage.getItem('historico_orcamento_mensal') || '{}');
-            cache[mesAtualSelecionado] = { ticket, dinheiro };
-            localStorage.setItem('historico_orcamento_mensal', JSON.stringify(cache));
-        }
-
-        function alterarOrcamento() {
-            let atual = obterOrcamentoDoMes();
-            let ticketAtual = atual.ticket !== null ? atual.ticket : 0;
-            let dinheiroAtual = atual.dinheiro !== null ? atual.dinheiro : 0;
-
-            let valTicket = prompt("Digite o valor do TICKET para " + mesAtualSelecionado.replace('_', ' de ') + " (R$):", ticketAtual);
-            if (valTicket === null) return;
-            valTicket = parseFloat(valTicket.replace(',', '.'));
-            if (isNaN(valTicket) || valTicket < 0) { alert("Valor de ticket inválido."); return; }
-
-            let valDinheiro = prompt("Digite o valor em DINHEIRO para " + mesAtualSelecionado.replace('_', ' de ') + " (R$):", dinheiroAtual);
-            if (valDinheiro === null) return;
-            valDinheiro = parseFloat(valDinheiro.replace(',', '.'));
-            if (isNaN(valDinheiro) || valDinheiro < 0) { alert("Valor em dinheiro inválido."); return; }
-
-            guardarOrcamentoDoMes(valTicket, valDinheiro);
+            guardarListaDoMes(lista);
             renderizarTabelaCompras();
+            document.getElementById('tabela-compras').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        // TICKET E DINHEIRO
+        function obterTicketDoMes() {
+            let cache = JSON.parse(localStorage.getItem('historico_ticket_mensal') || '{}');
+            return cache[chaveMesAno] !== undefined ? cache[chaveMesAno] : null;
+        }
+        function guardarTicketDoMes(val) {
+            let cache = JSON.parse(localStorage.getItem('historico_ticket_mensal') || '{}');
+            cache[chaveMesAno] = val;
+            localStorage.setItem('historico_ticket_mensal', JSON.stringify(cache));
+        }
+        function alterarTicket() {
+            let atual = obterTicketDoMes() || 0;
+            let val = prompt("Digite o valor do TICKET para " + mesSelecionado + " de " + anoSelecionado + " (R$):", atual);
+            if (val !== null) {
+                guardarTicketDoMes(formatarValorInput(val));
+                renderizarTabelaCompras();
+            }
+        }
+
+        function obterDinheiroDoMes() {
+            let cache = JSON.parse(localStorage.getItem('historico_dinheiro_mensal') || '{}');
+            return cache[chaveMesAno] !== undefined ? cache[chaveMesAno] : null;
+        }
+        function guardarDinheiroDoMes(val) {
+            let cache = JSON.parse(localStorage.getItem('historico_dinheiro_mensal') || '{}');
+            cache[chaveMesAno] = val;
+            localStorage.setItem('historico_dinheiro_mensal', JSON.stringify(cache));
+        }
+        function alterarDinheiro() {
+            let atual = obterDinheiroDoMes() || 0;
+            let val = prompt("Digite o valor em DINHEIRO para " + mesSelecionado + " de " + anoSelecionado + " (R$):", atual);
+            if (val !== null) {
+                guardarDinheiroDoMes(formatarValorInput(val));
+                renderizarTabelaCompras();
+            }
         }
 
         function obterListaDoMes() {
             let cacheGeral = JSON.parse(localStorage.getItem('historico_compras_mensal') || '{}');
-            return cacheGeral[mesAtualSelecionado] || [];
+            return cacheGeral[chaveMesAno] || [];
         }
 
         function guardarListaDoMes(lista) {
             let cacheGeral = JSON.parse(localStorage.getItem('historico_compras_mensal') || '{}');
-            cacheGeral[mesAtualSelecionado] = lista;
+            cacheGeral[chaveMesAno] = lista;
             localStorage.setItem('historico_compras_mensal', JSON.stringify(cacheGeral));
         }
 
         function calcularTotalAno() {
             let cacheGeral = JSON.parse(localStorage.getItem('historico_compras_mensal') || '{}');
-            let anoAtual = mesAtualSelecionado.split('_')[1] || '2026';
             let totalAno = 0;
-
-            for (let chave in cacheGeral) {
-                if (chave.includes(anoAtual)) {
-                    let listaMes = cacheGeral[chave] || [];
-                    listaMes.forEach(i => {
-                        totalAno += (i.qtd * i.preco);
-                    });
-                }
-            }
+            mesesArray.forEach(m => {
+                let chave = `${m}_${anoSelecionado}`;
+                let listaMes = cacheGeral[chave] || [];
+                listaMes.forEach(i => { totalAno += (i.qtd * i.preco); });
+            });
             return totalAno;
+        }
+
+        // RELATÓRIO ANUAL (MÊS A MÊS)
+        function abrirRelatorioAnual() {
+            document.getElementById('titulo-modal-ano').textContent = `📊 Relatório Mês a Mês (${anoSelecionado})`;
+            let cacheGeral = JSON.parse(localStorage.getItem('historico_compras_mensal') || '{}');
+            let container = document.getElementById('conteudo-relatorio-meses');
+            let html = '';
+            let totalAcumulado = 0;
+
+            mesesArray.forEach(m => {
+                let chave = `${m}_${anoSelecionado}`;
+                let lista = cacheGeral[chave] || [];
+                let totalMes = lista.reduce((soma, i) => soma + (i.qtd * i.preco), 0);
+                totalAcumulado += totalMes;
+
+                html += `
+                    <div class="flex justify-between items-center py-2 px-3 bg-gray-50 dark:bg-gray-700/50 rounded-xl">
+                        <span class="font-medium text-gray-800 dark:text-gray-200">${m}</span>
+                        <span class="font-bold text-gray-900 dark:text-white">R$ ${totalMes.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                    </div>
+                `;
+            });
+
+            container.innerHTML = html;
+            document.getElementById('modal-total-ano').textContent = `R$ ${totalAcumulado.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+            document.getElementById('modal-relatorio').classList.remove('hidden');
+        }
+
+        function fecharRelatorioAnual() {
+            document.getElementById('modal-relatorio').classList.add('hidden');
         }
 
         function adicionarFavorito(nome, qtd, preco, setor) {
@@ -573,7 +662,7 @@
         }
 
         function limparListaCompras() {
-            if (confirm(`Deseja limpar todos os itens de ${mesAtualSelecionado.replace('_', ' de ')}?`)) {
+            if (confirm(`Deseja limpar todos os itens de ${mesSelecionado} de ${anoSelecionado}?`)) {
                 guardarListaDoMes([]);
                 renderizarTabelaCompras();
                 cancelarEdicao();
@@ -583,8 +672,9 @@
         function partilharWhatsApp() {
             let lista = obterListaDoMes();
             if (lista.length === 0) { alert('A lista deste mês está vazia.'); return; }
-            let orcamento = obterOrcamentoDoMes();
-            let texto = `🛒 *Lista de Compras (${mesAtualSelecionado.replace('_', ' de ')})*%0A%0A`;
+            let ticketVal = obterTicketDoMes() || 0;
+            let dinheiroVal = obterDinheiroDoMes() || 0;
+            let texto = `🛒 *Lista de Compras (${mesSelecionado} / ${anoSelecionado})*%0A%0A`;
             let totalGeral = 0;
             lista.forEach(i => {
                 let sub = i.qtd * i.preco;
@@ -592,12 +682,10 @@
                 texto += `- ${i.nome} (${i.qtd}x) = R$ ${sub.toFixed(2)}%0A`;
             });
             texto += `%0A💰 *Total do Mês:* R$ ${totalGeral.toFixed(2)}`;
-            if (orcamento.ticket !== null || orcamento.dinheiro !== null) {
-                let t = orcamento.ticket || 0;
-                let d = orcamento.dinheiro || 0;
-                let totalOrcamento = t + d;
-                texto += `%0A💳 *Orçamento Total:* R$ ${totalOrcamento.toFixed(2)} (Ticket: R$ ${t.toFixed(2)} | Dinheiro: R$ ${d.toFixed(2)})`;
-                texto += `%0A💵 *Saldo Restante:* R$ ${(totalOrcamento - totalGeral).toFixed(2)}`;
+            texto += `%0A💳 *Ticket:* R$ ${ticketVal.toFixed(2)} | *Dinheiro:* R$ ${dinheiroVal.toFixed(2)}`;
+            let totalOrcamento = ticketVal + dinheiroVal;
+            if (totalOrcamento > 0) {
+                texto += `%0A⚖️ *Saldo Restante:* R$ ${(totalOrcamento - totalGeral).toFixed(2)}`;
             }
             window.open(`https://api.whatsapp.com/send?text=${texto}`, '_blank');
         }
@@ -606,29 +694,29 @@
             let lista = obterListaDoMes();
             const tbody = document.getElementById('tabela-compras');
             document.getElementById('status-progresso').textContent = `Itens no Mês (${lista.length})`;
+            document.getElementById('total-ano').textContent = `R$ ${calcularTotalAno().toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+
+            let ticketVal = obterTicketDoMes() || 0;
+            let dinheiroVal = obterDinheiroDoMes() || 0;
+            let totalOrcamento = ticketVal + dinheiroVal;
+
+            document.getElementById('info-orcamento').textContent = `T: R$${ticketVal.toFixed(2)} | D: R$${dinheiroVal.toFixed(2)}`;
+
+            let elSaldo = document.getElementById('saldo-restante');
+            if (ticketVal === 0 && dinheiroVal === 0) {
+                elSaldo.textContent = `Não def.`;
+                elSaldo.className = "text-sm font-bold text-gray-400 dark:text-gray-500 mt-0.5";
+            } else {
+                let totalGeralCalc = lista.reduce((soma, i) => soma + (i.qtd * i.preco), 0);
+                let saldoRestante = totalOrcamento - totalGeralCalc;
+                elSaldo.textContent = `R$ ${saldoRestante.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+                elSaldo.className = saldoRestante < 0 ? "text-sm font-bold text-red-600 dark:text-red-400 mt-0.5" : "text-sm font-bold text-indigo-600 dark:text-indigo-400 mt-0.5";
+            }
 
             if (lista.length === 0) {
                 tbody.innerHTML = `<tr><td colspan="6" class="py-8 text-center text-gray-400">Nenhum item registado neste mês.</td></tr>`;
                 document.getElementById('total-geral').textContent = `R$ 0`;
                 document.getElementById('total-peguei').textContent = `R$ 0`;
-                document.getElementById('total-ano').textContent = `R$ ${calcularTotalAno().toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
-                
-                let orcamento = obterOrcamentoDoMes();
-                let elSaldo = document.getElementById('saldo-restante');
-                let elInfo = document.getElementById('info-orcamento');
-
-                if (orcamento.ticket === null && orcamento.dinheiro === null) {
-                    elInfo.textContent = `Ticket: R$ 0 | Dinheiro: R$ 0`;
-                    elSaldo.textContent = `Não definido`;
-                    elSaldo.className = "text-sm sm:text-base font-bold text-gray-400 dark:text-gray-500 mt-0.5";
-                } else {
-                    let t = orcamento.ticket || 0;
-                    let d = orcamento.dinheiro || 0;
-                    let totalOrcamento = t + d;
-                    elInfo.textContent = `Ticket: R$ ${t.toFixed(2)} | Dinheiro: R$ ${d.toFixed(2)}`;
-                    elSaldo.textContent = `R$ ${totalOrcamento.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
-                    elSaldo.className = "text-sm sm:text-base font-bold text-indigo-600 dark:text-indigo-400 mt-0.5";
-                }
                 return;
             }
 
@@ -660,28 +748,8 @@
                 `;
             }).join('');
 
-            let orcamento = obterOrcamentoDoMes();
-            const elSaldo = document.getElementById('saldo-restante');
-            const elInfo = document.getElementById('info-orcamento');
-
-            if (orcamento.ticket === null && orcamento.dinheiro === null) {
-                elInfo.textContent = `Ticket: R$ 0 | Dinheiro: R$ 0`;
-                elSaldo.textContent = `Não definido`;
-                elSaldo.className = "text-sm sm:text-base font-bold text-gray-400 dark:text-gray-500 mt-0.5";
-            } else {
-                let t = orcamento.ticket || 0;
-                let d = orcamento.dinheiro || 0;
-                let totalOrcamento = t + d;
-                let saldoRestante = totalOrcamento - totalGeral;
-
-                elInfo.textContent = `Ticket: R$ ${t.toFixed(2)} | Dinheiro: R$ ${d.toFixed(2)}`;
-                elSaldo.textContent = `R$ ${saldoRestante.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
-                elSaldo.className = saldoRestante < 0 ? "text-sm sm:text-base font-bold text-red-600 dark:text-red-400 mt-0.5" : "text-sm sm:text-base font-bold text-indigo-600 dark:text-indigo-400 mt-0.5";
-            }
-
             document.getElementById('total-geral').textContent = `R$ ${totalGeral.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
             document.getElementById('total-peguei').textContent = `R$ ${totalPeguei.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
-            document.getElementById('total-ano').textContent = `R$ ${calcularTotalAno().toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
         }
     </script>
 </body>
