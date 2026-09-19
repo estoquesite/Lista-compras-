@@ -122,33 +122,37 @@
         <!-- CONTEÚDO PRINCIPAL -->
         <div class="max-w-4xl mx-auto p-4 sm:p-6 space-y-6">
             
-            <!-- FORMULÁRIO MANUAL -->
-            <div class="bg-white dark:bg-gray-800 p-5 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700">
-                <div class="flex justify-between items-center mb-3">
-                    <h2 id="form-titulo" class="text-md font-semibold text-gray-900 dark:text-white">Adicionar Novo Produto</h2>
+            <!-- FORMULÁRIO COMPACTO (NOME E QTD LADO A LADO) -->
+            <div class="bg-white dark:bg-gray-800 p-4 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700">
+                <div class="flex justify-between items-center mb-2">
+                    <h2 id="form-titulo" class="text-sm font-semibold text-gray-900 dark:text-white">Adicionar Novo Produto</h2>
                 </div>
                 
-                <form id="form-compra" class="space-y-3" onsubmit="salvarItemCompra(event)">
+                <form id="form-compra" class="space-y-2.5" onsubmit="salvarItemCompra(event)">
                     <input type="hidden" id="edit-compra-id">
-                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                        <div class="sm:col-span-2">
-                            <label class="block text-[11px] font-semibold text-gray-500 dark:text-gray-400 uppercase mb-1">Produto</label>
-                            <input type="text" id="compra-nome" required placeholder="Ex: Macarrão, Sabão..." class="w-full px-3 py-2 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 dark:text-white">
+                    
+                    <!-- NOME E QTD LADO A LADO -->
+                    <div class="grid grid-cols-4 gap-2">
+                        <div class="col-span-3">
+                            <label class="block text-[10px] font-semibold text-gray-500 dark:text-gray-400 uppercase mb-0.5">Produto</label>
+                            <input type="text" id="compra-nome" required placeholder="Ex: Arroz, Sabão..." class="w-full px-3 py-2 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 dark:text-white">
                         </div>
-                        <div>
-                            <label class="block text-[11px] font-semibold text-gray-500 dark:text-gray-400 uppercase mb-1">Qtd</label>
-                            <input type="number" id="compra-qtd" required min="1" value="1" class="w-full px-3 py-2 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 dark:text-white">
+                        <div class="col-span-1">
+                            <label class="block text-[10px] font-semibold text-gray-500 dark:text-gray-400 uppercase mb-0.5">Qtd</label>
+                            <input type="number" id="compra-qtd" required min="1" value="1" class="w-full px-2 py-2 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl text-sm text-center focus:outline-none focus:ring-2 focus:ring-blue-500 dark:text-white">
                         </div>
                     </div>
+
                     <div>
-                        <label class="block text-[11px] font-semibold text-gray-500 dark:text-gray-400 uppercase mb-1">Preço Unitário (R$)</label>
+                        <label class="block text-[10px] font-semibold text-gray-500 dark:text-gray-400 uppercase mb-0.5">Preço Unitário (R$)</label>
                         <input type="number" id="compra-preco" required step="0.01" min="0" placeholder="0,00" class="w-full px-3 py-2 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 dark:text-white">
                     </div>
+
                     <div class="flex gap-2 pt-1">
-                        <button type="submit" id="btn-submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2.5 rounded-xl transition text-sm shadow-sm">
+                        <button type="submit" id="btn-submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 rounded-xl transition text-sm shadow-sm">
                             ➕ Adicionar à Lista
                         </button>
-                        <button type="button" id="btn-cancelar" onclick="cancelarEdicao()" class="hidden bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 text-gray-700 dark:text-gray-200 px-4 py-2.5 rounded-xl text-sm transition">
+                        <button type="button" id="btn-cancelar" onclick="cancelarEdicao()" class="hidden bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 text-gray-700 dark:text-gray-200 px-3 py-2 rounded-xl text-sm transition">
                             Cancelar
                         </button>
                     </div>
@@ -156,25 +160,25 @@
             </div>
 
             <!-- TABELA DE ITENS COMPACTA -->
-            <div class="bg-white dark:bg-gray-800 p-5 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 space-y-4">
+            <div class="bg-white dark:bg-gray-800 p-4 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 space-y-3">
                 <div class="flex justify-between items-center">
-                    <h3 id="status-progresso" class="text-md font-semibold text-gray-900 dark:text-white">Itens na Lista (0)</h3>
+                    <h3 id="status-progresso" class="text-sm font-semibold text-gray-900 dark:text-white">Itens na Lista (0)</h3>
                     <div class="flex gap-2">
-                        <button onclick="limparListaCompras()" class="text-xs text-red-500 hover:underline">Limpar Mês Atual</button>
+                        <button onclick="limparListaCompras()" class="text-xs text-red-500 hover:underline">Limpar Mês</button>
                     </div>
                 </div>
 
                 <div class="overflow-x-auto">
                     <table class="w-full text-left border-collapse">
                         <thead>
-                            <tr class="border-b border-gray-100 dark:border-gray-700 text-[11px] font-semibold text-gray-400 uppercase">
-                                <th class="py-2.5 px-3">Item / Detalhes</th>
-                                <th class="py-2.5 px-2 text-center w-24">Ações</th>
+                            <tr class="border-b border-gray-100 dark:border-gray-700 text-[10px] font-semibold text-gray-400 uppercase">
+                                <th class="py-2 px-2">Item / Detalhes</th>
+                                <th class="py-2 px-2 text-center w-24">Ações</th>
                             </tr>
                         </thead>
                         <tbody id="tabela-compras" class="divide-y divide-gray-50 dark:divide-gray-700 text-sm">
                             <tr>
-                                <td colspan="2" class="py-8 text-center text-gray-400">Nenhum item neste mês. Use o microfone abaixo para adicionar!</td>
+                                <td colspan="2" class="py-6 text-center text-gray-400 text-xs">Nenhum item neste mês. Use o microfone abaixo para adicionar!</td>
                             </tr>
                         </tbody>
                     </table>
@@ -554,7 +558,7 @@
         function renderizarTabelaCompras() {
             let lista = obterListaDoMes();
             const tbody = document.getElementById('tabela-compras');
-            document.getElementById('status-progresso').textContent = `Itens no Mês (${lista.length})`;
+            document.getElementById('status-progresso').textContent = `Itens na Lista (${lista.length})`;
 
             let totalGeral = 0;
             lista.forEach(i => { totalGeral += (i.qtd * i.preco); });
@@ -588,7 +592,7 @@
             }
 
             if (lista.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="2" class="py-8 text-center text-gray-400">Nenhum item neste mês. Use o microfone abaixo para adicionar!</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="2" class="py-6 text-center text-gray-400 text-xs">Nenhum item neste mês. Use o microfone abaixo para adicionar!</td></tr>`;
                 return;
             }
 
@@ -597,7 +601,7 @@
 
                 return `
                     <tr class="hover:bg-gray-50/50 dark:hover:bg-gray-700/50 transition">
-                        <td class="py-2.5 px-3">
+                        <td class="py-2.5 px-2">
                             <div class="flex items-center justify-between">
                                 <span class="text-xs font-semibold text-gray-900 dark:text-white">${i.nome}</span>
                                 <span class="text-[11px] bg-blue-50 dark:bg-blue-950/50 text-blue-600 dark:text-blue-400 px-1.5 py-0.5 rounded font-bold">${i.qtd}x</span>
