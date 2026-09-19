@@ -304,7 +304,7 @@
             }
         }
 
-        // MOTOR DE RECONHECIMENTO DE VOZ INTELIGENTE ATUALIZADO
+        // MOTOR DE RECONHECIMENTO DE VOZ INTELIGENTE ATUALIZADO (SEPARAÇÃO CORRETA)
         function ouvirVoz() {
             const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
             if (!SpeechRecognition) {
@@ -346,7 +346,7 @@
             btnVoz.classList.add('bg-red-500', 'hover:bg-red-600');
         }
 
-        // NOVO ANALISADOR INTELIGENTE DE FRASE COMPLETA
+        // NOVO MOTOR DE SEPARAÇÃO: NOME ANTES DOS NÚMEROS, QTD E PREÇO DEPOIS
         function processarFalaInteligente(texto) {
             let limpo = texto.toLowerCase()
                 .replace(/quantidade/g, '')
@@ -355,67 +355,53 @@
                 .replace(/por/g, '');
 
             // Converter palavras faladas comuns para números digitais
-            limpo = limpo.replace(/\bhum\b|\buma\b/g, '1')
-                         .replace(/\bdois\b|\bduas\b/g, '2')
-                         .replace(/\btrês\b/g, '3')
-                         .replace(/\bquatro\b/g, '4')
-                         .replace(/\bcinco\b/g, '5')
-                         .replace(/\bseis\b/g, '6')
-                         .replace(/\bsete\b/g, '7')
-                         .replace(/\boito\b/g, '8')
-                         .replace(/\bnove\b/g, '9')
-                         .replace(/\bdez\b/g, '10');
+            const mapaNums = {
+                'um': '1', 'uma': '1', 'dois': '2', 'duas': '2', 'três': '3', 'tres': '3',
+                'quatro': '4', 'cinco': '5', 'seis': '6', 'sete': '7', 'oito': '8', 'nove': '9', 'dez': '10',
+                'onze': '11', 'doze': '12', 'treze': '13', 'quatorze': '14', 'quinze': '15',
+                'vinte': '20', 'trinta': '30', 'quarenta': '40', 'cinquenta': '50'
+            };
 
-            // Ajustar vírgula decimal para ponto (ex: 17,90 -> 17.90)
-            limpo = limpo.replace(/(\d+),(\d+)/g, '$1.$2');
+            let palavras = limpo.split(/\s+/);
+            let tokensProcessados = palavras.map(p => mapaNums[p] !== undefined ? mapaNums[p] : p);
+            let textoProcessado = tokensProcessados.join(' ').replace(/(\d+),(\d+)/g, '$1.$2');
 
-            // Encontrar todos os números na frase
-            const regexNums = /\d+(\.\d+)?/g;
-            const numsMatch = limpo.match(regexNums);
+            let partes = textoProcessado.split(/\s+/);
+            let nomeArr = [];
+            let numerosEncontrados = [];
 
-            let preco = 0;
-            let qtd = 1;
-            let nomeProduto = limpo;
-
-            if (numsMatch && numsMatch.length > 0) {
-                let numeros = numsMatch.map(Number);
-
-                // Verificar se algum número tem ponto decimal (ex: 17.90) -> esse é o preço
-                let comPonto = numeros.find(n => String(n).includes('.'));
-                
-                if (comPonto !== undefined) {
-                    preco = comPonto;
-                    let outros = numeros.filter(n => n !== comPonto);
-                    if (outros.length > 0) {
-                        qtd = outros[0];
-                    }
-                } else if (numeros.length >= 2) {
-                    // Se houver dois números inteiros (ex: feijão 2 18), o primeiro é qtd e o segundo é preço
-                    qtd = numeros[0];
-                    preco = numeros[1];
-                } else if (numeros.length === 1) {
-                    // Se houver apenas um número, verificamos se é maior que 10 (preço) ou pequeno (quantidade)
-                    if (numeros[0] > 10) {
-                        preco = numeros[0];
-                    } else {
-                        qtd = numeros[0];
+            partes.forEach(parte => {
+                let num = parseFloat(parte);
+                if (!isNaN(num) && parte.match(/^\d+(\.\d+)?$/)) {
+                    numerosEncontrados.push(num);
+                } else {
+                    if (numerosEncontrados.length === 0) {
+                        nomeArr.push(parte);
                     }
                 }
+            });
 
-                // Remover os números da string para ficar apenas com o nome do produto
-                numsMatch.forEach(numStr => {
-                    nomeProduto = nomeProduto.replace(numStr, '');
-                });
+            let nomeProduto = nomeArr.join(' ');
+            let qtd = 1;
+            let preco = 0;
+
+            if (numerosEncontrados.length === 1) {
+                let n = numerosEncontrados[0];
+                if (String(n).includes('.') || n > 15) {
+                    preco = n;
+                    qtd = 1;
+                } else {
+                    qtd = n;
+                    preco = 0;
+                }
+            } else if (numerosEncontrados.length >= 2) {
+                qtd = numerosEncontrados[0];
+                preco = numerosEncontrados[1];
             }
 
-            // Limpar espaços extras do nome
-            nomeProduto = nomeProduto.replace(/\s+/g, ' ').trim();
             if (!nomeProduto) nomeProduto = texto;
-
-            // Capitalizar a primeira letra do produto
             nomeProduto = nomeProduto.charAt(0).toUpperCase() + nomeProduto.slice(1);
 
-            // Preencher os campos automaticamente
             document.getElementById('compra-nome').value = nomeProduto;
             document.getElementById('compra-qtd').value = qtd > 0 ? qtd : 1;
             if (preco > 0) {
