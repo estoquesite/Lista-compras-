@@ -89,41 +89,44 @@
                         </select>
                     </div>
                     <button onclick="abrirRelatorioAnual()" class="w-full sm:w-auto bg-amber-600 hover:bg-amber-700 text-white px-3 py-1.5 rounded-xl text-xs font-medium transition shadow-sm flex items-center justify-center gap-1">
-                        📊 Relatório Anual (Mês a Mês)
+                        📊 Detalhes Mês a Mês
                     </button>
                 </div>
 
-                <!-- PAINEL DE VALORES: TICKET E DINHEIRO EM CIMA (LADO A LADO), TOTAL DO MÊS EMBAIXO -->
-                <div class="space-y-2">
-                    <!-- Linha de Cima: Ticket e Dinheiro Lado a Lado -->
-                    <div class="grid grid-cols-2 gap-2">
-                        <!-- Saldo Ticket -->
-                        <div class="bg-gray-50 dark:bg-gray-800 p-3 rounded-xl border border-gray-100 dark:border-gray-700 relative">
-                            <div class="flex justify-between items-center">
-                                <p class="text-[10px] font-semibold text-indigo-600 dark:text-indigo-400 uppercase">💳 Ticket Restante</p>
-                                <button onclick="alterarTicket()" class="text-xs text-indigo-500 hover:underline">✏️ Definir</button>
-                            </div>
-                            <p id="saldo-ticket" class="text-sm sm:text-base font-bold text-indigo-600 dark:text-indigo-400 mt-0.5">R$ 0</p>
-                            <p id="info-ticket-total" class="text-[9px] text-gray-400 mt-0.5 truncate">Inicial: não def.</p>
+                <!-- PAINEL UNIFICADO COM AS 4 CAIXINHAS NA MESMA VISÃO -->
+                <div class="grid grid-cols-2 gap-2">
+                    <!-- 1. Saldo Ticket -->
+                    <div class="bg-gray-50 dark:bg-gray-800 p-3 rounded-xl border border-gray-100 dark:border-gray-700 relative">
+                        <div class="flex justify-between items-center">
+                            <p class="text-[10px] font-semibold text-indigo-600 dark:text-indigo-400 uppercase">💳 Ticket Restante</p>
+                            <button onclick="alterarTicket()" class="text-xs text-indigo-500 hover:underline">✏️ Definir</button>
                         </div>
-                        <!-- Dinheiro -->
-                        <div class="bg-gray-50 dark:bg-gray-800 p-3 rounded-xl border border-gray-100 dark:border-gray-700 relative">
-                            <div class="flex justify-between items-center">
-                                <p class="text-[10px] font-semibold text-amber-600 dark:text-amber-400 uppercase">💵 Dinheiro</p>
-                                <button onclick="alterarDinheiro()" class="text-xs text-amber-500 hover:underline">✏️ Definir</button>
-                            </div>
-                            <p id="saldo-dinheiro" class="text-sm sm:text-base font-bold text-amber-600 dark:text-amber-400 mt-0.5">R$ 0</p>
-                            <p class="text-[9px] text-gray-400 mt-0.5 truncate">Orçamento em espécie</p>
-                        </div>
+                        <p id="saldo-ticket" class="text-sm sm:text-base font-bold text-indigo-600 dark:text-indigo-400 mt-0.5">R$ 0</p>
+                        <p id="info-ticket-total" class="text-[9px] text-gray-400 mt-0.5 truncate">Inicial: não def.</p>
                     </div>
 
-                    <!-- Linha de Baixo: Total do Mês (Destaque Maior) -->
-                    <div class="bg-blue-50/60 dark:bg-blue-950/30 p-3.5 rounded-xl border border-blue-100 dark:border-blue-900/40 flex justify-between items-center">
-                        <div>
-                            <p class="text-[11px] font-bold text-blue-700 dark:text-blue-300 uppercase tracking-wide">🛒 Total Gasto no Mês</p>
-                            <p class="text-[10px] text-gray-500 dark:text-gray-400">Soma de todos os produtos do mês</p>
+                    <!-- 2. Dinheiro -->
+                    <div class="bg-gray-50 dark:bg-gray-800 p-3 rounded-xl border border-gray-100 dark:border-gray-700 relative">
+                        <div class="flex justify-between items-center">
+                            <p class="text-[10px] font-semibold text-amber-600 dark:text-amber-400 uppercase">💵 Dinheiro</p>
+                            <button onclick="alterarDinheiro()" class="text-xs text-amber-500 hover:underline">✏️ Definir</button>
                         </div>
-                        <p id="total-geral" class="text-lg sm:text-xl font-extrabold text-gray-900 dark:text-white">R$ 0</p>
+                        <p id="saldo-dinheiro" class="text-sm sm:text-base font-bold text-amber-600 dark:text-amber-400 mt-0.5">R$ 0</p>
+                        <p class="text-[9px] text-gray-400 mt-0.5 truncate">Orçamento em espécie</p>
+                    </div>
+
+                    <!-- 3. Total do Mês -->
+                    <div class="bg-gray-50 dark:bg-gray-800 p-3 rounded-xl border border-gray-100 dark:border-gray-700">
+                        <p class="text-[10px] font-semibold text-gray-400 uppercase">🛒 Total do Mês</p>
+                        <p id="total-geral" class="text-sm sm:text-base font-bold text-gray-900 dark:text-white mt-0.5">R$ 0</p>
+                        <p class="text-[9px] text-gray-400 mt-0.5">Gastos atuais</p>
+                    </div>
+
+                    <!-- 4. Total Gasto no Ano -->
+                    <div class="bg-gray-50 dark:bg-gray-800 p-3 rounded-xl border border-gray-100 dark:border-gray-700">
+                        <p class="text-[10px] font-semibold text-emerald-600 dark:text-emerald-400 uppercase">🌟 Total Gasto Ano</p>
+                        <p id="total-ano" class="text-sm sm:text-base font-bold text-emerald-600 dark:text-emerald-400 mt-0.5">R$ 0</p>
+                        <p class="text-[9px] text-gray-400 mt-0.5">Acumulado anual</p>
                     </div>
                 </div>
 
@@ -133,7 +136,7 @@
         <!-- CONTEÚDO PRINCIPAL -->
         <div class="max-w-4xl mx-auto p-4 sm:p-6 space-y-6">
             
-            <!-- FORMULÁRIO COMPACTO EM UMA SÓ LINHA (NOME, QTD, PREÇO) -->
+            <!-- FORMULÁRIO COMPACTO EM UMA SÓ LINHA -->
             <div class="bg-white dark:bg-gray-800 p-4 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700">
                 <div class="flex justify-between items-center mb-2">
                     <h2 id="form-titulo" class="text-sm font-semibold text-gray-900 dark:text-white">Adicionar Novo Produto</h2>
@@ -452,6 +455,17 @@
             localStorage.setItem('historico_compras_mensal', JSON.stringify(cacheGeral));
         }
 
+        function calcularTotalAno() {
+            let cacheGeral = JSON.parse(localStorage.getItem('historico_compras_mensal') || '{}');
+            let totalAno = 0;
+            mesesArray.forEach(m => {
+                let chave = `${m}_${anoSelecionado}`;
+                let listaMes = cacheGeral[chave] || [];
+                listaMes.forEach(i => { totalAno += (i.qtd * i.preco); });
+            });
+            return totalAno;
+        }
+
         // RELATÓRIO ANUAL
         function abrirRelatorioAnual() {
             document.getElementById('titulo-modal-ano').textContent = `📊 Relatório Mês a Mês (${anoSelecionado})`;
@@ -573,6 +587,7 @@
             lista.forEach(i => { totalGeral += (i.qtd * i.preco); });
 
             document.getElementById('total-geral').textContent = `R$ ${totalGeral.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+            document.getElementById('total-ano').textContent = `R$ ${calcularTotalAno().toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
 
             // TICKET RESTANTE
             let ticketTotal = obterTicketDoMes();
