@@ -14,7 +14,7 @@
         <header class="bg-white rounded-2xl shadow-sm p-6 border border-gray-100 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
             <div>
                 <h1 class="text-2xl font-bold text-gray-900">🛒 Lista de Compras Mensal</h1>
-                <p class="text-sm text-gray-500">Adicione produtos e controle os gastos na hora</p>
+                <p class="text-sm text-gray-500">Adicione, edite produtos e controle os gastos na hora</p>
             </div>
             <div>
                 <button onclick="limparListaCompras()" class="bg-red-50 hover:bg-red-100 text-red-600 px-3 py-2 rounded-lg text-xs font-medium transition border border-red-200">
@@ -23,7 +23,7 @@
             </div>
         </header>
 
-        <!-- Cards de Resumo no Topo (Atualizam na hora) -->
+        <!-- Cards de Resumo no Topo -->
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex justify-between items-center">
                 <div>
@@ -41,10 +41,11 @@
             </div>
         </div>
 
-        <!-- Formulário para Adicionar Item Direto na Tela -->
+        <!-- Formulário para Adicionar / Editar Item -->
         <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
-            <h2 class="text-lg font-semibold text-gray-900 mb-4">Adicionar Produto Rápido</h2>
-            <form id="form-compra" class="space-y-4" onsubmit="adicionarItemCompra(event)">
+            <h2 id="form-titulo" class="text-lg font-semibold text-gray-900 mb-4">Adicionar Produto Rápido</h2>
+            <form id="form-compra" class="space-y-4" onsubmit="salvarItemCompra(event)">
+                <input type="hidden" id="edit-compra-id">
                 <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
                     <div class="sm:col-span-1">
                         <label class="block text-xs font-semibold text-gray-600 uppercase mb-1">Produto</label>
@@ -59,9 +60,14 @@
                         <input type="number" id="compra-preco" required step="0.01" min="0" placeholder="0,00" class="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
                     </div>
                 </div>
-                <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2.5 rounded-lg transition text-sm shadow-sm">
-                    ➕ Adicionar à Lista
-                </button>
+                <div class="flex gap-2">
+                    <button type="submit" id="btn-submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2.5 rounded-lg transition text-sm shadow-sm">
+                        ➕ Adicionar à Lista
+                    </button>
+                    <button type="button" id="btn-cancelar" onclick="cancelarEdicao()" class="hidden bg-gray-200 hover:bg-gray-300 text-gray-700 px-4 py-2.5 rounded-lg text-sm transition">
+                        Cancelar
+                    </button>
+                </div>
             </form>
         </div>
 
@@ -95,7 +101,7 @@
 
     </div>
 
-    <!-- Script de Gestão Direta -->
+    <!-- Script de Gestão com Edição e Exclusão -->
     <script>
         let listaComprasCache = JSON.parse(localStorage.getItem('minha_lista_compras_direta') || '[]');
 
@@ -103,25 +109,59 @@
             renderizarTabelaCompras();
         });
 
-        function adicionarItemCompra(e) {
+        function salvarItemCompra(e) {
             e.preventDefault();
+            const editId = document.getElementById('edit-compra-id').value;
             const nome = document.getElementById('compra-nome').value.trim();
             const qtd = parseFloat(document.getElementById('compra-qtd').value) || 1;
             const preco = parseFloat(document.getElementById('compra-preco').value) || 0;
 
-            const novoItem = {
-                id: Date.now(),
-                nome: nome,
-                qtd: qtd,
-                preco: preco,
-                peguei: false
-            };
+            if (editId) {
+                // Atualizar item existente
+                const item = listaComprasCache.find(i => i.id == editId);
+                if (item) {
+                    item.nome = nome;
+                    item.qtd = qtd;
+                    item.preco = preco;
+                }
+            } else {
+                // Adicionar novo item
+                const novoItem = {
+                    id: Date.now(),
+                    nome: nome,
+                    qtd: qtd,
+                    preco: preco,
+                    peguei: false
+                };
+                listaComprasCache.push(novoItem);
+            }
 
-            listaComprasCache.push(novoItem);
             salvarEAtualizar();
+            cancelarEdicao();
+        }
+
+        function prepararEdicao(id) {
+            const item = listaComprasCache.find(i => i.id === id);
+            if (!item) return;
+
+            document.getElementById('edit-compra-id').value = item.id;
+            document.getElementById('compra-nome').value = item.nome;
+            document.getElementById('compra-qtd').value = item.qtd;
+            document.getElementById('compra-preco').value = item.preco;
+
+            document.getElementById('form-titulo').textContent = 'Editar Produto';
+            document.getElementById('btn-submit').textContent = 'Atualizar Item';
+            document.getElementById('btn-cancelar').classList.remove('hidden');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function cancelarEdicao() {
             document.getElementById('form-compra').reset();
+            document.getElementById('edit-compra-id').value = '';
             document.getElementById('compra-qtd').value = '1';
-            document.getElementById('compra-nome').focus();
+            document.getElementById('form-titulo').textContent = 'Adicionar Produto Rápido';
+            document.getElementById('btn-submit').textContent = '➕ Adicionar à Lista';
+            document.getElementById('btn-cancelar').classList.add('hidden');
         }
 
         function toggleItemPeguei(id) {
@@ -133,14 +173,17 @@
         }
 
         function apagarItemCompra(id) {
-            listaComprasCache = listaComprasCache.filter(i => i.id !== id);
-            salvarEAtualizar();
+            if (confirm('Deseja excluir este item da lista?')) {
+                listaComprasCache = listaComprasCache.filter(i => i.id !== id);
+                salvarEAtualizar();
+            }
         }
 
         function limparListaCompras() {
             if (confirm('Deseja apagar todos os itens da lista?')) {
                 listaComprasCache = [];
                 salvarEAtualizar();
+                cancelarEdicao();
             }
         }
 
@@ -179,7 +222,8 @@
                         <td class="py-3 px-2 text-center">${i.qtd}</td>
                         <td class="py-3 px-2 text-right">R$ ${i.preco.toFixed(2)}</td>
                         <td class="py-3 px-2 text-right font-medium">R$ ${totalItem.toFixed(2)}</td>
-                        <td class="py-3 px-2 text-center">
+                        <td class="py-3 px-2 text-center space-x-2">
+                            <button onclick="prepararEdicao(${i.id})" class="text-blue-600 hover:text-blue-800 text-xs font-medium transition">Editar</button>
                             <button onclick="apagarItemCompra(${i.id})" class="text-gray-400 hover:text-red-600 text-xs font-medium transition">Excluir</button>
                         </td>
                     </tr>
