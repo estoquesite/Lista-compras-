@@ -3,9 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Lista de Compras</title>
+    <title>Minha Lista de Compras</title>
+    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <script>tailwind.config = { darkMode: 'class' }</script>
+    <script>
+        tailwind.config = { darkMode: 'class' }
+    </script>
+    <!-- Manifesto PWA para Instalar como App no Celular -->
     <link id="pwa-manifest" rel="manifest" href="data:application/manifest+json;charset=utf-8,{
         %22name%22: %22Lista de Compras%22,
         %22short_name%22: %22Compras%22,
@@ -15,34 +19,231 @@
         %22theme_color%22: %22%232563eb%22,
         %22icons%22: [{%22src%22: %22https://cdn-icons-png.flaticon.com/512/1170/1170678.png%22, %22sizes%22: %22512x512%22, %22type%22: %22image/png%22}]
     }">
+    <style>
+        :root {
+            --primary-color: #2563eb;
+            --secondary-color: #eff6ff;
+            --bg-color: #f8fafc;
+            --card-bg: #ffffff;
+            --text-color: #333333;
+            --border-color: #cbd5e1;
+        }
+        * { box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 10px;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 20px;
+            padding-top: 5px;
+        }
+        .header h2 {
+            color: var(--primary-color);
+            font-size: 26px;
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin: 0;
+        }
+        .item-box {
+            font-weight: 600;
+            color: #1e40af;
+            background-color: #f1f5f9;
+            padding: 8px 12px;
+            border-radius: 8px;
+            margin-bottom: 6px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 13px;
+            border-left: 3px solid #2563eb;
+            cursor: grab;
+        }
+        .item-box:active {
+            cursor: grabbing;
+        }
+        .item-controls {
+            display: flex;
+            gap: 6px;
+            align-items: center;
+        }
+        .drag-handle {
+            cursor: grab;
+            font-size: 14px;
+            color: #888;
+            padding: 0 4px;
+            user-select: none;
+        }
+        .btn-action-item {
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 12px;
+            padding: 0 4px;
+            border-radius: 3px;
+        }
+        .btn-edit-item:hover {
+            background-color: rgba(0, 0, 0, 0.1);
+        }
+        .btn-delete-item {
+            color: #c62828;
+            font-weight: bold;
+            font-size: 13px;
+        }
+        .btn-delete-item:hover {
+            background-color: rgba(198, 40, 40, 0.1);
+        }
+        .dragging {
+            opacity: 0.4;
+        }
+    </style>
 </head>
-<body class="bg-blue-50 dark:bg-gray-900 text-gray-800 dark:text-gray-100 p-4 pb-28">
-    <div class="max-w-md mx-auto space-y-4">
-        <header class="text-center py-4 bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-blue-100 dark:border-gray-700">
-            <h1 class="text-lg font-black text-blue-700 dark:text-blue-400 uppercase tracking-wide">🛒 Minha Lista de Compras</h1>
-        </header>
+<body class="bg-blue-50/50 dark:bg-gray-900 text-gray-800 dark:text-gray-100 transition-colors duration-200 pb-28">
 
-        <!-- Painel Adicionar Item -->
-        <div class="bg-white dark:bg-gray-800 p-4 rounded-2xl shadow-sm space-y-3 border border-gray-100 dark:border-gray-700 flex gap-2">
-            <input type="text" id="itemCompra" placeholder="Adicionar item..." class="flex-1 text-xs p-2.5 bg-gray-50 dark:bg-gray-900 border rounded-xl">
-            <button onclick="adicionarItemCompra()" class="bg-blue-600 hover:bg-blue-700 text-white font-bold px-4 rounded-xl text-xs transition">
-                + Adicionar
+    <!-- TELA DE LOGIN / PIN 1510 E BIOMETRIA -->
+    <div id="tela-login" class="fixed inset-0 z-50 bg-blue-950/90 backdrop-blur-sm flex items-center justify-center p-4">
+        <div class="bg-white dark:bg-gray-800 p-6 sm:p-8 rounded-3xl shadow-2xl max-w-sm w-full text-center space-y-4 border border-blue-100 dark:border-gray-700">
+            <div class="w-16 h-16 bg-blue-50 dark:bg-blue-950/50 rounded-2xl mx-auto flex items-center justify-center text-3xl">🛒</div>
+            <div>
+                <h2 class="text-xl font-bold text-gray-900 dark:text-white">Acesso Restrito</h2>
+                <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Lista de Compras</p>
+            </div>
+            
+            <form onsubmit="verificarLogin(event)" class="space-y-3 text-left">
+                <div>
+                    <label class="block text-[11px] font-semibold text-gray-500 dark:text-gray-400 uppercase mb-1">Senha (PIN)</label>
+                    <input type="password" id="input-senha" required placeholder="••••" class="w-full px-4 py-2.5 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl text-center text-lg tracking-widest focus:outline-none focus:ring-2 focus:ring-blue-500 dark:text-white">
+                </div>
+                <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-3 rounded-xl transition text-sm shadow-sm">
+                    Entrar com Senha PIN
+                </button>
+            </form>
+
+            <button type="button" onclick="entrarComBiometria()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-3 rounded-xl transition text-sm shadow-sm flex items-center justify-center gap-2">
+                <span>🔐</span> Entrar com Biometria
+            </button>
+
+            <p id="erro-senha" class="text-xs text-red-500 hidden font-medium">Senha incorreta! A senha correta é 1510.</p>
+        </div>
+    </div>
+
+    <!-- CONTEÚDO PRINCIPAL DA LISTA DE COMPRAS -->
+    <div id="conteudo-site" class="hidden container" id="printableArea">
+        <div class="header">
+            <h2>🛒 Minha Lista de Compras</h2>
+        </div>
+
+        <!-- RESUMO DO TICKET / VALOR TOTAL -->
+        <div class="bg-blue-600 text-white p-4 rounded-2xl shadow-md max-w-xl mx-auto mb-4 flex justify-between items-center">
+            <div>
+                <p class="text-[10px] uppercase font-bold tracking-wider opacity-90">Valor Total Estimado (Ticket)</p>
+                <h3 id="valorTotalTicket" class="text-xl font-extrabold">R$ 0,00</h3>
+            </div>
+            <div class="text-2xl">💰</div>
+        </div>
+
+        <!-- LISTA DE ITENS -->
+        <div class="bg-white dark:bg-gray-800 p-4 rounded-2xl shadow-sm border border-blue-100 dark:border-gray-700 max-w-xl mx-auto mb-6">
+            <h3 class="text-xs font-bold uppercase text-blue-800 dark:text-blue-400 mb-3">Itens para Comprar</h3>
+            <div id="listaContainer" class="space-y-1.5" ondragover="permitirDrop(event)" ondrop="soltarItem(event)">
+                <!-- Itens carregados dinamicamente -->
+            </div>
+        </div>
+
+        <div class="flex justify-center gap-3 print-hidden mb-6">
+            <button onclick="imprimirLista()" class="bg-blue-600 hover:bg-blue-700 text-white font-bold px-5 py-2.5 rounded-xl text-xs shadow-sm">
+                🖨️ Imprimir Lista (PDF)
+            </button>
+            <button onclick="limparTudo()" class="bg-red-100 text-red-700 dark:bg-red-950 dark:text-red-300 font-bold px-4 py-2.5 rounded-xl text-xs">
+                🗑️ Limpar Tudo
             </button>
         </div>
 
-        <!-- Lista -->
-        <div id="listaCompras" class="space-y-2"></div>
+        <!-- CAIXA DE ADICIONAR ITEM COM PREÇO -->
+        <div class="print-hidden bg-white dark:bg-gray-800 p-4 rounded-xl shadow-sm border border-blue-100 dark:border-gray-700 max-w-xl mx-auto space-y-3">
+            <h3 class="text-xs font-bold uppercase text-blue-800 dark:text-blue-400">✨ Adicionar Item e Preço (Dinheiro)</h3>
+            
+            <div>
+                <label class="block text-[10px] font-semibold uppercase text-gray-500 mb-1">Itens Frequentes / Atalhos</label>
+                <div class="flex gap-2">
+                    <select id="selectFrequentes" onchange="preencherPredefinido()" class="flex-1 text-xs p-2 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg dark:text-white font-medium">
+                        <option value="">-- Escolher item frequente --</option>
+                    </select>
+                    <button onclick="adicionarNovoFrequente()" class="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1.5 rounded-lg text-xs font-bold" title="Novo item frequente">➕ Novo</button>
+                    <button onclick="gerenciarFrequentes()" class="bg-gray-600 hover:bg-gray-700 text-white px-3 py-1.5 rounded-lg text-xs font-bold" title="Gerir itens frequentes">⚙️ Gerir</button>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-2">
+                <div class="sm:col-span-2">
+                    <label class="block text-[10px] font-semibold uppercase text-gray-500 mb-1">Descrição do Item</label>
+                    <input type="text" id="inputDesc" placeholder="Ex: Arroz, Feijão, Café..." class="w-full text-xs p-2.5 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg dark:text-white">
+                </div>
+                <div>
+                    <label class="block text-[10px] font-semibold uppercase text-gray-500 mb-1">Preço (R$)</label>
+                    <input type="number" step="0.01" id="inputPreco" placeholder="0,00" class="w-full text-xs p-2.5 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg dark:text-white font-bold">
+                </div>
+            </div>
+            <button onclick="adicionarItem()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2.5 rounded-lg text-xs transition">
+                ✓ Adicionar Item (OK)
+            </button>
+        </div>
     </div>
 
-    <!-- Barra Inferior Fixa -->
-    <div class="fixed bottom-0 left-0 right-0 bg-white/95 dark:bg-gray-900/95 backdrop-blur-md border-t border-gray-200 dark:border-gray-800 px-4 py-2 flex justify-between items-center max-w-md mx-auto rounded-t-2xl shadow-lg">
-        <button onclick="document.documentElement.classList.toggle('dark')" class="px-3 py-1.5 rounded-xl bg-gray-100 dark:bg-gray-800 text-xs font-semibold">🌙/☀️</button>
-        <button onclick="instalarApp()" class="px-3 py-1.5 rounded-xl bg-blue-100 dark:bg-blue-950 text-blue-800 dark:text-blue-300 text-xs font-bold">📱 Instalar App</button>
+    <!-- BARRA INFERIOR FIXA -->
+    <div class="print-hidden fixed bottom-0 left-0 right-0 z-40 bg-white/95 dark:bg-gray-900/95 backdrop-blur-md border-t border-gray-200 dark:border-gray-800 px-4 py-2 flex justify-between items-center max-w-xl mx-auto rounded-t-2xl shadow-lg">
+        <div class="flex items-center gap-2">
+            <button onclick="alternarDarkMode()" class="px-3 py-1.5 rounded-xl bg-gray-100 dark:bg-gray-800 text-xs font-semibold">🌙/☀️</button>
+            <button onclick="instalarApp()" class="px-3 py-1.5 rounded-xl bg-blue-100 dark:bg-blue-950 text-blue-800 dark:text-blue-300 text-xs font-bold">📱 Instalar App</button>
+            <button onclick="bloquearNovamente()" class="px-3 py-1.5 rounded-xl bg-gray-100 dark:bg-gray-800 text-xs font-semibold text-red-600">🔒 Sair</button>
+        </div>
+        <button onclick="ouvirVoz()" id="btn-voz" class="bg-red-600 hover:bg-red-700 text-white w-10 h-10 rounded-full shadow-lg flex items-center justify-center text-lg">🎤</button>
     </div>
 
     <script>
+        const SENHA_MESTRA = "1510";
+        let elementoArrastado = null;
         let deferredPrompt = null;
+
+        let itensFrequentesPadrao = ["CAFÉ", "LEITE", "AZEITE", "ARROZ", "FEIJÃO", "PÃO", "OVO", "MANTEIGA", "AÇÚCAR", "PAPEL HIGIÊNICO"];
+
         window.addEventListener('beforeinstallprompt', (e) => { e.preventDefault(); deferredPrompt = e; });
+
+        window.addEventListener('DOMContentLoaded', () => {
+            if (sessionStorage.getItem('autenticado_compras') === 'true') liberarAcesso();
+            if (localStorage.getItem('dark_mode_compras') === 'true') document.documentElement.classList.add('dark');
+            carregarFrequentes();
+
+            const salvo = localStorage.getItem('lista_compras_dinheiro_v1');
+            if(salvo) {
+                document.getElementById('listaContainer').innerHTML = salvo;
+                reativarEventosDragDrop();
+            } else {
+                // Exemplo inicial
+                document.getElementById('listaContainer').innerHTML = `
+                    <div class="item-box" draggable="true" ondragstart="iniciarArrasto(event)">
+                        <span><span class="drag-handle">⠿</span> <span class="item-text">CAFÉ</span> - <span class="item-preco">R$ 18,90</span></span>
+                        <span class="item-controls"><button onclick="editarItem(this)" class="btn-action-item btn-edit-item" title="Editar">✏️</button><button onclick="removerElemento(this)" class="btn-action-item btn-delete-item" title="Apagar">✕</button></span>
+                    </div>
+                `;
+            }
+            calcularTotal();
+
+            document.getElementById('inputPreco').addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') adicionarItem();
+            });
+            document.getElementById('inputDesc').addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') adicionarItem();
+            });
+        });
 
         function instalarApp() {
             if (deferredPrompt) {
@@ -53,16 +254,182 @@
             }
         }
 
-        function adicionarItemCompra() {
-            const item = document.getElementById('itemCompra').value.trim();
-            if(!item) return;
+        function verificarLogin(e) {
+            e.preventDefault();
+            if (document.getElementById('input-senha').value === SENHA_MESTRA) {
+                sessionStorage.setItem('autenticado_compras', 'true');
+                liberarAcesso();
+            } else {
+                document.getElementById('erro-senha').classList.remove('hidden');
+            }
+        }
 
-            const lista = document.getElementById('listaCompras');
+        async function entrarComBiometria() {
+            try {
+                const available = await PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable();
+                if (!available) return alert("Biometria não disponível neste aparelho.");
+                const challenge = new Uint8Array(32); window.crypto.getRandomValues(challenge);
+                const cred = await navigator.credentials.create({
+                    publicKey: { challenge, rp: { name: "Lista de Compras", id: window.location.hostname }, user: { id: new Uint8Array(16), name: "compras@local", displayName: "Mariana" }, pubKeyCredParams: [{alg: -7, type: "public-key"}] }
+                });
+                if(cred) { sessionStorage.setItem('autenticado_compras', 'true'); liberarAcesso(); }
+            } catch(e) { alert("Use a senha PIN (1510)."); }
+        }
+
+        function liberarAcesso() {
+            document.getElementById('tela-login').classList.add('hidden');
+            document.getElementById('conteudo-site').classList.remove('hidden');
+            calcularTotal();
+        }
+
+        function bloquearNovamente() {
+            sessionStorage.removeItem('autenticado_compras');
+            document.getElementById('conteudo-site').classList.add('hidden');
+            document.getElementById('tela-login').classList.remove('hidden');
+        }
+
+        function carregarFrequentes() {
+            let salvos = JSON.parse(localStorage.getItem('compras_frequentes')) || itensFrequentesPadrao;
+            const select = document.getElementById('selectFrequentes');
+            select.innerHTML = '<option value="">-- Escolher item frequente --</option>';
+            salvos.forEach(item => {
+                const opt = document.createElement('option');
+                opt.value = item; opt.innerText = item; select.appendChild(opt);
+            });
+        }
+
+        function adicionarNovoFrequente() {
+            const novo = prompt("Novo item frequente:");
+            if(novo && novo.trim() !== "") {
+                let salvos = JSON.parse(localStorage.getItem('compras_frequentes')) || itensFrequentesPadrao;
+                salvos.push(novo.trim().toUpperCase());
+                localStorage.setItem('compras_frequentes', JSON.stringify(salvos));
+                carregarFrequentes();
+            }
+        }
+
+        function gerenciarFrequentes() {
+            let salvos = JSON.parse(localStorage.getItem('compras_frequentes')) || itensFrequentesPadrao;
+            let escolha = prompt(`Itens Frequentes:\n${salvos.map((i,idx)=>`${idx+1}.${i}`).join('\n')}\n\nNúmero do item a apagar (ou cancelar):`);
+            if(escolha && !isNaN(escolha)) {
+                salvos.splice(parseInt(escolha)-1, 1);
+                localStorage.setItem('compras_frequentes', JSON.stringify(salvos));
+                carregarFrequentes();
+            }
+        }
+
+        function preencherPredefinido() {
+            const val = document.getElementById('selectFrequentes').value;
+            if(val) document.getElementById('inputDesc').value = val.toUpperCase();
+        }
+
+        function adicionarItem() {
+            const desc = document.getElementById('inputDesc').value.trim().toUpperCase();
+            const precoVal = parseFloat(document.getElementById('inputPreco').value) || 0;
+
+            if(!desc) return alert("Digite a descrição do item.");
+
+            const container = document.getElementById('listaContainer');
+            const handleHtml = `<span class="drag-handle">⠿</span>`;
+            const controlsHtml = `<span class="item-controls"><button onclick="editarItem(this)" class="btn-action-item btn-edit-item" title="Editar">✏️</button><button onclick="removerElemento(this)" class="btn-action-item btn-delete-item" title="Apagar">✕</button></span>`;
+            
+            const precoFormatado = precoVal > 0 ? `R$ ${precoVal.toFixed(2).replace('.', ',')}` : '';
+
             const div = document.createElement('div');
-            div.className = "bg-white dark:bg-gray-800 p-3 rounded-xl shadow-sm border border-blue-100 dark:border-gray-700 flex justify-between items-center text-xs font-bold";
-            div.innerHTML = `<label class="flex items-center gap-2 cursor-pointer"><input type="checkbox" onchange="this.nextElementSibling.classList.toggle('line-through', this.checked)" class="w-4 h-4 accent-blue-600"><span>${item.toUpperCase()}</span></label><button onclick="this.parentElement.remove()" class="text-red-500 px-2">✕</button>`;
-            lista.appendChild(div);
-            document.getElementById('itemCompra').value = '';
+            div.className = 'item-box';
+            div.setAttribute('draggable', 'true');
+            div.setAttribute('ondragstart', 'iniciarArrasto(event)');
+            div.innerHTML = `<span>${handleHtml} <span class="item-text">${desc}</span> <span class="item-preco text-blue-600 dark:text-blue-400 font-bold">${precoFormatado}</span></span>${controlsHtml}`;
+            container.appendChild(div);
+
+            document.getElementById('inputDesc').value = '';
+            document.getElementById('inputPreco').value = '';
+            document.getElementById('selectFrequentes').value = '';
+            guardarEstadoDOM();
+        }
+
+        function calcularTotal() {
+            let total = 0;
+            document.querySelectorAll('.item-preco').forEach(el => {
+                let texto = el.innerText;
+                if(texto.includes('R$')) {
+                    let num = parseFloat(texto.replace('R$', '').trim().replace('.', '').replace(',', '.')) || 0;
+                    total += num;
+                }
+            });
+            document.getElementById('valorTotalTicket').innerText = `R$ ${total.toFixed(2).replace('.', ',')}`;
+        }
+
+        function editarItem(btn) {
+            const box = btn.closest('.item-box');
+            const spanText = box.querySelector('.item-text');
+            const spanPreco = box.querySelector('.item-preco');
+            
+            const novoTexto = prompt("Editar item:", spanText.innerText);
+            if(novoTexto !== null && novoTexto.trim() !== "") {
+                spanText.innerText = novoTexto.trim().toUpperCase();
+            }
+
+            const novoPreco = prompt("Editar preço (ex: 15.50):", spanPreco.innerText.replace('R$', '').trim());
+            if(novoPreco !== null) {
+                let val = parseFloat(novoPreco.replace(',', '.')) || 0;
+                spanPreco.innerText = val > 0 ? `R$ ${val.toFixed(2).replace('.', ',')}` : '';
+            }
+
+            guardarEstadoDOM();
+        }
+
+        function removerElemento(btn) {
+            btn.closest('.item-box').remove();
+            guardarEstadoDOM();
+        }
+
+        function iniciarArrasto(e) { elementoArrastado = e.currentTarget; e.currentTarget.classList.add('dragging'); }
+        function permitirDrop(e) { e.preventDefault(); if(elementoArrastado) e.currentTarget.appendChild(elementoArrastado); }
+        function soltarItem(e) { e.preventDefault(); if(elementoArrastado) { elementoArrastado.classList.remove('dragging'); elementoArrastado = null; guardarEstadoDOM(); } }
+
+        function reativarEventosDragDrop() {
+            document.querySelectorAll('.item-box').forEach(item => {
+                item.setAttribute('draggable', 'true');
+                item.setAttribute('ondragstart', 'iniciarArrasto(event)');
+            });
+            document.getElementById('listaContainer').setAttribute('ondragover', 'permitirDrop(event)');
+            document.getElementById('listaContainer').setAttribute('ondrop', 'soltarItem(event)');
+        }
+
+        function guardarEstadoDOM() {
+            localStorage.setItem('lista_compras_dinheiro_v1', document.getElementById('listaContainer').innerHTML);
+            calcularTotal();
+        }
+
+        function limparTudo() {
+            if(confirm("Deseja esvaziar a lista de compras?")) {
+                localStorage.removeItem('lista_compras_dinheiro_v1');
+                location.reload();
+            }
+        }
+
+        function alternarDarkMode() {
+            document.documentElement.classList.toggle('dark');
+            localStorage.setItem('dark_mode_compras', document.documentElement.classList.contains('dark'));
+        }
+
+        function ouvirVoz() {
+            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+            if(!SpeechRecognition) return alert("Reconhecimento de voz não suportado.");
+            const rec = new SpeechRecognition();
+            rec.lang = 'pt-PT';
+            rec.onresult = (e) => {
+                document.getElementById('inputDesc').value = e.results[0][0].transcript.toUpperCase();
+                adicionarItem(); // Manda o OK sozinho!
+            };
+            rec.start();
+        }
+
+        function imprimirLista() {
+            const win = window.open('', '_blank', 'width=800,height=700');
+            win.document.write(`<!DOCTYPE html><html lang="pt-PT"><head><meta charset="UTF-8"><title>Impressão</title><style>body{font-family:'Segoe UI',sans-serif;padding:20px;}.item-box{border:1px solid #ccc;padding:6px 10px;margin-bottom:6px;font-size:12px;font-weight:bold;border-left:3px solid #2563eb;display:flex;justify-content:space-between;}.drag-handle,.item-controls{display:none!important;}h2{color:#2563eb;text-align:center;}</style></head><body><h2>🛒 Minha Lista de Compras</h2><div style="margin-top:20px;">${document.getElementById('listaContainer').innerHTML}</div><h3 style="text-align:right;margin-top:20px;">${document.getElementById('valorTotalTicket').innerText}</h3><script>setTimeout(()=>window.print(),500);<\/script></body></html>`);
+            win.document.close();
         }
     </script>
 </body>
