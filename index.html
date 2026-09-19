@@ -6,111 +6,135 @@
     <title>Lista de Compras Inteligente</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = { darkMode: 'class' }
+    </script>
 </head>
-<body class="bg-gray-50 min-h-screen text-gray-800">
+<body class="bg-gray-50 dark:bg-gray-900 min-h-screen text-gray-800 dark:text-gray-100 transition-colors duration-200">
+    
+    <!-- TOPO FIXO (Sticky Header) para acompanhar a rolagem no mercado -->
+    <div class="sticky top-0 z-50 bg-white/95 dark:bg-gray-900/95 backdrop-blur-md shadow-sm border-b border-gray-100 dark:border-gray-800 transition-colors">
+        <div class="max-w-4xl mx-auto p-4 space-y-3">
+            
+            <!-- Cabeçalho Principal -->
+            <div class="flex justify-between items-center">
+                <div>
+                    <h1 class="text-xl font-bold text-gray-900 dark:text-white flex items-center gap-1.5">🛒 Lista de Compras</h1>
+                    <p class="text-xs text-gray-500 dark:text-gray-400">Modo Supermercado Ativo</p>
+                </div>
+                <div class="flex items-center gap-1.5">
+                    <button onclick="alternarDarkMode()" class="p-2 rounded-xl bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300 text-xs transition" title="Alternar Modo Escuro">
+                        🌙/☀️
+                    </button>
+                    <button onclick="partilharWhatsApp()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-2 rounded-xl text-xs font-medium transition flex items-center gap-1 shadow-sm">
+                        📱 WhatsApp
+                    </button>
+                    <button onclick="limparListaCompras()" class="bg-red-50 dark:bg-red-950/40 hover:bg-red-100 text-red-600 dark:text-red-400 p-2 rounded-xl text-xs transition border border-red-200 dark:border-red-900" title="Limpar Lista">
+                        🗑️
+                    </button>
+                </div>
+            </div>
+
+            <!-- 3 Cards de Resumo Compactos (Sempre Visíveis) -->
+            <div class="grid grid-cols-3 gap-2">
+                <div class="bg-gray-50 dark:bg-gray-800 p-3 rounded-xl border border-gray-100 dark:border-gray-700">
+                    <p class="text-[10px] font-semibold text-gray-400 uppercase">Total</p>
+                    <p id="total-geral" class="text-base sm:text-lg font-bold text-gray-900 dark:text-white mt-0.5">R$ 0</p>
+                </div>
+                <div class="bg-gray-50 dark:bg-gray-800 p-3 rounded-xl border border-gray-100 dark:border-gray-700">
+                    <p class="text-[10px] font-semibold text-emerald-600 dark:text-emerald-400 uppercase">Carrinho</p>
+                    <p id="total-peguei" class="text-base sm:text-lg font-bold text-emerald-600 dark:text-emerald-400 mt-0.5">R$ 0</p>
+                </div>
+                <div class="bg-gray-50 dark:bg-gray-800 p-3 rounded-xl border border-gray-100 dark:border-gray-700 relative">
+                    <div class="flex justify-between items-center">
+                        <p class="text-[10px] font-semibold text-indigo-600 dark:text-indigo-400 uppercase">Saldo Ticket</p>
+                        <button onclick="alterarTicket()" class="text-xs text-indigo-500 hover:underline">✏️</button>
+                    </div>
+                    <p id="saldo-ticket" class="text-base sm:text-lg font-bold text-indigo-600 dark:text-indigo-400 mt-0.5">R$ 1.000</p>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- CONTEÚDO PRINCIPAL -->
     <div class="max-w-4xl mx-auto p-4 sm:p-6 space-y-6">
         
-        <!-- Cabeçalho -->
-        <header class="bg-white rounded-2xl shadow-sm p-6 border border-gray-100 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-            <div>
-                <h1 class="text-2xl font-bold text-gray-900">🛒 Lista de Compras Mensal</h1>
-                <p class="text-sm text-gray-500">Controlo de gastos e saldo do ticket em tempo real</p>
-            </div>
-            <div class="flex flex-wrap items-center gap-2">
-                <button onclick="partilharWhatsApp()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-2 rounded-lg text-xs font-medium transition shadow-sm flex items-center gap-1">
-                    📱 Partilhar WhatsApp
-                </button>
-                <button onclick="limparListaCompras()" class="bg-red-50 hover:bg-red-100 text-red-600 px-3 py-2 rounded-lg text-xs font-medium transition border border-red-200">
-                    🗑️ Limpar Tudo
-                </button>
-            </div>
-        </header>
-
-        <!-- 3 Cards de Resumo no Topo (Incluindo o Saldo do Ticket) -->
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <!-- Card 1: Total da Lista -->
-            <div class="bg-white p-5 rounded-2xl shadow-sm border border-gray-100 flex justify-between items-center">
-                <div>
-                    <p class="text-xs font-medium text-gray-500 uppercase">Valor Total da Lista</p>
-                    <p id="total-geral" class="text-2xl font-bold text-gray-900 mt-1">R$ 0,00</p>
-                </div>
-                <div class="w-10 h-10 bg-blue-50 rounded-xl flex items-center justify-center text-blue-600 text-lg font-bold">📋</div>
-            </div>
-
-            <!-- Card 2: Valor no Carrinho (Peguei) -->
-            <div class="bg-white p-5 rounded-2xl shadow-sm border border-gray-100 flex justify-between items-center">
-                <div>
-                    <p class="text-xs font-medium text-gray-500 uppercase">No Carrinho (Peguei)</p>
-                    <p id="total-peguei" class="text-2xl font-bold text-emerald-600 mt-1">R$ 0,00</p>
-                </div>
-                <div class="w-10 h-10 bg-emerald-50 rounded-xl flex items-center justify-center text-emerald-600 text-lg font-bold">🛒</div>
-            </div>
-
-            <!-- Card 3: Saldo Restante do Ticket -->
-            <div class="bg-white p-5 rounded-2xl shadow-sm border border-gray-100 flex justify-between items-center relative">
-                <div>
-                    <div class="flex items-center gap-1">
-                        <p class="text-xs font-medium text-gray-500 uppercase">Saldo do Ticket</p>
-                        <button onclick="alterarTicket()" class="text-blue-600 text-xs hover:underline" title="Alterar valor do ticket">✏️</button>
-                    </div>
-                    <p id="saldo-ticket" class="text-2xl font-bold text-indigo-600 mt-1">R$ 1.000,00</p>
-                </div>
-                <div class="w-10 h-10 bg-indigo-50 rounded-xl flex items-center justify-center text-indigo-600 text-lg font-bold">💳</div>
+        <!-- ITENS FREQUENTES (Adição Rápida com 1 clique) -->
+        <div class="bg-white dark:bg-gray-800 p-4 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700">
+            <p class="text-xs font-semibold text-gray-400 uppercase mb-2">⚡ Adicionar Frequentes com 1 Clique</p>
+            <div class="flex flex-wrap gap-1.5" id="botoes-frequentes">
+                <button onclick="adicionarFavorito('Arroz 5kg', 1, 28.90, 'Mercearia')" class="px-3 py-1.5 bg-blue-50 dark:bg-blue-950/50 hover:bg-blue-100 text-blue-700 dark:text-blue-300 rounded-lg text-xs font-medium transition border border-blue-100 dark:border-blue-900">+ Arroz</button>
+                <button onclick="adicionarFavorito('Feijão 1kg', 2, 8.50, 'Mercearia')" class="px-3 py-1.5 bg-blue-50 dark:bg-blue-950/50 hover:bg-blue-100 text-blue-700 dark:text-blue-300 rounded-lg text-xs font-medium transition border border-blue-100 dark:border-blue-900">+ Feijão</button>
+                <button onclick="adicionarFavorito('Leite 1L', 6, 5.50, 'Mercearia')" class="px-3 py-1.5 bg-blue-50 dark:bg-blue-950/50 hover:bg-blue-100 text-blue-700 dark:text-blue-300 rounded-lg text-xs font-medium transition border border-blue-100 dark:border-blue-900">+ Leite</button>
+                <button onclick="adicionarFavorito('Café 500g', 1, 18.00, 'Mercearia')" class="px-3 py-1.5 bg-blue-50 dark:bg-blue-950/50 hover:bg-blue-100 text-blue-700 dark:text-blue-300 rounded-lg text-xs font-medium transition border border-blue-100 dark:border-blue-900">+ Café</button>
+                <button onclick="adicionarFavorito('Óleo de Soja', 2, 7.20, 'Mercearia')" class="px-3 py-1.5 bg-blue-50 dark:bg-blue-950/50 hover:bg-blue-100 text-blue-700 dark:text-blue-300 rounded-lg text-xs font-medium transition border border-blue-100 dark:border-blue-900">+ Óleo</button>
+                <button onclick="adicionarFavorito('Detergente', 4, 2.50, 'Limpeza')" class="px-3 py-1.5 bg-blue-50 dark:bg-blue-950/50 hover:bg-blue-100 text-blue-700 dark:text-blue-300 rounded-lg text-xs font-medium transition border border-blue-100 dark:border-blue-900">+ Detergente</button>
             </div>
         </div>
 
-        <!-- Formulário para Adicionar / Editar Item -->
-        <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
-            <h2 id="form-titulo" class="text-lg font-semibold text-gray-900 mb-4">Adicionar Produto Rápido</h2>
-            <form id="form-compra" class="space-y-4" onsubmit="salvarItemCompra(event)">
+        <!-- FORMULÁRIO DE CADASTRO / EDIÇÃO -->
+        <div class="bg-white dark:bg-gray-800 p-5 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700">
+            <h2 id="form-titulo" class="text-md font-semibold text-gray-900 dark:text-white mb-3">Adicionar Novo Produto</h2>
+            <form id="form-compra" class="space-y-3" onsubmit="salvarItemCompra(event)">
                 <input type="hidden" id="edit-compra-id">
-                <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                    <div class="sm:col-span-1">
-                        <label class="block text-xs font-semibold text-gray-600 uppercase mb-1">Produto</label>
-                        <input type="text" id="compra-nome" required placeholder="Ex: Feijão, Arroz..." class="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                <div class="grid grid-cols-1 sm:grid-cols-4 gap-3">
+                    <div class="sm:col-span-2">
+                        <label class="block text-[11px] font-semibold text-gray-500 dark:text-gray-400 uppercase mb-1">Produto</label>
+                        <input type="text" id="compra-nome" required placeholder="Ex: Macarrão, Sabão..." class="w-full px-3 py-2 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 dark:text-white">
                     </div>
                     <div>
-                        <label class="block text-xs font-semibold text-gray-600 uppercase mb-1">Quantidade</label>
-                        <input type="number" id="compra-qtd" required min="1" value="1" class="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        <label class="block text-[11px] font-semibold text-gray-500 dark:text-gray-400 uppercase mb-1">Setor</label>
+                        <select id="compra-setor" class="w-full px-3 py-2 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 dark:text-white">
+                            <option value="Mercearia">Mercearia</option>
+                            <option value="Hortifruti">Hortifruti</option>
+                            <option value="Açougue/Frios">Açougue/Frios</option>
+                            <option value="Limpeza">Limpeza</option>
+                            <option value="Outros">Outros</option>
+                        </select>
                     </div>
                     <div>
-                        <label class="block text-xs font-semibold text-gray-600 uppercase mb-1">Preço Unitário (R$)</label>
-                        <input type="number" id="compra-preco" required step="0.01" min="0" placeholder="0,00" class="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        <label class="block text-[11px] font-semibold text-gray-500 dark:text-gray-400 uppercase mb-1">Qtd</label>
+                        <input type="number" id="compra-qtd" required min="1" value="1" class="w-full px-3 py-2 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 dark:text-white">
                     </div>
                 </div>
-                <div class="flex gap-2">
-                    <button type="submit" id="btn-submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2.5 rounded-lg transition text-sm shadow-sm">
+                <div>
+                    <label class="block text-[11px] font-semibold text-gray-500 dark:text-gray-400 uppercase mb-1">Preço Unitário (R$)</label>
+                    <input type="number" id="compra-preco" required step="0.01" min="0" placeholder="0,00" class="w-full px-3 py-2 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 dark:text-white">
+                </div>
+                <div class="flex gap-2 pt-1">
+                    <button type="submit" id="btn-submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2.5 rounded-xl transition text-sm shadow-sm">
                         ➕ Adicionar à Lista
                     </button>
-                    <button type="button" id="btn-cancelar" onclick="cancelarEdicao()" class="hidden bg-gray-200 hover:bg-gray-300 text-gray-700 px-4 py-2.5 rounded-lg text-sm transition">
+                    <button type="button" id="btn-cancelar" onclick="cancelarEdicao()" class="hidden bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 text-gray-700 dark:text-gray-200 px-4 py-2.5 rounded-xl text-sm transition">
                         Cancelar
                     </button>
                 </div>
             </form>
         </div>
 
-        <!-- Tabela da Lista de Compras -->
-        <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
-            <div class="flex justify-between items-center mb-4">
-                <h3 id="status-progresso" class="text-md font-semibold text-gray-900">Itens na Lista (0)</h3>
-                <span id="info-status" class="text-xs text-gray-400">Salvo no telemóvel</span>
+        <!-- LISTA DE ITENS POR SETOR -->
+        <div class="bg-white dark:bg-gray-800 p-5 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 space-y-4">
+            <div class="flex justify-between items-center">
+                <h3 id="status-progresso" class="text-md font-semibold text-gray-900 dark:text-white">Itens na Lista (0)</h3>
+                <span class="text-xs text-gray-400">Toque no quadrado para marcar</span>
             </div>
 
-            <div class="overflow-x-auto">
+            <div id="container-tabela" class="overflow-x-auto">
                 <table class="w-full text-left border-collapse">
                     <thead>
-                        <tr class="border-b border-gray-100 text-xs font-semibold text-gray-400 uppercase">
-                            <th class="py-3 px-2 text-center w-12">Peguei</th>
-                            <th class="py-3 px-2">Produto</th>
-                            <th class="py-3 px-2 text-center">Qtd</th>
-                            <th class="py-3 px-2 text-right">Preço Unit.</th>
-                            <th class="py-3 px-2 text-right">Total</th>
-                            <th class="py-3 px-2 text-center">Ações</th>
+                        <tr class="border-b border-gray-100 dark:border-gray-700 text-[11px] font-semibold text-gray-400 uppercase">
+                            <th class="py-2.5 px-2 text-center w-10">Feito</th>
+                            <th class="py-2.5 px-2">Produto / Setor</th>
+                            <th class="py-2.5 px-2 text-center">Qtd</th>
+                            <th class="py-2.5 px-2 text-right">Preço</th>
+                            <th class="py-2.5 px-2 text-right">Total</th>
+                            <th class="py-2.5 px-2 text-center">Ações</th>
                         </tr>
                     </thead>
-                    <tbody id="tabela-compras" class="divide-y divide-gray-50 text-sm">
+                    <tbody id="tabela-compras" class="divide-y divide-gray-50 dark:divide-gray-700 text-sm">
                         <tr>
-                            <td colspan="6" class="py-8 text-center text-gray-400">Nenhum item na lista ainda. Adicione acima!</td>
+                            <td colspan="6" class="py-8 text-center text-gray-400">Nenhum item na lista. Use os botões acima!</td>
                         </tr>
                     </tbody>
                 </table>
@@ -119,10 +143,21 @@
 
     </div>
 
-    <!-- Script de Gestão Inteligente -->
+    <!-- SCRIPT DA APLICAÇÃO -->
     <script>
-        let listaComprasCache = JSON.parse(localStorage.getItem('minha_lista_compras_direta') || '[]');
-        let valorTicket = parseFloat(localStorage.getItem('meu_valor_ticket') || '1000.00');
+        let listaComprasCache = JSON.parse(localStorage.getItem('minha_lista_compras_turbo') || '[]');
+        let valorTicket = parseFloat(localStorage.getItem('meu_valor_ticket_turbo') || '1000.00');
+
+        // Dark Mode State
+        if (localStorage.getItem('dark_mode') === 'true') {
+            document.documentElement.classList.add('dark');
+        }
+
+        function alternarDarkMode() {
+            document.documentElement.classList.toggle('dark');
+            const isDark = document.documentElement.classList.contains('dark');
+            localStorage.setItem('dark_mode', isDark);
+        }
 
         window.addEventListener('DOMContentLoaded', () => {
             renderizarTabelaCompras();
@@ -134,18 +169,32 @@
                 novoValor = parseFloat(novoValor.replace(',', '.'));
                 if (!isNaN(novoValor) && novoValor >= 0) {
                     valorTicket = novoValor;
-                    localStorage.setItem('meu_valor_ticket', valorTicket);
+                    localStorage.setItem('meu_valor_ticket_turbo', valorTicket);
                     renderizarTabelaCompras();
                 } else {
-                    alert("Por favor, insira um valor numérico válido.");
+                    alert("Por favor, insira um valor válido.");
                 }
             }
+        }
+
+        function adicionarFavorito(nome, qtd, preco, setor) {
+            const novoItem = {
+                id: Date.now() + Math.random(),
+                nome: nome,
+                qtd: qtd,
+                preco: preco,
+                setor: setor,
+                peguei: false
+            };
+            listaComprasCache.push(novoItem);
+            salvarEAtualizar();
         }
 
         function salvarItemCompra(e) {
             e.preventDefault();
             const editId = document.getElementById('edit-compra-id').value;
             const nome = document.getElementById('compra-nome').value.trim();
+            const setor = document.getElementById('compra-setor').value;
             const qtd = parseFloat(document.getElementById('compra-qtd').value) || 1;
             const preco = parseFloat(document.getElementById('compra-preco').value) || 0;
 
@@ -153,6 +202,7 @@
                 const item = listaComprasCache.find(i => i.id == editId);
                 if (item) {
                     item.nome = nome;
+                    item.setor = setor;
                     item.qtd = qtd;
                     item.preco = preco;
                 }
@@ -160,6 +210,7 @@
                 const novoItem = {
                     id: Date.now(),
                     nome: nome,
+                    setor: setor,
                     qtd: qtd,
                     preco: preco,
                     peguei: false
@@ -177,6 +228,7 @@
 
             document.getElementById('edit-compra-id').value = item.id;
             document.getElementById('compra-nome').value = item.nome;
+            document.getElementById('compra-setor').value = item.setor || 'Mercearia';
             document.getElementById('compra-qtd').value = item.qtd;
             document.getElementById('compra-preco').value = item.preco;
 
@@ -190,7 +242,7 @@
             document.getElementById('form-compra').reset();
             document.getElementById('edit-compra-id').value = '';
             document.getElementById('compra-qtd').value = '1';
-            document.getElementById('form-titulo').textContent = 'Adicionar Produto Rápido';
+            document.getElementById('form-titulo').textContent = 'Adicionar Novo Produto';
             document.getElementById('btn-submit').textContent = '➕ Adicionar à Lista';
             document.getElementById('btn-cancelar').classList.add('hidden');
         }
@@ -204,7 +256,7 @@
         }
 
         function apagarItemCompra(id) {
-            if (confirm('Deseja excluir este item da lista?')) {
+            if (confirm('Deseja excluir este item?')) {
                 listaComprasCache = listaComprasCache.filter(i => i.id !== id);
                 salvarEAtualizar();
             }
@@ -223,21 +275,21 @@
                 alert('A lista está vazia.');
                 return;
             }
-            let texto = "🛒 *Minha Lista de Compras Mensal*%0A%0A";
+            let texto = "🛒 *Minha Lista de Compras*%0A%0A";
             let totalGeral = 0;
             listaComprasCache.forEach(i => {
                 let sub = i.qtd * i.preco;
                 totalGeral += sub;
-                texto += `- ${i.nome} (${i.qtd}x R$ ${i.preco.toFixed(2)}) = R$ ${sub.toFixed(2)}%0A`;
+                texto += `- ${i.nome} (${i.qtd}x) = R$ ${sub.toFixed(2)}%0A`;
             });
-            texto += `%0A💰 *Valor Total:* R$ ${totalGeral.toFixed(2)}`;
-            texto += `%0A💳 *Saldo do Ticket:* R$ ${(valorTicket - totalGeral).toFixed(2)}`;
+            texto += `%0A💰 *Total:* R$ ${totalGeral.toFixed(2)}`;
+            texto += `%0A💳 *Saldo Ticket:* R$ ${(valorTicket - totalGeral).toFixed(2)}`;
             
             window.open(`https://api.whatsapp.com/send?text=${texto}`, '_blank');
         }
 
         function salvarEAtualizar() {
-            localStorage.setItem('minha_lista_compras_direta', JSON.stringify(listaComprasCache));
+            localStorage.setItem('minha_lista_compras_turbo', JSON.stringify(listaComprasCache));
             renderizarTabelaCompras();
         }
 
@@ -246,13 +298,12 @@
             document.getElementById('status-progresso').textContent = `Itens na Lista (${listaComprasCache.length})`;
 
             if (listaComprasCache.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="6" class="py-8 text-center text-gray-400">Nenhum item na lista ainda. Adicione acima!</td></tr>`;
-                document.getElementById('total-geral').textContent = 'R$ 0,00';
-                document.getElementById('total-peguei').textContent = 'R$ 0,00';
-                let saldoInicial = valorTicket - 0;
+                tbody.innerHTML = `<tr><td colspan="6" class="py-8 text-center text-gray-400">Nenhum item na lista ainda. Use os botões acima!</td></tr>`;
+                document.getElementById('total-geral').textContent = 'R$ 0';
+                document.getElementById('total-peguei').textContent = 'R$ 0';
                 let elSaldo = document.getElementById('saldo-ticket');
-                elSaldo.textContent = `R$ ${saldoInicial.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
-                elSaldo.className = "text-2xl font-bold text-indigo-600 mt-1";
+                elSaldo.textContent = `R$ ${valorTicket.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+                elSaldo.className = "text-base sm:text-lg font-bold text-indigo-600 dark:text-indigo-400 mt-0.5";
                 return;
             }
 
@@ -262,37 +313,37 @@
             tbody.innerHTML = listaComprasCache.map(i => {
                 const totalItem = i.qtd * i.preco;
                 totalGeral += totalItem;
-                if (i.peguei) {
-                    totalPeguei += totalItem;
-                }
+                if (i.peguei) totalPeguei += totalItem;
 
                 return `
-                    <tr class="hover:bg-gray-50/50 transition ${i.peguei ? 'bg-emerald-50/30' : ''}">
+                    <tr class="hover:bg-gray-50/50 dark:hover:bg-gray-700/50 transition ${i.peguei ? 'bg-emerald-50/40 dark:bg-emerald-950/20' : ''}">
                         <td class="py-3 px-2 text-center">
-                            <input type="checkbox" ${i.peguei ? 'checked' : ''} onchange="toggleItemPeguei(${i.id})" class="w-4 h-4 text-emerald-600 rounded border-gray-300 focus:ring-emerald-500 cursor-pointer">
+                            <input type="checkbox" ${i.peguei ? 'checked' : ''} onchange="toggleItemPeguei(${i.id})" class="w-5 h-5 text-emerald-600 rounded border-gray-300 dark:border-gray-600 focus:ring-emerald-500 cursor-pointer">
                         </td>
-                        <td class="py-3 px-2 font-medium ${i.peguei ? 'line-through text-gray-400' : 'text-gray-900'}">${i.nome}</td>
-                        <td class="py-3 px-2 text-center">${i.qtd}</td>
-                        <td class="py-3 px-2 text-right">R$ ${i.preco.toFixed(2)}</td>
-                        <td class="py-3 px-2 text-right font-medium">R$ ${totalItem.toFixed(2)}</td>
-                        <td class="py-3 px-2 text-center space-x-2">
-                            <button onclick="prepararEdicao(${i.id})" class="text-blue-600 hover:text-blue-800 text-xs font-medium transition">Editar</button>
-                            <button onclick="apagarItemCompra(${i.id})" class="text-gray-400 hover:text-red-600 text-xs font-medium transition">Excluir</button>
+                        <td class="py-3 px-2">
+                            <div class="font-medium ${i.peguei ? 'line-through text-gray-400 dark:text-gray-500' : 'text-gray-900 dark:text-white'}">${i.nome}</div>
+                            <span class="inline-block px-2 py-0.5 mt-0.5 text-[10px] font-medium bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 rounded-md">${i.setor || 'Geral'}</span>
+                        </td>
+                        <td class="py-3 px-2 text-center text-gray-700 dark:text-gray-300">${i.qtd}</td>
+                        <td class="py-3 px-2 text-right text-gray-700 dark:text-gray-300">R$ ${i.preco.toFixed(2)}</td>
+                        <td class="py-3 px-2 text-right font-medium text-gray-900 dark:text-white">R$ ${totalItem.toFixed(2)}</td>
+                        <td class="py-3 px-2 text-center space-x-1">
+                            <button onclick="prepararEdicao(${i.id})" class="text-blue-600 dark:text-blue-400 hover:underline text-xs">Editar</button>
+                            <button onclick="apagarItemCompra(${i.id})" class="text-gray-400 hover:text-red-600 dark:hover:text-red-400 text-xs">Excluir</button>
                         </td>
                     </tr>
                 `;
             }).join('');
 
-            // Cálculo do Saldo do Ticket
+            // Saldo do Ticket
             let saldoRestante = valorTicket - totalGeral;
             const elSaldo = document.getElementById('saldo-ticket');
             elSaldo.textContent = `R$ ${saldoRestante.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
             
-            // Se o saldo ficar negativo (passou do ticket), pinta o texto de vermelho para avisar
             if (saldoRestante < 0) {
-                elSaldo.className = "text-2xl font-bold text-red-600 mt-1";
+                elSaldo.className = "text-base sm:text-lg font-bold text-red-600 dark:text-red-400 mt-0.5";
             } else {
-                elSaldo.className = "text-2xl font-bold text-indigo-600 mt-1";
+                elSaldo.className = "text-base sm:text-lg font-bold text-indigo-600 dark:text-indigo-400 mt-0.5";
             }
 
             document.getElementById('total-geral').textContent = `R$ ${totalGeral.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
