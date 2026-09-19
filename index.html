@@ -93,14 +93,12 @@
                     </button>
                 </div>
 
-                <!-- 3 CARDS ESSENCIAIS: TOTAL DO MÊS | SALDO TICKET (RESTANTE) | DINHEIRO -->
+                <!-- 3 CARDS ESSENCIAIS -->
                 <div class="grid grid-cols-1 sm:grid-cols-3 gap-2">
-                    <!-- Total do Mês -->
                     <div class="bg-gray-50 dark:bg-gray-800 p-3 rounded-xl border border-gray-100 dark:border-gray-700">
                         <p class="text-[10px] font-semibold text-gray-400 uppercase">Total do Mês</p>
                         <p id="total-geral" class="text-base sm:text-lg font-bold text-gray-900 dark:text-white mt-0.5">R$ 0</p>
                     </div>
-                    <!-- Saldo Ticket (Desconta Automaticamente) -->
                     <div class="bg-gray-50 dark:bg-gray-800 p-3 rounded-xl border border-gray-100 dark:border-gray-700 relative">
                         <div class="flex justify-between items-center">
                             <p class="text-[10px] font-semibold text-indigo-600 dark:text-indigo-400 uppercase">💳 Saldo Ticket (Restante)</p>
@@ -109,7 +107,6 @@
                         <p id="saldo-ticket" class="text-base sm:text-lg font-bold text-indigo-600 dark:text-indigo-400 mt-0.5">R$ 0</p>
                         <p id="info-ticket-total" class="text-[10px] text-gray-400 mt-0.5">Valor inicial não definido</p>
                     </div>
-                    <!-- Dinheiro -->
                     <div class="bg-gray-50 dark:bg-gray-800 p-3 rounded-xl border border-gray-100 dark:border-gray-700 relative">
                         <div class="flex justify-between items-center">
                             <p class="text-[10px] font-semibold text-amber-600 dark:text-amber-400 uppercase">💵 Dinheiro</p>
@@ -133,22 +130,10 @@
                 
                 <form id="form-compra" class="space-y-3" onsubmit="salvarItemCompra(event)">
                     <input type="hidden" id="edit-compra-id">
-                    <div class="grid grid-cols-1 sm:grid-cols-4 gap-3">
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
                         <div class="sm:col-span-2">
                             <label class="block text-[11px] font-semibold text-gray-500 dark:text-gray-400 uppercase mb-1">Produto</label>
                             <input type="text" id="compra-nome" required placeholder="Ex: Macarrão, Sabão..." class="w-full px-3 py-2 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 dark:text-white">
-                        </div>
-                        <div>
-                            <label class="block text-[11px] font-semibold text-gray-500 dark:text-gray-400 uppercase mb-1">Setor</label>
-                            <select id="compra-setor" class="w-full px-3 py-2 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 dark:text-white">
-                                <option value="Mercearia">Mercearia</option>
-                                <option value="Infantil">Infantil</option>
-                                <option value="Hortifruti">Hortifruti</option>
-                                <option value="Açougue/Frios">Açougue/Frios</option>
-                                <option value="Limpeza">Limpeza</option>
-                                <option value="Higiene">Higiene</option>
-                                <option value="Outros">Outros</option>
-                            </select>
                         </div>
                         <div>
                             <label class="block text-[11px] font-semibold text-gray-500 dark:text-gray-400 uppercase mb-1">Qtd</label>
@@ -170,7 +155,7 @@
                 </form>
             </div>
 
-            <!-- TABELA DE ITENS -->
+            <!-- TABELA DE ITENS COMPACTA -->
             <div class="bg-white dark:bg-gray-800 p-5 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 space-y-4">
                 <div class="flex justify-between items-center">
                     <h3 id="status-progresso" class="text-md font-semibold text-gray-900 dark:text-white">Itens na Lista (0)</h3>
@@ -183,16 +168,13 @@
                     <table class="w-full text-left border-collapse">
                         <thead>
                             <tr class="border-b border-gray-100 dark:border-gray-700 text-[11px] font-semibold text-gray-400 uppercase">
-                                <th class="py-2.5 px-2">Produto / Setor</th>
-                                <th class="py-2.5 px-2 text-center">Qtd</th>
-                                <th class="py-2.5 px-2 text-right">Preço</th>
-                                <th class="py-2.5 px-2 text-right">Total</th>
-                                <th class="py-2.5 px-2 text-center">Ações</th>
+                                <th class="py-2.5 px-3">Item / Detalhes</th>
+                                <th class="py-2.5 px-2 text-center w-24">Ações</th>
                             </tr>
                         </thead>
                         <tbody id="tabela-compras" class="divide-y divide-gray-50 dark:divide-gray-700 text-sm">
                             <tr>
-                                <td colspan="5" class="py-8 text-center text-gray-400">Nenhum item neste mês. Use o microfone abaixo para adicionar!</td>
+                                <td colspan="2" class="py-8 text-center text-gray-400">Nenhum item neste mês. Use o microfone abaixo para adicionar!</td>
                             </tr>
                         </tbody>
                     </table>
@@ -400,7 +382,6 @@
             lista.push({
                 id: Date.now() + Math.random(),
                 nome: nomeProduto,
-                setor: 'Mercearia',
                 qtd: qtd > 0 ? qtd : 1,
                 preco: preco > 0 ? preco : 0
             });
@@ -410,7 +391,7 @@
             document.getElementById('tabela-compras').scrollIntoView({ behavior: 'smooth' });
         }
 
-        // TICKET COM DESCONTO AUTOMÁTICO DO SALDO RESTANTE
+        // TICKET E DINHEIRO
         function obterTicketDoMes() {
             let cache = JSON.parse(localStorage.getItem('historico_ticket_mensal') || '{}');
             return cache[chaveMesAno] !== undefined ? cache[chaveMesAno] : null;
@@ -493,7 +474,6 @@
             e.preventDefault();
             const editId = document.getElementById('edit-compra-id').value;
             const nome = document.getElementById('compra-nome').value.trim();
-            const setor = document.getElementById('compra-setor').value;
             const qtd = parseFloat(document.getElementById('compra-qtd').value) || 1;
             const preco = parseFloat(document.getElementById('compra-preco').value) || 0;
 
@@ -501,9 +481,9 @@
 
             if (editId) {
                 const item = lista.find(i => i.id == editId);
-                if (item) { item.nome = nome; item.setor = setor; item.qtd = qtd; item.preco = preco; }
+                if (item) { item.nome = nome; item.qtd = qtd; item.preco = preco; }
             } else {
-                lista.push({ id: Date.now(), nome, setor, qtd, preco });
+                lista.push({ id: Date.now(), nome, qtd, preco });
             }
 
             guardarListaDoMes(lista);
@@ -518,7 +498,6 @@
 
             document.getElementById('edit-compra-id').value = item.id;
             document.getElementById('compra-nome').value = item.nome;
-            document.getElementById('compra-setor').value = item.setor || 'Mercearia';
             document.getElementById('compra-qtd').value = item.qtd;
             document.getElementById('compra-preco').value = item.preco;
 
@@ -582,7 +561,7 @@
 
             document.getElementById('total-geral').textContent = `R$ ${totalGeral.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
 
-            // TICKET RESTANTE (TICKET TOTAL - TOTAL GASTO)
+            // TICKET RESTANTE
             let ticketTotal = obterTicketDoMes();
             let elTicket = document.getElementById('saldo-ticket');
             let elTicketInfo = document.getElementById('info-ticket-total');
@@ -609,7 +588,7 @@
             }
 
             if (lista.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="5" class="py-8 text-center text-gray-400">Nenhum item neste mês. Use o microfone abaixo para adicionar!</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="2" class="py-8 text-center text-gray-400">Nenhum item neste mês. Use o microfone abaixo para adicionar!</td></tr>`;
                 return;
             }
 
@@ -618,16 +597,19 @@
 
                 return `
                     <tr class="hover:bg-gray-50/50 dark:hover:bg-gray-700/50 transition">
-                        <td class="py-3 px-2">
-                            <div class="font-medium text-gray-900 dark:text-white">${i.nome}</div>
-                            <span class="inline-block px-2 py-0.5 mt-0.5 text-[10px] font-medium bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 rounded-md">${i.setor || 'Geral'}</span>
+                        <td class="py-2.5 px-3">
+                            <div class="flex items-center justify-between">
+                                <span class="text-xs font-semibold text-gray-900 dark:text-white">${i.nome}</span>
+                                <span class="text-[11px] bg-blue-50 dark:bg-blue-950/50 text-blue-600 dark:text-blue-400 px-1.5 py-0.5 rounded font-bold">${i.qtd}x</span>
+                            </div>
+                            <div class="text-[11px] text-gray-500 dark:text-gray-400 mt-1 flex justify-between">
+                                <span>R$ ${i.preco.toFixed(2)} un</span>
+                                <span class="font-bold text-gray-800 dark:text-gray-200">Total: R$ ${totalItem.toFixed(2)}</span>
+                            </div>
                         </td>
-                        <td class="py-3 px-2 text-center text-gray-700 dark:text-gray-300">${i.qtd}</td>
-                        <td class="py-3 px-2 text-right text-gray-700 dark:text-gray-300">R$ ${i.preco.toFixed(2)}</td>
-                        <td class="py-3 px-2 text-right font-medium text-gray-900 dark:text-white">R$ ${totalItem.toFixed(2)}</td>
-                        <td class="py-3 px-2 text-center space-x-1">
-                            <button onclick="prepararEdicao(${i.id})" class="text-blue-600 dark:text-blue-400 hover:underline text-xs">Editar</button>
-                            <button onclick="apagarItemCompra(${i.id})" class="text-gray-400 hover:text-red-600 dark:hover:text-red-400 text-xs">Excluir</button>
+                        <td class="py-2.5 px-2 text-center whitespace-nowrap w-24">
+                            <button onclick="prepararEdicao(${i.id})" class="text-blue-600 dark:text-blue-400 hover:underline text-[11px] mr-2">Editar</button>
+                            <button onclick="apagarItemCompra(${i.id})" class="text-gray-400 hover:text-red-600 dark:hover:text-red-400 text-[11px]">Excluir</button>
                         </td>
                     </tr>
                 `;
