@@ -15,7 +15,7 @@
 </head>
 <body class="bg-gray-50 dark:bg-gray-900 min-h-screen text-gray-800 dark:text-gray-100 transition-colors duration-200 pb-28">
 
-    <!-- TELA DE LOGIN / CAPA COM NOME E SENHA -->
+    <!-- TELA DE LOGIN / CAPA COM NOME, SENHA E BIOMETRIA -->
     <div id="tela-login" class="fixed inset-0 z-50 bg-gray-900/90 backdrop-blur-sm flex items-center justify-center p-4">
         <div class="bg-white dark:bg-gray-800 p-6 sm:p-8 rounded-3xl shadow-2xl max-w-sm w-full text-center space-y-4 border border-gray-100 dark:border-gray-700">
             <div class="w-16 h-16 bg-blue-50 dark:bg-blue-950/50 rounded-2xl mx-auto flex items-center justify-center text-3xl">🛒</div>
@@ -23,6 +23,7 @@
                 <h2 class="text-xl font-bold text-gray-900 dark:text-white">Acesso Restrito</h2>
                 <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Identifique-se para aceder à sua lista.</p>
             </div>
+            
             <form onsubmit="verificarLogin(event)" class="space-y-3 text-left">
                 <div>
                     <label class="block text-[11px] font-semibold text-gray-500 dark:text-gray-400 uppercase mb-1">Coloque aqui seu nome</label>
@@ -30,12 +31,19 @@
                 </div>
                 <div>
                     <label class="block text-[11px] font-semibold text-gray-500 dark:text-gray-400 uppercase mb-1">Senha (PIN)</label>
-                    <input type="password" id="input-senha" required placeholder="••••" class="w-full px-4 py-2.5 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl text-center text-lg tracking-widest focus:outline-none focus:ring-2 focus:ring-blue-500 dark:text-white">
+                    <input type="password" id="input-senha" placeholder="••••" class="w-full px-4 py-2.5 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl text-center text-lg tracking-widest focus:outline-none focus:ring-2 focus:ring-blue-500 dark:text-white">
                 </div>
-                <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-3 rounded-xl transition text-sm shadow-sm mt-2">
-                    Entrar no Sistema
+                
+                <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-3 rounded-xl transition text-sm shadow-sm mt-1">
+                    Entrar com Senha PIN
                 </button>
             </form>
+
+            <!-- BOTÃO DE BIOMETRIA -->
+            <button type="button" onclick="entrarComBiometria()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-medium py-3 rounded-xl transition text-sm shadow-sm flex items-center justify-center gap-2">
+                <span>🔐</span> Entrar com Biometria
+            </button>
+
             <p id="erro-senha" class="text-xs text-red-500 hidden font-medium">Senha incorreta! A senha correta é 1510.</p>
         </div>
     </div>
@@ -47,7 +55,7 @@
         <div class="sticky top-0 z-40 bg-white/95 dark:bg-gray-900/95 backdrop-blur-md shadow-sm border-b border-gray-100 dark:border-gray-800 transition-colors">
             <div class="max-w-4xl mx-auto p-3 space-y-2">
                 
-                <!-- LINHA 1: TÍTULO + RELATÓRIO ANUAL NO TOPO -->
+                <!-- LINHA 1: TÍTULO + RELATÓRIO ANUAL -->
                 <div class="flex justify-between items-center">
                     <div>
                         <h1 class="text-base sm:text-lg font-bold text-gray-900 dark:text-white flex items-center gap-1.5">🛒 Lista de Compras</h1>
@@ -210,7 +218,7 @@
         </div>
     </div>
 
-    <!-- BARRA INFERIOR DISCRETA COM OS BOTÕES UTILITÁRIOS (WHATSAPP, MODO ESCURO E SAIR) + MICROFONE -->
+    <!-- BARRA INFERIOR COM BOTÕES UTILITÁRIOS E MICROFONE -->
     <div class="fixed bottom-0 left-0 right-0 z-40 bg-white/90 dark:bg-gray-900/90 backdrop-blur-md border-t border-gray-200 dark:border-gray-800 px-4 py-2.5 flex justify-between items-center max-w-4xl mx-auto rounded-t-2xl shadow-lg">
         <div class="flex items-center gap-2">
             <button onclick="alternarDarkMode()" class="px-3 py-1.5 rounded-xl bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300 text-xs font-medium transition flex items-center gap-1" title="Modo Escuro">
@@ -229,7 +237,7 @@
         </button>
     </div>
 
-    <!-- SCRIPT DE SEGURANÇA E LÓGICA -->
+    <!-- SCRIPT DE SEGURANÇA, BIOMETRIA E LÓGICA -->
     <script>
         const SENHA_MESTRA = "1510";
 
@@ -265,6 +273,78 @@
                 erroEl.classList.remove('hidden');
                 document.getElementById('input-senha').value = '';
                 document.getElementById('input-senha').focus();
+            }
+        }
+
+        // AUTENTICAÇÃO BIOMÉTRICA (WebAuthn)
+        async function entrarComBiometria() {
+            if (!window.PublicKeyCredential) {
+                alert("O seu navegador não suporta autenticação biométrica.");
+                return;
+            }
+            try {
+                const available = await PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable();
+                if (!available) {
+                    alert("Nenhum leitor biométrico (impressão digital ou Face ID) encontrado neste aparelho.");
+                    return;
+                }
+
+                const challenge = new Uint8Array(32);
+                window.crypto.getRandomValues(challenge);
+                
+                const userId = new Uint8Array(16);
+                window.crypto.getRandomValues(userId);
+
+                const createCredentialOptions = {
+                    challenge: challenge,
+                    rp: { name: "Lista de Compras", id: window.location.hostname },
+                    user: {
+                        id: userId,
+                        name: "mariana@compras.local",
+                        displayName: document.getElementById('input-usuario').value.trim() || "Mariana"
+                    },
+                    pubKeyCredParams: [{ alg: -7, type: "public-key" }, { alg: -257, type: "public-key" }],
+                    authenticatorSelection: {
+                        authenticatorAttachment: "platform",
+                        userVerification: "required",
+                        residentKey: "preferred"
+                    },
+                    timeout: 60000
+                };
+
+                let cred;
+                const credentialIdStr = localStorage.getItem('biometria_cred_id');
+
+                if (credentialIdStr) {
+                    try {
+                        const rawId = Uint8Array.from(atob(credentialIdStr), c => c.charCodeAt(0));
+                        const getOptions = {
+                            challenge: challenge,
+                            allowCredentials: [{ id: rawId, type: "public-key" }],
+                            userVerification: "required",
+                            timeout: 60000
+                        };
+                        cred = await navigator.credentials.get({ publicKey: getOptions });
+                    } catch (err) {
+                        cred = await navigator.credentials.create({ publicKey: createCredentialOptions });
+                        const rawIdStr = btoa(String.fromCharCode.apply(null, new Uint8Array(cred.rawId)));
+                        localStorage.setItem('biometria_cred_id', rawIdStr);
+                    }
+                } else {
+                    cred = await navigator.credentials.create({ publicKey: createCredentialOptions });
+                    const rawIdStr = btoa(String.fromCharCode.apply(null, new Uint8Array(cred.rawId)));
+                    localStorage.setItem('biometria_cred_id', rawIdStr);
+                }
+
+                if (cred) {
+                    sessionStorage.setItem('autenticado_site', 'true');
+                    const usuario = document.getElementById('input-usuario').value.trim() || "Mariana";
+                    sessionStorage.setItem('nome_utilizador', usuario);
+                    liberarAcesso();
+                }
+            } catch (error) {
+                console.log("Erro na biometria:", error);
+                alert("Biometria cancelada ou não configurada. Podes usar a senha PIN (1510).");
             }
         }
 
