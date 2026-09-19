@@ -13,7 +13,7 @@
         tailwind.config = { darkMode: 'class' }
     </script>
 </head>
-<body class="bg-gray-50 dark:bg-gray-900 min-h-screen text-gray-800 dark:text-gray-100 transition-colors duration-200">
+<body class="bg-gray-50 dark:bg-gray-900 min-h-screen text-gray-800 dark:text-gray-100 transition-colors duration-200 pb-20">
 
     <!-- TELA DE LOGIN / CAPA COM NOME E SENHA -->
     <div id="tela-login" class="fixed inset-0 z-50 bg-gray-900/90 backdrop-blur-sm flex items-center justify-center p-4">
@@ -53,22 +53,27 @@
                         <p id="saudacao-usuario" class="text-xs text-gray-500 dark:text-gray-400">Olá!</p>
                     </div>
                     <div class="flex items-center gap-1.5">
-                        <button onclick="alternarDarkMode()" class="p-2 rounded-xl bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300 text-xs transition" title="Alternar Modo Escuro">
+                        <!-- MICROFONE LÁ EM CIMA -->
+                        <button onclick="ouvirVoz()" id="btn-voz-topo" class="bg-red-500 hover:bg-red-600 text-white px-3 py-2 rounded-xl text-xs font-medium transition flex items-center gap-1 shadow-sm" title="Falar Produto">
+                            🎤 Falar
+                        </button>
+                        <button onclick="alternarDarkMode()" class="p-2 rounded-xl bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300 text-xs transition" title="Modo Escuro">
                             🌙/☀️
                         </button>
                         <button onclick="partilharWhatsApp()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-2 rounded-xl text-xs font-medium transition flex items-center gap-1 shadow-sm">
                             📱 WhatsApp
                         </button>
-                        <button onclick="bloquearNovamente()" class="bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 text-gray-600 dark:text-gray-300 p-2 rounded-xl text-xs transition" title="Bloquear / Sair">
+                        <button onclick="bloquearNovamente()" class="bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 text-gray-600 dark:text-gray-300 p-2 rounded-xl text-xs transition" title="Sair">
                             🔒
                         </button>
                     </div>
                 </div>
 
-                <!-- SELETOR DE MÊS E ANO -->
+                <!-- SELETOR DE MÊS E ANO AUTOMÁTICO -->
                 <div class="flex items-center justify-between bg-blue-50 dark:bg-blue-950/40 border border-blue-100 dark:border-blue-900/50 p-2.5 rounded-2xl">
                     <span class="text-xs font-semibold text-blue-700 dark:text-blue-300 uppercase px-2">📅 Mês de Referência:</span>
                     <select id="filtro-mes-ano" onchange="mudarMesReferencia()" class="bg-white dark:bg-gray-900 text-gray-800 dark:text-white px-3 py-1.5 rounded-xl text-xs font-semibold border border-blue-200 dark:border-blue-800 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        <option value="Setembro_2026">Setembro / 2026</option>
                         <option value="Outubro_2026">Outubro / 2026</option>
                         <option value="Novembro_2026">Novembro / 2026</option>
                         <option value="Dezembro_2026">Dezembro / 2026</option>
@@ -87,8 +92,8 @@
                     </select>
                 </div>
 
-                <!-- 3 Cards de Resumo -->
-                <div class="grid grid-cols-3 gap-2">
+                <!-- 4 CARDS DE RESUMO -->
+                <div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
                     <div class="bg-gray-50 dark:bg-gray-800 p-3 rounded-xl border border-gray-100 dark:border-gray-700">
                         <p class="text-[10px] font-semibold text-gray-400 uppercase">Total do Mês</p>
                         <p id="total-geral" class="text-base sm:text-lg font-bold text-gray-900 dark:text-white mt-0.5">R$ 0</p>
@@ -97,12 +102,17 @@
                         <p class="text-[10px] font-semibold text-emerald-600 dark:text-emerald-400 uppercase">Carrinho</p>
                         <p id="total-peguei" class="text-base sm:text-lg font-bold text-emerald-600 dark:text-emerald-400 mt-0.5">R$ 0</p>
                     </div>
+                    <div class="bg-gray-50 dark:bg-gray-800 p-3 rounded-xl border border-gray-100 dark:border-gray-700">
+                        <p class="text-[10px] font-semibold text-amber-600 dark:text-amber-400 uppercase">Total do Ano</p>
+                        <p id="total-ano" class="text-base sm:text-lg font-bold text-amber-600 dark:text-amber-400 mt-0.5">R$ 0</p>
+                    </div>
                     <div class="bg-gray-50 dark:bg-gray-800 p-3 rounded-xl border border-gray-100 dark:border-gray-700 relative">
                         <div class="flex justify-between items-center">
-                            <p class="text-[10px] font-semibold text-indigo-600 dark:text-indigo-400 uppercase">Saldo Ticket</p>
-                            <button onclick="alterarTicket()" class="text-xs text-indigo-500 hover:underline">✏️</button>
+                            <p class="text-[10px] font-semibold text-indigo-600 dark:text-indigo-400 uppercase">Orçamento (T + D)</p>
+                            <button onclick="alterarOrcamento()" class="text-xs text-indigo-500 hover:underline">✏️ Definir</button>
                         </div>
-                        <p id="saldo-ticket" class="text-base sm:text-lg font-bold text-indigo-600 dark:text-indigo-400 mt-0.5">R$ 1.000</p>
+                        <p id="info-orcamento" class="text-[11px] text-gray-500 dark:text-gray-400 mt-0.5 truncate">Ticket: R$ 0 | Dinheiro: R$ 0</p>
+                        <p id="saldo-restante" class="text-sm sm:text-base font-bold text-indigo-600 dark:text-indigo-400 mt-0.5">Não definido</p>
                     </div>
                 </div>
 
@@ -175,11 +185,12 @@
                 </div>
             </div>
 
-            <!-- FORMULÁRIO COM MICROFONE -->
+            <!-- FORMULÁRIO -->
             <div class="bg-white dark:bg-gray-800 p-5 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700">
                 <div class="flex justify-between items-center mb-3">
                     <h2 id="form-titulo" class="text-md font-semibold text-gray-900 dark:text-white">Adicionar Novo Produto</h2>
-                    <button type="button" onclick="ouvirVoz()" id="btn-voz" class="bg-red-500 hover:bg-red-600 text-white px-3 py-1.5 rounded-xl text-xs font-medium transition flex items-center gap-1.5 shadow-sm">
+                    <!-- MICROFONE NO FORMULÁRIO -->
+                    <button type="button" onclick="ouvirVoz()" id="btn-voz-form" class="bg-red-500 hover:bg-red-600 text-white px-3 py-1.5 rounded-xl text-xs font-medium transition flex items-center gap-1.5 shadow-sm">
                         🎤 Falar Produto
                     </button>
                 </div>
@@ -256,12 +267,22 @@
         </div>
     </div>
 
-    <!-- SCRIPT DE SEGURANÇA E LÓGICA COM HISTÓRICO MENSAL -->
+    <!-- MICROFONE FLUTUANTE LÁ EM BAIXO (FIXO NO ECRÃ) -->
+    <button onclick="ouvirVoz()" id="btn-voz-flutuante" class="fixed bottom-6 right-6 z-50 bg-red-600 hover:bg-red-700 text-white w-14 h-14 rounded-full shadow-2xl flex items-center justify-center text-2xl transition transform hover:scale-105 active:scale-95" title="Falar Produto">
+        🎤
+    </button>
+
+    <!-- SCRIPT DE SEGURANÇA E LÓGICA -->
     <script>
         const SENHA_MESTRA = "1510";
 
-        let mesAtualSelecionado = "Outubro_2026";
-        let valorTicket = parseFloat(localStorage.getItem('meu_valor_ticket_turbo') || '1000.00');
+        const mesesArray = ['Janeiro', 'Fevereiro', 'Marco', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'];
+        const dataHoje = new Date();
+        const mesRealAtual = mesesArray[dataHoje.getMonth()];
+        const anoRealAtual = dataHoje.getFullYear();
+        const mesAnoAutomatico = `${mesRealAtual}_${anoRealAtual}`;
+
+        let mesAtualSelecionado = localStorage.getItem('ultimo_mes_selecionado') || mesAnoAutomatico;
 
         window.addEventListener('DOMContentLoaded', () => {
             if (sessionStorage.getItem('autenticado_site') === 'true') {
@@ -296,12 +317,8 @@
             const nomeUser = sessionStorage.getItem('nome_utilizador') || 'Mariana';
             document.getElementById('saudacao-usuario').textContent = `Bem-vinda, ${nomeUser}!`;
 
-            // Definir mês selecionado no select se houver memória
-            const salvoMes = localStorage.getItem('ultimo_mes_selecionado');
-            if (salvoMes) {
-                mesAtualSelecionado = salvoMes;
-                document.getElementById('filtro-mes-ano').value = salvoMes;
-            }
+            const selectEl = document.getElementById('filtro-mes-ano');
+            selectEl.value = mesAtualSelecionado;
 
             renderizarTabelaCompras();
         }
@@ -334,7 +351,7 @@
             icone.textContent = gavetinha.classList.contains('hidden') ? '▼' : '▲';
         }
 
-        // RECONHECIMENTO DE VOZ
+        // RECONHECIMENTO DE VOZ INTELIGENTE (ATUALIZADO PARA OS BOTÕES TOPO E BAIXO)
         function ouvirVoz() {
             const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
             if (!SpeechRecognition) {
@@ -344,27 +361,37 @@
 
             const recognition = new SpeechRecognition();
             recognition.lang = 'pt-BR';
-            const btnVoz = document.getElementById('btn-voz');
+            
+            const btnTopo = document.getElementById('btn-voz-topo');
+            const btnForm = document.getElementById('btn-voz-form');
+            const btnFloat = document.getElementById('btn-voz-flutuante');
 
             recognition.onstart = () => {
-                btnVoz.textContent = "🎙️ A escutar...";
-                btnVoz.classList.add('animate-pulse');
+                if (btnTopo) btnTopo.classList.add('animate-pulse', 'bg-amber-500');
+                if (btnForm) btnForm.classList.add('animate-pulse', 'bg-amber-500');
+                if (btnFloat) btnFloat.classList.add('animate-pulse', 'bg-amber-500');
             };
 
             recognition.onresult = (event) => {
                 const texto = event.results[0][0].transcript;
                 processarFalaInteligente(texto);
+                // Levar o ecrã suavemente para o formulário para ver o preenchimento
+                document.getElementById('compra-nome').scrollIntoView({ behavior: 'smooth' });
             };
 
-            recognition.onerror = () => { resetarBotaoVoz(); };
-            recognition.onend = () => { resetarBotaoVoz(); };
+            recognition.onerror = () => { resetarBotoesVoz(); };
+            recognition.onend = () => { resetarBotoesVoz(); };
             recognition.start();
         }
 
-        function resetarBotaoVoz() {
-            const btnVoz = document.getElementById('btn-voz');
-            btnVoz.textContent = "🎤 Falar Produto";
-            btnVoz.classList.remove('animate-pulse');
+        function resetarBotoesVoz() {
+            const btnTopo = document.getElementById('btn-voz-topo');
+            const btnForm = document.getElementById('btn-voz-form');
+            const btnFloat = document.getElementById('btn-voz-flutuante');
+
+            if (btnTopo) btnTopo.classList.remove('animate-pulse', 'bg-amber-500');
+            if (btnForm) btnForm.classList.remove('animate-pulse', 'bg-amber-500');
+            if (btnFloat) btnFloat.classList.remove('animate-pulse', 'bg-amber-500');
         }
 
         function processarFalaInteligente(texto) {
@@ -417,16 +444,35 @@
             if (preco > 0) document.getElementById('compra-preco').value = preco.toFixed(2);
         }
 
-        function alterarTicket() {
-            let novoValor = prompt("Digite o valor total do seu Ticket/Orçamento (R$):", valorTicket);
-            if (novoValor !== null) {
-                novoValor = parseFloat(novoValor.replace(',', '.'));
-                if (!isNaN(novoValor) && novoValor >= 0) {
-                    valorTicket = novoValor;
-                    localStorage.setItem('meu_valor_ticket_turbo', valorTicket);
-                    renderizarTabelaCompras();
-                }
-            }
+        // ORÇAMENTO MENSAL (TICKET + DINHEIRO)
+        function obterOrcamentoDoMes() {
+            let cache = JSON.parse(localStorage.getItem('historico_orcamento_mensal') || '{}');
+            return cache[mesAtualSelecionado] || { ticket: null, dinheiro: null };
+        }
+
+        function guardarOrcamentoDoMes(ticket, dinheiro) {
+            let cache = JSON.parse(localStorage.getItem('historico_orcamento_mensal') || '{}');
+            cache[mesAtualSelecionado] = { ticket, dinheiro };
+            localStorage.setItem('historico_orcamento_mensal', JSON.stringify(cache));
+        }
+
+        function alterarOrcamento() {
+            let atual = obterOrcamentoDoMes();
+            let ticketAtual = atual.ticket !== null ? atual.ticket : 0;
+            let dinheiroAtual = atual.dinheiro !== null ? atual.dinheiro : 0;
+
+            let valTicket = prompt("Digite o valor do TICKET para " + mesAtualSelecionado.replace('_', ' de ') + " (R$):", ticketAtual);
+            if (valTicket === null) return;
+            valTicket = parseFloat(valTicket.replace(',', '.'));
+            if (isNaN(valTicket) || valTicket < 0) { alert("Valor de ticket inválido."); return; }
+
+            let valDinheiro = prompt("Digite o valor em DINHEIRO para " + mesAtualSelecionado.replace('_', ' de ') + " (R$):", dinheiroAtual);
+            if (valDinheiro === null) return;
+            valDinheiro = parseFloat(valDinheiro.replace(',', '.'));
+            if (isNaN(valDinheiro) || valDinheiro < 0) { alert("Valor em dinheiro inválido."); return; }
+
+            guardarOrcamentoDoMes(valTicket, valDinheiro);
+            renderizarTabelaCompras();
         }
 
         function obterListaDoMes() {
@@ -438,6 +484,22 @@
             let cacheGeral = JSON.parse(localStorage.getItem('historico_compras_mensal') || '{}');
             cacheGeral[mesAtualSelecionado] = lista;
             localStorage.setItem('historico_compras_mensal', JSON.stringify(cacheGeral));
+        }
+
+        function calcularTotalAno() {
+            let cacheGeral = JSON.parse(localStorage.getItem('historico_compras_mensal') || '{}');
+            let anoAtual = mesAtualSelecionado.split('_')[1] || '2026';
+            let totalAno = 0;
+
+            for (let chave in cacheGeral) {
+                if (chave.includes(anoAtual)) {
+                    let listaMes = cacheGeral[chave] || [];
+                    listaMes.forEach(i => {
+                        totalAno += (i.qtd * i.preco);
+                    });
+                }
+            }
+            return totalAno;
         }
 
         function adicionarFavorito(nome, qtd, preco, setor) {
@@ -521,6 +583,7 @@
         function partilharWhatsApp() {
             let lista = obterListaDoMes();
             if (lista.length === 0) { alert('A lista deste mês está vazia.'); return; }
+            let orcamento = obterOrcamentoDoMes();
             let texto = `🛒 *Lista de Compras (${mesAtualSelecionado.replace('_', ' de ')})*%0A%0A`;
             let totalGeral = 0;
             lista.forEach(i => {
@@ -528,8 +591,14 @@
                 totalGeral += sub;
                 texto += `- ${i.nome} (${i.qtd}x) = R$ ${sub.toFixed(2)}%0A`;
             });
-            texto += `%0A💰 *Total:* R$ ${totalGeral.toFixed(2)}`;
-            texto += `%0A💳 *Saldo Ticket:* R$ ${(valorTicket - totalGeral).toFixed(2)}`;
+            texto += `%0A💰 *Total do Mês:* R$ ${totalGeral.toFixed(2)}`;
+            if (orcamento.ticket !== null || orcamento.dinheiro !== null) {
+                let t = orcamento.ticket || 0;
+                let d = orcamento.dinheiro || 0;
+                let totalOrcamento = t + d;
+                texto += `%0A💳 *Orçamento Total:* R$ ${totalOrcamento.toFixed(2)} (Ticket: R$ ${t.toFixed(2)} | Dinheiro: R$ ${d.toFixed(2)})`;
+                texto += `%0A💵 *Saldo Restante:* R$ ${(totalOrcamento - totalGeral).toFixed(2)}`;
+            }
             window.open(`https://api.whatsapp.com/send?text=${texto}`, '_blank');
         }
 
@@ -542,8 +611,24 @@
                 tbody.innerHTML = `<tr><td colspan="6" class="py-8 text-center text-gray-400">Nenhum item registado neste mês.</td></tr>`;
                 document.getElementById('total-geral').textContent = `R$ 0`;
                 document.getElementById('total-peguei').textContent = `R$ 0`;
-                let elSaldo = document.getElementById('saldo-ticket');
-                elSaldo.textContent = `R$ ${valorTicket.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+                document.getElementById('total-ano').textContent = `R$ ${calcularTotalAno().toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+                
+                let orcamento = obterOrcamentoDoMes();
+                let elSaldo = document.getElementById('saldo-restante');
+                let elInfo = document.getElementById('info-orcamento');
+
+                if (orcamento.ticket === null && orcamento.dinheiro === null) {
+                    elInfo.textContent = `Ticket: R$ 0 | Dinheiro: R$ 0`;
+                    elSaldo.textContent = `Não definido`;
+                    elSaldo.className = "text-sm sm:text-base font-bold text-gray-400 dark:text-gray-500 mt-0.5";
+                } else {
+                    let t = orcamento.ticket || 0;
+                    let d = orcamento.dinheiro || 0;
+                    let totalOrcamento = t + d;
+                    elInfo.textContent = `Ticket: R$ ${t.toFixed(2)} | Dinheiro: R$ ${d.toFixed(2)}`;
+                    elSaldo.textContent = `R$ ${totalOrcamento.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+                    elSaldo.className = "text-sm sm:text-base font-bold text-indigo-600 dark:text-indigo-400 mt-0.5";
+                }
                 return;
             }
 
@@ -575,13 +660,28 @@
                 `;
             }).join('');
 
-            let saldoRestante = valorTicket - totalGeral;
-            const elSaldo = document.getElementById('saldo-ticket');
-            elSaldo.textContent = `R$ ${saldoRestante.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
-            elSaldo.className = saldoRestante < 0 ? "text-base sm:text-lg font-bold text-red-600 dark:text-red-400 mt-0.5" : "text-base sm:text-lg font-bold text-indigo-600 dark:text-indigo-400 mt-0.5";
+            let orcamento = obterOrcamentoDoMes();
+            const elSaldo = document.getElementById('saldo-restante');
+            const elInfo = document.getElementById('info-orcamento');
+
+            if (orcamento.ticket === null && orcamento.dinheiro === null) {
+                elInfo.textContent = `Ticket: R$ 0 | Dinheiro: R$ 0`;
+                elSaldo.textContent = `Não definido`;
+                elSaldo.className = "text-sm sm:text-base font-bold text-gray-400 dark:text-gray-500 mt-0.5";
+            } else {
+                let t = orcamento.ticket || 0;
+                let d = orcamento.dinheiro || 0;
+                let totalOrcamento = t + d;
+                let saldoRestante = totalOrcamento - totalGeral;
+
+                elInfo.textContent = `Ticket: R$ ${t.toFixed(2)} | Dinheiro: R$ ${d.toFixed(2)}`;
+                elSaldo.textContent = `R$ ${saldoRestante.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+                elSaldo.className = saldoRestante < 0 ? "text-sm sm:text-base font-bold text-red-600 dark:text-red-400 mt-0.5" : "text-sm sm:text-base font-bold text-indigo-600 dark:text-indigo-400 mt-0.5";
+            }
 
             document.getElementById('total-geral').textContent = `R$ ${totalGeral.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
             document.getElementById('total-peguei').textContent = `R$ ${totalPeguei.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+            document.getElementById('total-ano').textContent = `R$ ${calcularTotalAno().toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
         }
     </script>
 </body>
