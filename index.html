@@ -93,13 +93,9 @@
                     </button>
                 </div>
 
-                <!-- 4 CARDS: TOTAL DO MÊS | TICKET | DINHEIRO | TOTAL ANO (LADO A LADO) -->
+                <!-- 4 CARDS: TICKET E DINHEIRO LADO A LADO EM CIMA -->
                 <div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
-                    <div class="bg-gray-50 dark:bg-gray-800 p-3 rounded-xl border border-gray-100 dark:border-gray-700">
-                        <p class="text-[10px] font-semibold text-gray-400 uppercase">Total do Mês</p>
-                        <p id="total-geral" class="text-base sm:text-lg font-bold text-gray-900 dark:text-white mt-0.5">R$ 0</p>
-                    </div>
-                    <!-- Ticket -->
+                    <!-- Caixinha Ticket -->
                     <div class="bg-gray-50 dark:bg-gray-800 p-3 rounded-xl border border-gray-100 dark:border-gray-700 relative">
                         <div class="flex justify-between items-center">
                             <p class="text-[10px] font-semibold text-indigo-600 dark:text-indigo-400 uppercase">💳 Ticket</p>
@@ -107,7 +103,7 @@
                         </div>
                         <p id="saldo-ticket" class="text-sm sm:text-base font-bold text-indigo-600 dark:text-indigo-400 mt-0.5">R$ 0</p>
                     </div>
-                    <!-- Dinheiro -->
+                    <!-- Caixinha Dinheiro -->
                     <div class="bg-gray-50 dark:bg-gray-800 p-3 rounded-xl border border-gray-100 dark:border-gray-700 relative">
                         <div class="flex justify-between items-center">
                             <p class="text-[10px] font-semibold text-amber-600 dark:text-amber-400 uppercase">💵 Dinheiro</p>
@@ -115,7 +111,12 @@
                         </div>
                         <p id="saldo-dinheiro" class="text-sm sm:text-base font-bold text-amber-600 dark:text-amber-400 mt-0.5">R$ 0</p>
                     </div>
-                    <!-- Total Ano -->
+                    <!-- Total do Mês -->
+                    <div class="bg-gray-50 dark:bg-gray-800 p-3 rounded-xl border border-gray-100 dark:border-gray-700">
+                        <p class="text-[10px] font-semibold text-gray-400 uppercase">Total do Mês</p>
+                        <p id="total-geral" class="text-base sm:text-lg font-bold text-gray-900 dark:text-white mt-0.5">R$ 0</p>
+                    </div>
+                    <!-- Total Gasto Ano -->
                     <div class="bg-gray-50 dark:bg-gray-800 p-3 rounded-xl border border-gray-100 dark:border-gray-700">
                         <p class="text-[10px] font-semibold text-emerald-600 dark:text-emerald-400 uppercase">Total Gasto Ano</p>
                         <p id="total-ano" class="text-base sm:text-lg font-bold text-emerald-600 dark:text-emerald-400 mt-0.5">R$ 0</p>
@@ -128,7 +129,7 @@
         <!-- CONTEÚDO PRINCIPAL -->
         <div class="max-w-4xl mx-auto p-4 sm:p-6 space-y-6">
             
-            <!-- FORMULÁRIO MANUAL (OPCIONAL) -->
+            <!-- FORMULÁRIO MANUAL -->
             <div class="bg-white dark:bg-gray-800 p-5 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700">
                 <div class="flex justify-between items-center mb-3">
                     <h2 id="form-titulo" class="text-md font-semibold text-gray-900 dark:text-white">Adicionar Novo Produto</h2>
