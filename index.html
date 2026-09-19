@@ -14,30 +14,48 @@
         <header class="bg-white rounded-2xl shadow-sm p-6 border border-gray-100 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
             <div>
                 <h1 class="text-2xl font-bold text-gray-900">🛒 Lista de Compras Mensal</h1>
-                <p class="text-sm text-gray-500">Adicione, edite produtos e controle os gastos na hora</p>
+                <p class="text-sm text-gray-500">Controlo de gastos e saldo do ticket em tempo real</p>
             </div>
-            <div>
+            <div class="flex flex-wrap items-center gap-2">
+                <button onclick="partilharWhatsApp()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-2 rounded-lg text-xs font-medium transition shadow-sm flex items-center gap-1">
+                    📱 Partilhar WhatsApp
+                </button>
                 <button onclick="limparListaCompras()" class="bg-red-50 hover:bg-red-100 text-red-600 px-3 py-2 rounded-lg text-xs font-medium transition border border-red-200">
-                    🗑️ Limpar Lista Toda
+                    🗑️ Limpar Tudo
                 </button>
             </div>
         </header>
 
-        <!-- Cards de Resumo no Topo -->
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex justify-between items-center">
+        <!-- 3 Cards de Resumo no Topo (Incluindo o Saldo do Ticket) -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <!-- Card 1: Total da Lista -->
+            <div class="bg-white p-5 rounded-2xl shadow-sm border border-gray-100 flex justify-between items-center">
                 <div>
-                    <p class="text-sm font-medium text-gray-500">Valor Total da Lista</p>
-                    <p id="total-geral" class="text-3xl font-bold text-gray-900 mt-1">R$ 0,00</p>
+                    <p class="text-xs font-medium text-gray-500 uppercase">Valor Total da Lista</p>
+                    <p id="total-geral" class="text-2xl font-bold text-gray-900 mt-1">R$ 0,00</p>
                 </div>
-                <div class="w-12 h-12 bg-blue-50 rounded-xl flex items-center justify-center text-blue-600 text-xl font-bold">📋</div>
+                <div class="w-10 h-10 bg-blue-50 rounded-xl flex items-center justify-center text-blue-600 text-lg font-bold">📋</div>
             </div>
-            <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex justify-between items-center">
+
+            <!-- Card 2: Valor no Carrinho (Peguei) -->
+            <div class="bg-white p-5 rounded-2xl shadow-sm border border-gray-100 flex justify-between items-center">
                 <div>
-                    <p class="text-sm font-medium text-gray-500">Valor no Carrinho (Peguei)</p>
-                    <p id="total-peguei" class="text-3xl font-bold text-emerald-600 mt-1">R$ 0,00</p>
+                    <p class="text-xs font-medium text-gray-500 uppercase">No Carrinho (Peguei)</p>
+                    <p id="total-peguei" class="text-2xl font-bold text-emerald-600 mt-1">R$ 0,00</p>
                 </div>
-                <div class="w-12 h-12 bg-emerald-50 rounded-xl flex items-center justify-center text-emerald-600 text-xl font-bold">🛒</div>
+                <div class="w-10 h-10 bg-emerald-50 rounded-xl flex items-center justify-center text-emerald-600 text-lg font-bold">🛒</div>
+            </div>
+
+            <!-- Card 3: Saldo Restante do Ticket -->
+            <div class="bg-white p-5 rounded-2xl shadow-sm border border-gray-100 flex justify-between items-center relative">
+                <div>
+                    <div class="flex items-center gap-1">
+                        <p class="text-xs font-medium text-gray-500 uppercase">Saldo do Ticket</p>
+                        <button onclick="alterarTicket()" class="text-blue-600 text-xs hover:underline" title="Alterar valor do ticket">✏️</button>
+                    </div>
+                    <p id="saldo-ticket" class="text-2xl font-bold text-indigo-600 mt-1">R$ 1.000,00</p>
+                </div>
+                <div class="w-10 h-10 bg-indigo-50 rounded-xl flex items-center justify-center text-indigo-600 text-lg font-bold">💳</div>
             </div>
         </div>
 
@@ -101,13 +119,28 @@
 
     </div>
 
-    <!-- Script de Gestão com Edição e Exclusão -->
+    <!-- Script de Gestão Inteligente -->
     <script>
         let listaComprasCache = JSON.parse(localStorage.getItem('minha_lista_compras_direta') || '[]');
+        let valorTicket = parseFloat(localStorage.getItem('meu_valor_ticket') || '1000.00');
 
         window.addEventListener('DOMContentLoaded', () => {
             renderizarTabelaCompras();
         });
+
+        function alterarTicket() {
+            let novoValor = prompt("Digite o valor total do seu Ticket/Orçamento (R$):", valorTicket);
+            if (novoValor !== null) {
+                novoValor = parseFloat(novoValor.replace(',', '.'));
+                if (!isNaN(novoValor) && novoValor >= 0) {
+                    valorTicket = novoValor;
+                    localStorage.setItem('meu_valor_ticket', valorTicket);
+                    renderizarTabelaCompras();
+                } else {
+                    alert("Por favor, insira um valor numérico válido.");
+                }
+            }
+        }
 
         function salvarItemCompra(e) {
             e.preventDefault();
@@ -117,7 +150,6 @@
             const preco = parseFloat(document.getElementById('compra-preco').value) || 0;
 
             if (editId) {
-                // Atualizar item existente
                 const item = listaComprasCache.find(i => i.id == editId);
                 if (item) {
                     item.nome = nome;
@@ -125,7 +157,6 @@
                     item.preco = preco;
                 }
             } else {
-                // Adicionar novo item
                 const novoItem = {
                     id: Date.now(),
                     nome: nome,
@@ -187,6 +218,24 @@
             }
         }
 
+        function partilharWhatsApp() {
+            if (listaComprasCache.length === 0) {
+                alert('A lista está vazia.');
+                return;
+            }
+            let texto = "🛒 *Minha Lista de Compras Mensal*%0A%0A";
+            let totalGeral = 0;
+            listaComprasCache.forEach(i => {
+                let sub = i.qtd * i.preco;
+                totalGeral += sub;
+                texto += `- ${i.nome} (${i.qtd}x R$ ${i.preco.toFixed(2)}) = R$ ${sub.toFixed(2)}%0A`;
+            });
+            texto += `%0A💰 *Valor Total:* R$ ${totalGeral.toFixed(2)}`;
+            texto += `%0A💳 *Saldo do Ticket:* R$ ${(valorTicket - totalGeral).toFixed(2)}`;
+            
+            window.open(`https://api.whatsapp.com/send?text=${texto}`, '_blank');
+        }
+
         function salvarEAtualizar() {
             localStorage.setItem('minha_lista_compras_direta', JSON.stringify(listaComprasCache));
             renderizarTabelaCompras();
@@ -200,6 +249,10 @@
                 tbody.innerHTML = `<tr><td colspan="6" class="py-8 text-center text-gray-400">Nenhum item na lista ainda. Adicione acima!</td></tr>`;
                 document.getElementById('total-geral').textContent = 'R$ 0,00';
                 document.getElementById('total-peguei').textContent = 'R$ 0,00';
+                let saldoInicial = valorTicket - 0;
+                let elSaldo = document.getElementById('saldo-ticket');
+                elSaldo.textContent = `R$ ${saldoInicial.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+                elSaldo.className = "text-2xl font-bold text-indigo-600 mt-1";
                 return;
             }
 
@@ -229,6 +282,18 @@
                     </tr>
                 `;
             }).join('');
+
+            // Cálculo do Saldo do Ticket
+            let saldoRestante = valorTicket - totalGeral;
+            const elSaldo = document.getElementById('saldo-ticket');
+            elSaldo.textContent = `R$ ${saldoRestante.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+            
+            // Se o saldo ficar negativo (passou do ticket), pinta o texto de vermelho para avisar
+            if (saldoRestante < 0) {
+                elSaldo.className = "text-2xl font-bold text-red-600 mt-1";
+            } else {
+                elSaldo.className = "text-2xl font-bold text-indigo-600 mt-1";
+            }
 
             document.getElementById('total-geral').textContent = `R$ ${totalGeral.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
             document.getElementById('total-peguei').textContent = `R$ ${totalPeguei.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
