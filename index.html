@@ -235,7 +235,7 @@
         </div>
     </div>
 
-    <!-- SCRIPT DE SEGURANÇA, LÓGICA E RECONHECIMENTO DE VOZ -->
+    <!-- SCRIPT DE SEGURANÇA E LÓGICA -->
     <script>
         const SENHA_MESTRA = "1510";
 
@@ -304,7 +304,7 @@
             }
         }
 
-        // FUNÇÃO INTELIGENTE DE RECONHECIMENTO DE VOZ
+        // MOTOR DE RECONHECIMENTO DE VOZ INTELIGENTE ATUALIZADO
         function ouvirVoz() {
             const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
             if (!SpeechRecognition) {
@@ -317,13 +317,13 @@
             const btnVoz = document.getElementById('btn-voz');
 
             recognition.onstart = () => {
-                btnVoz.textContent = "🎙️ A escutar... Fale produto e preço";
+                btnVoz.textContent = "🎙️ A escutar... Fale produto, qtd e preço";
                 btnVoz.classList.remove('bg-red-500', 'hover:bg-red-600');
                 btnVoz.classList.add('bg-amber-500', 'animate-pulse');
             };
 
             recognition.onresult = (event) => {
-                const texto = event.results[0][0].transcript.toLowerCase();
+                const texto = event.results[0][0].transcript;
                 processarFalaInteligente(texto);
             };
 
@@ -346,43 +346,83 @@
             btnVoz.classList.add('bg-red-500', 'hover:bg-red-600');
         }
 
-        // Tenta extrair o nome, preço e quantidade do que você falou
+        // NOVO ANALISADOR INTELIGENTE DE FRASE COMPLETA
         function processarFalaInteligente(texto) {
-            // Exemplo de fala esperada: "arroz 17,90 2" ou "café 18 reais"
-            // Vamos separar por espaços
-            const partes = texto.replace('reais', '').replace('real', '').replace(',', '.').trim().split(/\s+/);
-            
-            let precoEncontrado = 0;
-            let qtdEncontrada = 1;
-            let nomePalavras = [];
+            let limpo = texto.toLowerCase()
+                .replace(/quantidade/g, '')
+                .replace(/reais/g, '')
+                .replace(/real/g, '')
+                .replace(/por/g, '');
 
-            partes.forEach(p => {
-                let numero = parseFloat(p);
-                // Se for um número e ainda não temos preço, assume que é o preço
-                if (!isNaN(numero) && precoEncontrado === 0 && nomePalavras.length > 0) {
-                    precoEncontrado = numero;
-                } else if (!isNaN(numero) && precoEncontrado > 0) {
-                    // Se já temos preço, o próximo número é a quantidade
-                    qtdEncontrada = parseInt(numero) || 1;
-                } else {
-                    nomePalavras.push(p);
+            // Converter palavras faladas comuns para números digitais
+            limpo = limpo.replace(/\bhum\b|\buma\b/g, '1')
+                         .replace(/\bdois\b|\bduas\b/g, '2')
+                         .replace(/\btrês\b/g, '3')
+                         .replace(/\bquatro\b/g, '4')
+                         .replace(/\bcinco\b/g, '5')
+                         .replace(/\bseis\b/g, '6')
+                         .replace(/\bsete\b/g, '7')
+                         .replace(/\boito\b/g, '8')
+                         .replace(/\bnove\b/g, '9')
+                         .replace(/\bdez\b/g, '10');
+
+            // Ajustar vírgula decimal para ponto (ex: 17,90 -> 17.90)
+            limpo = limpo.replace(/(\d+),(\d+)/g, '$1.$2');
+
+            // Encontrar todos os números na frase
+            const regexNums = /\d+(\.\d+)?/g;
+            const numsMatch = limpo.match(regexNums);
+
+            let preco = 0;
+            let qtd = 1;
+            let nomeProduto = limpo;
+
+            if (numsMatch && numsMatch.length > 0) {
+                let numeros = numsMatch.map(Number);
+
+                // Verificar se algum número tem ponto decimal (ex: 17.90) -> esse é o preço
+                let comPonto = numeros.find(n => String(n).includes('.'));
+                
+                if (comPonto !== undefined) {
+                    preco = comPonto;
+                    let outros = numeros.filter(n => n !== comPonto);
+                    if (outros.length > 0) {
+                        qtd = outros[0];
+                    }
+                } else if (numeros.length >= 2) {
+                    // Se houver dois números inteiros (ex: feijão 2 18), o primeiro é qtd e o segundo é preço
+                    qtd = numeros[0];
+                    preco = numeros[1];
+                } else if (numeros.length === 1) {
+                    // Se houver apenas um número, verificamos se é maior que 10 (preço) ou pequeno (quantidade)
+                    if (numeros[0] > 10) {
+                        preco = numeros[0];
+                    } else {
+                        qtd = numeros[0];
+                    }
                 }
-            });
 
-            let nomeProduto = nomePalavras.join(' ');
-            if (!nomeProduto) nomeProduto = texto; // fallback se falar só números
-
-            // Capitalizar primeira letra
-            nomeProduto = nomeProduto.charAt(0).toUpperCase() + nomeProduto.slice(1);
-
-            // Preencher os campos automaticamente para você ver
-            document.getElementById('compra-nome').value = nomeProduto;
-            document.getElementById('compra-qtd').value = qtdEncontrada;
-            if (precoEncontrado > 0) {
-                document.getElementById('compra-preco').value = precoEncontrado.toFixed(2);
+                // Remover os números da string para ficar apenas com o nome do produto
+                numsMatch.forEach(numStr => {
+                    nomeProduto = nomeProduto.replace(numStr, '');
+                });
             }
 
-            // Destaque visual temporário nos campos preenchidos
+            // Limpar espaços extras do nome
+            nomeProduto = nomeProduto.replace(/\s+/g, ' ').trim();
+            if (!nomeProduto) nomeProduto = texto;
+
+            // Capitalizar a primeira letra do produto
+            nomeProduto = nomeProduto.charAt(0).toUpperCase() + nomeProduto.slice(1);
+
+            // Preencher os campos automaticamente
+            document.getElementById('compra-nome').value = nomeProduto;
+            document.getElementById('compra-qtd').value = qtd > 0 ? qtd : 1;
+            if (preco > 0) {
+                document.getElementById('compra-preco').value = preco.toFixed(2);
+            }
+
+            // Destaque visual verde nos campos atualizados
             document.getElementById('compra-nome').classList.add('ring-2', 'ring-emerald-500');
             setTimeout(() => {
                 document.getElementById('compra-nome').classList.remove('ring-2', 'ring-emerald-500');
