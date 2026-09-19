@@ -13,7 +13,7 @@
         tailwind.config = { darkMode: 'class' }
     </script>
 </head>
-<body class="bg-gray-50 dark:bg-gray-900 min-h-screen text-gray-800 dark:text-gray-100 transition-colors duration-200 pb-20">
+<body class="bg-gray-50 dark:bg-gray-900 min-h-screen text-gray-800 dark:text-gray-100 transition-colors duration-200 pb-28">
 
     <!-- TELA DE LOGIN / CAPA COM NOME E SENHA -->
     <div id="tela-login" class="fixed inset-0 z-50 bg-gray-900/90 backdrop-blur-sm flex items-center justify-center p-4">
@@ -43,33 +43,26 @@
     <!-- CONTEÚDO DO SITE -->
     <div id="conteudo-site" class="hidden">
         
-        <!-- TOPO FIXO -->
+        <!-- TOPO FIXO SUPER COMPACTO -->
         <div class="sticky top-0 z-40 bg-white/95 dark:bg-gray-900/95 backdrop-blur-md shadow-sm border-b border-gray-100 dark:border-gray-800 transition-colors">
-            <div class="max-w-4xl mx-auto p-4 space-y-3">
+            <div class="max-w-4xl mx-auto p-3 space-y-2">
                 
+                <!-- LINHA 1: TÍTULO + RELATÓRIO ANUAL NO TOPO -->
                 <div class="flex justify-between items-center">
                     <div>
-                        <h1 class="text-xl font-bold text-gray-900 dark:text-white flex items-center gap-1.5">🛒 Lista de Compras</h1>
-                        <p id="saudacao-usuario" class="text-xs text-gray-500 dark:text-gray-400">Olá!</p>
+                        <h1 class="text-base sm:text-lg font-bold text-gray-900 dark:text-white flex items-center gap-1.5">🛒 Lista de Compras</h1>
+                        <p id="saudacao-usuario" class="text-[11px] text-gray-500 dark:text-gray-400">Olá!</p>
                     </div>
-                    <div class="flex items-center gap-1.5">
-                        <button onclick="alternarDarkMode()" class="p-2 rounded-xl bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300 text-xs transition" title="Modo Escuro">
-                            🌙/☀️
-                        </button>
-                        <button onclick="partilharWhatsApp()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-2 rounded-xl text-xs font-medium transition flex items-center gap-1 shadow-sm">
-                            📱 WhatsApp
-                        </button>
-                        <button onclick="bloquearNovamente()" class="bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 text-gray-600 dark:text-gray-300 p-2 rounded-xl text-xs transition" title="Sair">
-                            🔒
-                        </button>
-                    </div>
+                    <button onclick="abrirRelatorioAnual()" class="bg-amber-600 hover:bg-amber-700 text-white px-3 py-1.5 rounded-xl text-xs font-medium transition shadow-sm flex items-center gap-1">
+                        📊 Relatório Anual
+                    </button>
                 </div>
 
-                <!-- SELETOR DE MÊS E ANO + RELATÓRIO -->
-                <div class="flex flex-col sm:flex-row items-center justify-between bg-blue-50 dark:bg-blue-950/40 border border-blue-100 dark:border-blue-900/50 p-2.5 rounded-2xl gap-2">
-                    <div class="flex items-center w-full sm:w-auto justify-between sm:justify-start">
-                        <span class="text-xs font-semibold text-blue-700 dark:text-blue-300 uppercase px-2">📅 Mês:</span>
-                        <select id="filtro-mes-ano" onchange="mudarMesReferencia()" class="bg-white dark:bg-gray-900 text-gray-800 dark:text-white px-3 py-1.5 rounded-xl text-xs font-semibold border border-blue-200 dark:border-blue-800 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                <!-- LINHA 2: SELETOR DE MÊS E ANO -->
+                <div class="flex items-center justify-between bg-blue-50 dark:bg-blue-950/40 border border-blue-100 dark:border-blue-900/50 p-2 rounded-xl">
+                    <span class="text-xs font-semibold text-blue-700 dark:text-blue-300 uppercase px-1">📅 Mês:</span>
+                    <div class="flex gap-1">
+                        <select id="filtro-mes-ano" onchange="mudarMesReferencia()" class="bg-white dark:bg-gray-900 text-gray-800 dark:text-white px-2.5 py-1 rounded-lg text-xs font-semibold border border-blue-200 dark:border-blue-800 focus:outline-none focus:ring-1 focus:ring-blue-500">
                             <option value="Janeiro">Janeiro</option>
                             <option value="Fevereiro">Fevereiro</option>
                             <option value="Marco">Março</option>
@@ -83,49 +76,46 @@
                             <option value="Novembro">Novembro</option>
                             <option value="Dezembro">Dezembro</option>
                         </select>
-                        <select id="filtro-ano" onchange="mudarMesReferencia()" class="bg-white dark:bg-gray-900 text-gray-800 dark:text-white px-3 py-1.5 rounded-xl text-xs font-semibold border border-blue-200 dark:border-blue-800 focus:outline-none focus:ring-2 focus:ring-blue-500 ml-1.5">
+                        <select id="filtro-ano" onchange="mudarMesReferencia()" class="bg-white dark:bg-gray-900 text-gray-800 dark:text-white px-2 py-1 rounded-lg text-xs font-semibold border border-blue-200 dark:border-blue-800 focus:outline-none focus:ring-1 focus:ring-blue-500">
                             <option value="2026">2026</option>
                             <option value="2027">2027</option>
                         </select>
                     </div>
-                    <button onclick="abrirRelatorioAnual()" class="w-full sm:w-auto bg-amber-600 hover:bg-amber-700 text-white px-3 py-1.5 rounded-xl text-xs font-medium transition shadow-sm flex items-center justify-center gap-1">
-                        📊 Detalhes Mês a Mês
-                    </button>
                 </div>
 
-                <!-- PAINEL UNIFICADO COM AS 4 CAIXINHAS NA MESMA VISÃO -->
+                <!-- LINHA 3: AS 4 CAIXINHAS NA MESMA VISÃO -->
                 <div class="grid grid-cols-2 gap-2">
                     <!-- 1. Saldo Ticket -->
-                    <div class="bg-gray-50 dark:bg-gray-800 p-3 rounded-xl border border-gray-100 dark:border-gray-700 relative">
+                    <div class="bg-gray-50 dark:bg-gray-800 p-2.5 rounded-xl border border-gray-100 dark:border-gray-700 relative">
                         <div class="flex justify-between items-center">
                             <p class="text-[10px] font-semibold text-indigo-600 dark:text-indigo-400 uppercase">💳 Ticket Restante</p>
-                            <button onclick="alterarTicket()" class="text-xs text-indigo-500 hover:underline">✏️ Definir</button>
+                            <button onclick="alterarTicket()" class="text-[11px] text-indigo-500 hover:underline">✏️ Definir</button>
                         </div>
-                        <p id="saldo-ticket" class="text-sm sm:text-base font-bold text-indigo-600 dark:text-indigo-400 mt-0.5">R$ 0</p>
+                        <p id="saldo-ticket" class="text-sm font-bold text-indigo-600 dark:text-indigo-400 mt-0.5">R$ 0</p>
                         <p id="info-ticket-total" class="text-[9px] text-gray-400 mt-0.5 truncate">Inicial: não def.</p>
                     </div>
 
                     <!-- 2. Dinheiro -->
-                    <div class="bg-gray-50 dark:bg-gray-800 p-3 rounded-xl border border-gray-100 dark:border-gray-700 relative">
+                    <div class="bg-gray-50 dark:bg-gray-800 p-2.5 rounded-xl border border-gray-100 dark:border-gray-700 relative">
                         <div class="flex justify-between items-center">
                             <p class="text-[10px] font-semibold text-amber-600 dark:text-amber-400 uppercase">💵 Dinheiro</p>
-                            <button onclick="alterarDinheiro()" class="text-xs text-amber-500 hover:underline">✏️ Definir</button>
+                            <button onclick="alterarDinheiro()" class="text-[11px] text-amber-500 hover:underline">✏️ Definir</button>
                         </div>
-                        <p id="saldo-dinheiro" class="text-sm sm:text-base font-bold text-amber-600 dark:text-amber-400 mt-0.5">R$ 0</p>
+                        <p id="saldo-dinheiro" class="text-sm font-bold text-amber-600 dark:text-amber-400 mt-0.5">R$ 0</p>
                         <p class="text-[9px] text-gray-400 mt-0.5 truncate">Orçamento em espécie</p>
                     </div>
 
                     <!-- 3. Total do Mês -->
-                    <div class="bg-gray-50 dark:bg-gray-800 p-3 rounded-xl border border-gray-100 dark:border-gray-700">
+                    <div class="bg-gray-50 dark:bg-gray-800 p-2.5 rounded-xl border border-gray-100 dark:border-gray-700">
                         <p class="text-[10px] font-semibold text-gray-400 uppercase">🛒 Total do Mês</p>
-                        <p id="total-geral" class="text-sm sm:text-base font-bold text-gray-900 dark:text-white mt-0.5">R$ 0</p>
+                        <p id="total-geral" class="text-sm font-bold text-gray-900 dark:text-white mt-0.5">R$ 0</p>
                         <p class="text-[9px] text-gray-400 mt-0.5">Gastos atuais</p>
                     </div>
 
                     <!-- 4. Total Gasto no Ano -->
-                    <div class="bg-gray-50 dark:bg-gray-800 p-3 rounded-xl border border-gray-100 dark:border-gray-700">
+                    <div class="bg-gray-50 dark:bg-gray-800 p-2.5 rounded-xl border border-gray-100 dark:border-gray-700">
                         <p class="text-[10px] font-semibold text-emerald-600 dark:text-emerald-400 uppercase">🌟 Total Gasto Ano</p>
-                        <p id="total-ano" class="text-sm sm:text-base font-bold text-emerald-600 dark:text-emerald-400 mt-0.5">R$ 0</p>
+                        <p id="total-ano" class="text-sm font-bold text-emerald-600 dark:text-emerald-400 mt-0.5">R$ 0</p>
                         <p class="text-[9px] text-gray-400 mt-0.5">Acumulado anual</p>
                     </div>
                 </div>
@@ -220,10 +210,24 @@
         </div>
     </div>
 
-    <!-- MICROFONE FLUTUANTE -->
-    <button onclick="ouvirVoz()" id="btn-voz-flutuante" class="fixed bottom-6 right-6 z-50 bg-red-600 hover:bg-red-700 text-white w-14 h-14 rounded-full shadow-2xl flex items-center justify-center text-2xl transition transform hover:scale-105 active:scale-95" title="Falar e Adicionar Automaticamente">
-        🎤
-    </button>
+    <!-- BARRA INFERIOR DISCRETA COM OS BOTÕES UTILITÁRIOS (WHATSAPP, MODO ESCURO E SAIR) + MICROFONE -->
+    <div class="fixed bottom-0 left-0 right-0 z-40 bg-white/90 dark:bg-gray-900/90 backdrop-blur-md border-t border-gray-200 dark:border-gray-800 px-4 py-2.5 flex justify-between items-center max-w-4xl mx-auto rounded-t-2xl shadow-lg">
+        <div class="flex items-center gap-2">
+            <button onclick="alternarDarkMode()" class="px-3 py-1.5 rounded-xl bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300 text-xs font-medium transition flex items-center gap-1" title="Modo Escuro">
+                🌙/☀️ Tema
+            </button>
+            <button onclick="partilharWhatsApp()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-1.5 rounded-xl text-xs font-medium transition flex items-center gap-1 shadow-sm">
+                📱 WhatsApp
+            </button>
+            <button onclick="bloquearNovamente()" class="px-3 py-1.5 rounded-xl bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300 text-xs font-medium transition flex items-center gap-1" title="Sair">
+                🔒 Sair
+            </button>
+        </div>
+        <!-- MICROFONE FLUTUANTE NA BARRA -->
+        <button onclick="ouvirVoz()" id="btn-voz-flutuante" class="bg-red-600 hover:bg-red-700 text-white w-12 h-12 rounded-full shadow-lg flex items-center justify-center text-xl transition transform hover:scale-105 active:scale-95" title="Falar e Adicionar Automaticamente">
+            🎤
+        </button>
+    </div>
 
     <!-- SCRIPT DE SEGURANÇA E LÓGICA -->
     <script>
@@ -597,22 +601,22 @@
             if (ticketTotal === null) {
                 elTicket.textContent = `Não def.`;
                 elTicketInfo.textContent = `Clique em Definir ✏️`;
-                elTicket.className = "text-sm sm:text-base font-bold text-gray-400 dark:text-gray-500 mt-0.5";
+                elTicket.className = "text-sm font-bold text-gray-400 dark:text-gray-500 mt-0.5";
             } else {
                 let ticketRestante = ticketTotal - totalGeral;
                 elTicket.textContent = `R$ ${ticketRestante.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
                 elTicketInfo.textContent = `Total inicial: R$ ${ticketTotal.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
-                elTicket.className = ticketRestante < 0 ? "text-sm sm:text-base font-bold text-red-600 dark:text-red-400 mt-0.5" : "text-sm sm:text-base font-bold text-indigo-600 dark:text-indigo-400 mt-0.5";
+                elTicket.className = ticketRestante < 0 ? "text-sm font-bold text-red-600 dark:text-red-400 mt-0.5" : "text-sm font-bold text-indigo-600 dark:text-indigo-400 mt-0.5";
             }
 
             let dinheiroVal = obterDinheiroDoMes();
             let elDinheiro = document.getElementById('saldo-dinheiro');
             if (dinheiroVal === null) {
                 elDinheiro.textContent = `Não def.`;
-                elDinheiro.className = "text-sm sm:text-base font-bold text-gray-400 dark:text-gray-500 mt-0.5";
+                elDinheiro.className = "text-sm font-bold text-gray-400 dark:text-gray-500 mt-0.5";
             } else {
                 elDinheiro.textContent = `R$ ${dinheiroVal.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
-                elDinheiro.className = "text-sm sm:text-base font-bold text-amber-600 dark:text-amber-400 mt-0.5";
+                elDinheiro.className = "text-sm font-bold text-amber-600 dark:text-amber-400 mt-0.5";
             }
 
             if (lista.length === 0) {
