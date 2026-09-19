@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Lista de Compras Segura</title>
-    <!-- Ícone personalizado para o aplicativo no telemóvel -->
+    <!-- Ícone personalizado -->
     <link rel="icon" href="https://cdn-icons-png.flaticon.com/512/1170/1170576.png" type="image/png">
     <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/1170/1170576.png">
     <!-- Tailwind CSS -->
@@ -65,10 +65,32 @@
                     </div>
                 </div>
 
+                <!-- SELETOR DE MÊS E ANO -->
+                <div class="flex items-center justify-between bg-blue-50 dark:bg-blue-950/40 border border-blue-100 dark:border-blue-900/50 p-2.5 rounded-2xl">
+                    <span class="text-xs font-semibold text-blue-700 dark:text-blue-300 uppercase px-2">📅 Mês de Referência:</span>
+                    <select id="filtro-mes-ano" onchange="mudarMesReferencia()" class="bg-white dark:bg-gray-900 text-gray-800 dark:text-white px-3 py-1.5 rounded-xl text-xs font-semibold border border-blue-200 dark:border-blue-800 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        <option value="Outubro_2026">Outubro / 2026</option>
+                        <option value="Novembro_2026">Novembro / 2026</option>
+                        <option value="Dezembro_2026">Dezembro / 2026</option>
+                        <option value="Janeiro_2027">Janeiro / 2027</option>
+                        <option value="Fevereiro_2027">Fevereiro / 2027</option>
+                        <option value="Marco_2027">Março / 2027</option>
+                        <option value="Abril_2027">Abril / 2027</option>
+                        <option value="Maio_2027">Maio / 2027</option>
+                        <option value="Junho_2027">Junho / 2027</option>
+                        <option value="Julho_2027">Julho / 2027</option>
+                        <option value="Agosto_2027">Agosto / 2027</option>
+                        <option value="Setembro_2027">Setembro / 2027</option>
+                        <option value="Outubro_2027">Outubro / 2027</option>
+                        <option value="Novembro_2027">Novembro / 2027</option>
+                        <option value="Dezembro_2027">Dezembro / 2027</option>
+                    </select>
+                </div>
+
                 <!-- 3 Cards de Resumo -->
                 <div class="grid grid-cols-3 gap-2">
                     <div class="bg-gray-50 dark:bg-gray-800 p-3 rounded-xl border border-gray-100 dark:border-gray-700">
-                        <p class="text-[10px] font-semibold text-gray-400 uppercase">Total</p>
+                        <p class="text-[10px] font-semibold text-gray-400 uppercase">Total do Mês</p>
                         <p id="total-geral" class="text-base sm:text-lg font-bold text-gray-900 dark:text-white mt-0.5">R$ 0</p>
                     </div>
                     <div class="bg-gray-50 dark:bg-gray-800 p-3 rounded-xl border border-gray-100 dark:border-gray-700">
@@ -153,11 +175,10 @@
                 </div>
             </div>
 
-            <!-- FORMULÁRIO COM O BOTÃO DE VOZ (MICROFONE) -->
+            <!-- FORMULÁRIO COM MICROFONE -->
             <div class="bg-white dark:bg-gray-800 p-5 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700">
                 <div class="flex justify-between items-center mb-3">
                     <h2 id="form-titulo" class="text-md font-semibold text-gray-900 dark:text-white">Adicionar Novo Produto</h2>
-                    <!-- BOTÃO DO MICROFONE INTELIGENTE -->
                     <button type="button" onclick="ouvirVoz()" id="btn-voz" class="bg-red-500 hover:bg-red-600 text-white px-3 py-1.5 rounded-xl text-xs font-medium transition flex items-center gap-1.5 shadow-sm">
                         🎤 Falar Produto
                     </button>
@@ -207,7 +228,7 @@
                 <div class="flex justify-between items-center">
                     <h3 id="status-progresso" class="text-md font-semibold text-gray-900 dark:text-white">Itens na Lista (0)</h3>
                     <div class="flex gap-2">
-                        <button onclick="limparListaCompras()" class="text-xs text-red-500 hover:underline">Limpar Tudo</button>
+                        <button onclick="limparListaCompras()" class="text-xs text-red-500 hover:underline">Limpar Mês Atual</button>
                     </div>
                 </div>
 
@@ -225,7 +246,7 @@
                         </thead>
                         <tbody id="tabela-compras" class="divide-y divide-gray-50 dark:divide-gray-700 text-sm">
                             <tr>
-                                <td colspan="6" class="py-8 text-center text-gray-400">Nenhum item na lista.</td>
+                                <td colspan="6" class="py-8 text-center text-gray-400">Nenhum item neste mês.</td>
                             </tr>
                         </tbody>
                     </table>
@@ -235,18 +256,17 @@
         </div>
     </div>
 
-    <!-- SCRIPT DE SEGURANÇA E LÓGICA -->
+    <!-- SCRIPT DE SEGURANÇA E LÓGICA COM HISTÓRICO MENSAL -->
     <script>
         const SENHA_MESTRA = "1510";
 
-        let listaComprasCache = JSON.parse(localStorage.getItem('minha_lista_compras_turbo') || '[]');
+        let mesAtualSelecionado = "Outubro_2026";
         let valorTicket = parseFloat(localStorage.getItem('meu_valor_ticket_turbo') || '1000.00');
 
         window.addEventListener('DOMContentLoaded', () => {
             if (sessionStorage.getItem('autenticado_site') === 'true') {
                 liberarAcesso();
             }
-
             if (localStorage.getItem('dark_mode') === 'true') {
                 document.documentElement.classList.add('dark');
             }
@@ -276,6 +296,13 @@
             const nomeUser = sessionStorage.getItem('nome_utilizador') || 'Mariana';
             document.getElementById('saudacao-usuario').textContent = `Bem-vinda, ${nomeUser}!`;
 
+            // Definir mês selecionado no select se houver memória
+            const salvoMes = localStorage.getItem('ultimo_mes_selecionado');
+            if (salvoMes) {
+                mesAtualSelecionado = salvoMes;
+                document.getElementById('filtro-mes-ano').value = salvoMes;
+            }
+
             renderizarTabelaCompras();
         }
 
@@ -293,22 +320,25 @@
             localStorage.setItem('dark_mode', isDark);
         }
 
+        function mudarMesReferencia() {
+            mesAtualSelecionado = document.getElementById('filtro-mes-ano').value;
+            localStorage.setItem('ultimo_mes_selecionado', mesAtualSelecionado);
+            renderizarTabelaCompras();
+            cancelarEdicao();
+        }
+
         function alternarGavetinha() {
             const gavetinha = document.getElementById('gavetinha-frequentes');
             const icone = document.getElementById('icone-gavetinha');
             gavetinha.classList.toggle('hidden');
-            if (gavetinha.classList.contains('hidden')) {
-                icone.textContent = '▼';
-            } else {
-                icone.textContent = '▲';
-            }
+            icone.textContent = gavetinha.classList.contains('hidden') ? '▼' : '▲';
         }
 
-        // MOTOR DE RECONHECIMENTO DE VOZ INTELIGENTE ATUALIZADO (SEPARAÇÃO CORRETA)
+        // RECONHECIMENTO DE VOZ
         function ouvirVoz() {
             const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
             if (!SpeechRecognition) {
-                alert("O seu navegador não suporta reconhecimento de voz. Tente usar pelo Google Chrome no telemóvel.");
+                alert("O seu navegador não suporta reconhecimento de voz.");
                 return;
             }
 
@@ -317,9 +347,8 @@
             const btnVoz = document.getElementById('btn-voz');
 
             recognition.onstart = () => {
-                btnVoz.textContent = "🎙️ A escutar... Fale produto, qtd e preço";
-                btnVoz.classList.remove('bg-red-500', 'hover:bg-red-600');
-                btnVoz.classList.add('bg-amber-500', 'animate-pulse');
+                btnVoz.textContent = "🎙️ A escutar...";
+                btnVoz.classList.add('animate-pulse');
             };
 
             recognition.onresult = (event) => {
@@ -327,26 +356,17 @@
                 processarFalaInteligente(texto);
             };
 
-            recognition.onerror = () => {
-                resetarBotaoVoz();
-                alert("Não consegui ouvir bem. Tente novamente.");
-            };
-
-            recognition.onend = () => {
-                resetarBotaoVoz();
-            };
-
+            recognition.onerror = () => { resetarBotaoVoz(); };
+            recognition.onend = () => { resetarBotaoVoz(); };
             recognition.start();
         }
 
         function resetarBotaoVoz() {
             const btnVoz = document.getElementById('btn-voz');
             btnVoz.textContent = "🎤 Falar Produto";
-            btnVoz.classList.remove('bg-amber-500', 'animate-pulse');
-            btnVoz.classList.add('bg-red-500', 'hover:bg-red-600');
+            btnVoz.classList.remove('animate-pulse');
         }
 
-        // NOVO MOTOR DE SEPARAÇÃO: NOME ANTES DOS NÚMEROS, QTD E PREÇO DEPOIS
         function processarFalaInteligente(texto) {
             let limpo = texto.toLowerCase()
                 .replace(/quantidade/g, '')
@@ -354,12 +374,9 @@
                 .replace(/real/g, '')
                 .replace(/por/g, '');
 
-            // Converter palavras faladas comuns para números digitais
             const mapaNums = {
                 'um': '1', 'uma': '1', 'dois': '2', 'duas': '2', 'três': '3', 'tres': '3',
-                'quatro': '4', 'cinco': '5', 'seis': '6', 'sete': '7', 'oito': '8', 'nove': '9', 'dez': '10',
-                'onze': '11', 'doze': '12', 'treze': '13', 'quatorze': '14', 'quinze': '15',
-                'vinte': '20', 'trinta': '30', 'quarenta': '40', 'cinquenta': '50'
+                'quatro': '4', 'cinco': '5', 'seis': '6', 'sete': '7', 'oito': '8', 'nove': '9', 'dez': '10'
             };
 
             let palavras = limpo.split(/\s+/);
@@ -375,9 +392,7 @@
                 if (!isNaN(num) && parte.match(/^\d+(\.\d+)?$/)) {
                     numerosEncontrados.push(num);
                 } else {
-                    if (numerosEncontrados.length === 0) {
-                        nomeArr.push(parte);
-                    }
+                    if (numerosEncontrados.length === 0) nomeArr.push(parte);
                 }
             });
 
@@ -387,13 +402,8 @@
 
             if (numerosEncontrados.length === 1) {
                 let n = numerosEncontrados[0];
-                if (String(n).includes('.') || n > 15) {
-                    preco = n;
-                    qtd = 1;
-                } else {
-                    qtd = n;
-                    preco = 0;
-                }
+                if (String(n).includes('.') || n > 15) { preco = n; qtd = 1; }
+                else { qtd = n; preco = 0; }
             } else if (numerosEncontrados.length >= 2) {
                 qtd = numerosEncontrados[0];
                 preco = numerosEncontrados[1];
@@ -404,15 +414,7 @@
 
             document.getElementById('compra-nome').value = nomeProduto;
             document.getElementById('compra-qtd').value = qtd > 0 ? qtd : 1;
-            if (preco > 0) {
-                document.getElementById('compra-preco').value = preco.toFixed(2);
-            }
-
-            // Destaque visual verde nos campos atualizados
-            document.getElementById('compra-nome').classList.add('ring-2', 'ring-emerald-500');
-            setTimeout(() => {
-                document.getElementById('compra-nome').classList.remove('ring-2', 'ring-emerald-500');
-            }, 1500);
+            if (preco > 0) document.getElementById('compra-preco').value = preco.toFixed(2);
         }
 
         function alterarTicket() {
@@ -423,23 +425,26 @@
                     valorTicket = novoValor;
                     localStorage.setItem('meu_valor_ticket_turbo', valorTicket);
                     renderizarTabelaCompras();
-                } else {
-                    alert("Por favor, insira um valor válido.");
                 }
             }
         }
 
+        function obterListaDoMes() {
+            let cacheGeral = JSON.parse(localStorage.getItem('historico_compras_mensal') || '{}');
+            return cacheGeral[mesAtualSelecionado] || [];
+        }
+
+        function guardarListaDoMes(lista) {
+            let cacheGeral = JSON.parse(localStorage.getItem('historico_compras_mensal') || '{}');
+            cacheGeral[mesAtualSelecionado] = lista;
+            localStorage.setItem('historico_compras_mensal', JSON.stringify(cacheGeral));
+        }
+
         function adicionarFavorito(nome, qtd, preco, setor) {
-            const novoItem = {
-                id: Date.now() + Math.random(),
-                nome: nome,
-                qtd: qtd,
-                preco: preco,
-                setor: setor,
-                peguei: false
-            };
-            listaComprasCache.push(novoItem);
-            salvarEAtualizar();
+            let lista = obterListaDoMes();
+            lista.push({ id: Date.now() + Math.random(), nome, qtd, preco, setor, peguei: false });
+            guardarListaDoMes(lista);
+            renderizarTabelaCompras();
         }
 
         function salvarItemCompra(e) {
@@ -450,32 +455,23 @@
             const qtd = parseFloat(document.getElementById('compra-qtd').value) || 1;
             const preco = parseFloat(document.getElementById('compra-preco').value) || 0;
 
+            let lista = obterListaDoMes();
+
             if (editId) {
-                const item = listaComprasCache.find(i => i.id == editId);
-                if (item) {
-                    item.nome = nome;
-                    item.setor = setor;
-                    item.qtd = qtd;
-                    item.preco = preco;
-                }
+                const item = lista.find(i => i.id == editId);
+                if (item) { item.nome = nome; item.setor = setor; item.qtd = qtd; item.preco = preco; }
             } else {
-                const novoItem = {
-                    id: Date.now(),
-                    nome: nome,
-                    setor: setor,
-                    qtd: qtd,
-                    preco: preco,
-                    peguei: false
-                };
-                listaComprasCache.push(novoItem);
+                lista.push({ id: Date.now(), nome, setor, qtd, preco, peguei: false });
             }
 
-            salvarEAtualizar();
+            guardarListaDoMes(lista);
+            renderizarTabelaCompras();
             cancelarEdicao();
         }
 
         function prepararEdicao(id) {
-            const item = listaComprasCache.find(i => i.id === id);
+            let lista = obterListaDoMes();
+            const item = lista.find(i => i.id === id);
             if (!item) return;
 
             document.getElementById('edit-compra-id').value = item.id;
@@ -500,69 +496,61 @@
         }
 
         function toggleItemPeguei(id) {
-            const item = listaComprasCache.find(i => i.id === id);
-            if (item) {
-                item.peguei = !item.peguei;
-                salvarEAtualizar();
-            }
+            let lista = obterListaDoMes();
+            const item = lista.find(i => i.id === id);
+            if (item) { item.peguei = !item.peguei; guardarListaDoMes(lista); renderizarTabelaCompras(); }
         }
 
         function apagarItemCompra(id) {
             if (confirm('Deseja excluir este item?')) {
-                listaComprasCache = listaComprasCache.filter(i => i.id !== id);
-                salvarEAtualizar();
+                let lista = obterListaDoMes();
+                lista = lista.filter(i => i.id !== id);
+                guardarListaDoMes(lista);
+                renderizarTabelaCompras();
             }
         }
 
         function limparListaCompras() {
-            if (confirm('Deseja apagar todos os itens da lista?')) {
-                listaComprasCache = [];
-                salvarEAtualizar();
+            if (confirm(`Deseja limpar todos os itens de ${mesAtualSelecionado.replace('_', ' de ')}?`)) {
+                guardarListaDoMes([]);
+                renderizarTabelaCompras();
                 cancelarEdicao();
             }
         }
 
         function partilharWhatsApp() {
-            if (listaComprasCache.length === 0) {
-                alert('A lista está vazia.');
-                return;
-            }
-            let texto = "🛒 *Minha Lista de Compras*%0A%0A";
+            let lista = obterListaDoMes();
+            if (lista.length === 0) { alert('A lista deste mês está vazia.'); return; }
+            let texto = `🛒 *Lista de Compras (${mesAtualSelecionado.replace('_', ' de ')})*%0A%0A`;
             let totalGeral = 0;
-            listaComprasCache.forEach(i => {
+            lista.forEach(i => {
                 let sub = i.qtd * i.preco;
                 totalGeral += sub;
                 texto += `- ${i.nome} (${i.qtd}x) = R$ ${sub.toFixed(2)}%0A`;
             });
             texto += `%0A💰 *Total:* R$ ${totalGeral.toFixed(2)}`;
             texto += `%0A💳 *Saldo Ticket:* R$ ${(valorTicket - totalGeral).toFixed(2)}`;
-            
             window.open(`https://api.whatsapp.com/send?text=${texto}`, '_blank');
         }
 
-        function salvarEAtualizar() {
-            localStorage.setItem('minha_lista_compras_turbo', JSON.stringify(listaComprasCache));
-            renderizarTabelaCompras();
-        }
-
         function renderizarTabelaCompras() {
+            let lista = obterListaDoMes();
             const tbody = document.getElementById('tabela-compras');
-            document.getElementById('status-progresso').textContent = `Itens na Lista (${listaComprasCache.length})`;
+            document.getElementById('status-progresso').textContent = `Itens no Mês (${lista.length})`;
 
-            if (listaComprasCache.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="6" class="py-8 text-center text-gray-400">Nenhum item na lista.</td></tr>`;
+            if (lista.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="6" class="py-8 text-center text-gray-400">Nenhum item registado neste mês.</td></tr>`;
                 document.getElementById('total-geral').textContent = `R$ 0`;
                 document.getElementById('total-peguei').textContent = `R$ 0`;
                 let elSaldo = document.getElementById('saldo-ticket');
                 elSaldo.textContent = `R$ ${valorTicket.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
-                elSaldo.className = "text-base sm:text-lg font-bold text-indigo-600 dark:text-indigo-400 mt-0.5";
                 return;
             }
 
             let totalGeral = 0;
             let totalPeguei = 0;
 
-            tbody.innerHTML = listaComprasCache.map(i => {
+            tbody.innerHTML = lista.map(i => {
                 const totalItem = i.qtd * i.preco;
                 totalGeral += totalItem;
                 if (i.peguei) totalPeguei += totalItem;
@@ -590,12 +578,7 @@
             let saldoRestante = valorTicket - totalGeral;
             const elSaldo = document.getElementById('saldo-ticket');
             elSaldo.textContent = `R$ ${saldoRestante.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
-            
-            if (saldoRestante < 0) {
-                elSaldo.className = "text-base sm:text-lg font-bold text-red-600 dark:text-red-400 mt-0.5";
-            } else {
-                elSaldo.className = "text-base sm:text-lg font-bold text-indigo-600 dark:text-indigo-400 mt-0.5";
-            }
+            elSaldo.className = saldoRestante < 0 ? "text-base sm:text-lg font-bold text-red-600 dark:text-red-400 mt-0.5" : "text-base sm:text-lg font-bold text-indigo-600 dark:text-indigo-400 mt-0.5";
 
             document.getElementById('total-geral').textContent = `R$ ${totalGeral.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
             document.getElementById('total-peguei').textContent = `R$ ${totalPeguei.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
