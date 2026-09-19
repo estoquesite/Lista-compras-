@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Lista de Compras Inteligente</title>
+    <title>Lista de Compras Segura</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
@@ -11,146 +11,254 @@
     </script>
 </head>
 <body class="bg-gray-50 dark:bg-gray-900 min-h-screen text-gray-800 dark:text-gray-100 transition-colors duration-200">
-    
-    <!-- TOPO FIXO (Sticky Header) para acompanhar a rolagem no mercado -->
-    <div class="sticky top-0 z-50 bg-white/95 dark:bg-gray-900/95 backdrop-blur-md shadow-sm border-b border-gray-100 dark:border-gray-800 transition-colors">
-        <div class="max-w-4xl mx-auto p-4 space-y-3">
-            
-            <!-- Cabeçalho Principal -->
-            <div class="flex justify-between items-center">
+
+    <!-- TELA DE LOGIN / CAPA DE UTILIZADOR E SENHA -->
+    <div id="tela-login" class="fixed inset-0 z-50 bg-gray-900/90 backdrop-blur-sm flex items-center justify-center p-4">
+        <div class="bg-white dark:bg-gray-800 p-6 sm:p-8 rounded-3xl shadow-2xl max-w-sm w-full text-center space-y-4 border border-gray-100 dark:border-gray-700">
+            <div class="w-16 h-16 bg-blue-50 dark:bg-blue-950/50 rounded-2xl mx-auto flex items-center justify-center text-3xl">🔐</div>
+            <div>
+                <h2 class="text-xl font-bold text-gray-900 dark:text-white">Acesso Restrito</h2>
+                <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Identifique-se para aceder à sua lista.</p>
+            </div>
+            <form onsubmit="verificarLogin(event)" class="space-y-3 text-left">
                 <div>
-                    <h1 class="text-xl font-bold text-gray-900 dark:text-white flex items-center gap-1.5">🛒 Lista de Compras</h1>
-                    <p class="text-xs text-gray-500 dark:text-gray-400">Modo Supermercado Ativo</p>
-                </div>
-                <div class="flex items-center gap-1.5">
-                    <button onclick="alternarDarkMode()" class="p-2 rounded-xl bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300 text-xs transition" title="Alternar Modo Escuro">
-                        🌙/☀️
-                    </button>
-                    <button onclick="partilharWhatsApp()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-2 rounded-xl text-xs font-medium transition flex items-center gap-1 shadow-sm">
-                        📱 WhatsApp
-                    </button>
-                    <button onclick="limparListaCompras()" class="bg-red-50 dark:bg-red-950/40 hover:bg-red-100 text-red-600 dark:text-red-400 p-2 rounded-xl text-xs transition border border-red-200 dark:border-red-900" title="Limpar Lista">
-                        🗑️
-                    </button>
-                </div>
-            </div>
-
-            <!-- 3 Cards de Resumo Compactos (Sempre Visíveis) -->
-            <div class="grid grid-cols-3 gap-2">
-                <div class="bg-gray-50 dark:bg-gray-800 p-3 rounded-xl border border-gray-100 dark:border-gray-700">
-                    <p class="text-[10px] font-semibold text-gray-400 uppercase">Total</p>
-                    <p id="total-geral" class="text-base sm:text-lg font-bold text-gray-900 dark:text-white mt-0.5">R$ 0</p>
-                </div>
-                <div class="bg-gray-50 dark:bg-gray-800 p-3 rounded-xl border border-gray-100 dark:border-gray-700">
-                    <p class="text-[10px] font-semibold text-emerald-600 dark:text-emerald-400 uppercase">Carrinho</p>
-                    <p id="total-peguei" class="text-base sm:text-lg font-bold text-emerald-600 dark:text-emerald-400 mt-0.5">R$ 0</p>
-                </div>
-                <div class="bg-gray-50 dark:bg-gray-800 p-3 rounded-xl border border-gray-100 dark:border-gray-700 relative">
-                    <div class="flex justify-between items-center">
-                        <p class="text-[10px] font-semibold text-indigo-600 dark:text-indigo-400 uppercase">Saldo Ticket</p>
-                        <button onclick="alterarTicket()" class="text-xs text-indigo-500 hover:underline">✏️</button>
-                    </div>
-                    <p id="saldo-ticket" class="text-base sm:text-lg font-bold text-indigo-600 dark:text-indigo-400 mt-0.5">R$ 1.000</p>
-                </div>
-            </div>
-
-        </div>
-    </div>
-
-    <!-- CONTEÚDO PRINCIPAL -->
-    <div class="max-w-4xl mx-auto p-4 sm:p-6 space-y-6">
-        
-        <!-- ITENS FREQUENTES (Adição Rápida com 1 clique) -->
-        <div class="bg-white dark:bg-gray-800 p-4 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700">
-            <p class="text-xs font-semibold text-gray-400 uppercase mb-2">⚡ Adicionar Frequentes com 1 Clique</p>
-            <div class="flex flex-wrap gap-1.5" id="botoes-frequentes">
-                <button onclick="adicionarFavorito('Arroz 5kg', 1, 28.90, 'Mercearia')" class="px-3 py-1.5 bg-blue-50 dark:bg-blue-950/50 hover:bg-blue-100 text-blue-700 dark:text-blue-300 rounded-lg text-xs font-medium transition border border-blue-100 dark:border-blue-900">+ Arroz</button>
-                <button onclick="adicionarFavorito('Feijão 1kg', 2, 8.50, 'Mercearia')" class="px-3 py-1.5 bg-blue-50 dark:bg-blue-950/50 hover:bg-blue-100 text-blue-700 dark:text-blue-300 rounded-lg text-xs font-medium transition border border-blue-100 dark:border-blue-900">+ Feijão</button>
-                <button onclick="adicionarFavorito('Leite 1L', 6, 5.50, 'Mercearia')" class="px-3 py-1.5 bg-blue-50 dark:bg-blue-950/50 hover:bg-blue-100 text-blue-700 dark:text-blue-300 rounded-lg text-xs font-medium transition border border-blue-100 dark:border-blue-900">+ Leite</button>
-                <button onclick="adicionarFavorito('Café 500g', 1, 18.00, 'Mercearia')" class="px-3 py-1.5 bg-blue-50 dark:bg-blue-950/50 hover:bg-blue-100 text-blue-700 dark:text-blue-300 rounded-lg text-xs font-medium transition border border-blue-100 dark:border-blue-900">+ Café</button>
-                <button onclick="adicionarFavorito('Óleo de Soja', 2, 7.20, 'Mercearia')" class="px-3 py-1.5 bg-blue-50 dark:bg-blue-950/50 hover:bg-blue-100 text-blue-700 dark:text-blue-300 rounded-lg text-xs font-medium transition border border-blue-100 dark:border-blue-900">+ Óleo</button>
-                <button onclick="adicionarFavorito('Detergente', 4, 2.50, 'Limpeza')" class="px-3 py-1.5 bg-blue-50 dark:bg-blue-950/50 hover:bg-blue-100 text-blue-700 dark:text-blue-300 rounded-lg text-xs font-medium transition border border-blue-100 dark:border-blue-900">+ Detergente</button>
-            </div>
-        </div>
-
-        <!-- FORMULÁRIO DE CADASTRO / EDIÇÃO -->
-        <div class="bg-white dark:bg-gray-800 p-5 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700">
-            <h2 id="form-titulo" class="text-md font-semibold text-gray-900 dark:text-white mb-3">Adicionar Novo Produto</h2>
-            <form id="form-compra" class="space-y-3" onsubmit="salvarItemCompra(event)">
-                <input type="hidden" id="edit-compra-id">
-                <div class="grid grid-cols-1 sm:grid-cols-4 gap-3">
-                    <div class="sm:col-span-2">
-                        <label class="block text-[11px] font-semibold text-gray-500 dark:text-gray-400 uppercase mb-1">Produto</label>
-                        <input type="text" id="compra-nome" required placeholder="Ex: Macarrão, Sabão..." class="w-full px-3 py-2 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 dark:text-white">
-                    </div>
-                    <div>
-                        <label class="block text-[11px] font-semibold text-gray-500 dark:text-gray-400 uppercase mb-1">Setor</label>
-                        <select id="compra-setor" class="w-full px-3 py-2 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 dark:text-white">
-                            <option value="Mercearia">Mercearia</option>
-                            <option value="Hortifruti">Hortifruti</option>
-                            <option value="Açougue/Frios">Açougue/Frios</option>
-                            <option value="Limpeza">Limpeza</option>
-                            <option value="Outros">Outros</option>
-                        </select>
-                    </div>
-                    <div>
-                        <label class="block text-[11px] font-semibold text-gray-500 dark:text-gray-400 uppercase mb-1">Qtd</label>
-                        <input type="number" id="compra-qtd" required min="1" value="1" class="w-full px-3 py-2 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 dark:text-white">
-                    </div>
+                    <label class="block text-[11px] font-semibold text-gray-500 dark:text-gray-400 uppercase mb-1">Utilizador</label>
+                    <input type="text" id="input-usuario" required placeholder="Ex: Mariana" class="w-full px-4 py-2.5 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 dark:text-white">
                 </div>
                 <div>
-                    <label class="block text-[11px] font-semibold text-gray-500 dark:text-gray-400 uppercase mb-1">Preço Unitário (R$)</label>
-                    <input type="number" id="compra-preco" required step="0.01" min="0" placeholder="0,00" class="w-full px-3 py-2 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 dark:text-white">
+                    <label class="block text-[11px] font-semibold text-gray-500 dark:text-gray-400 uppercase mb-1">Senha (PIN)</label>
+                    <input type="password" id="input-senha" required placeholder="••••" class="w-full px-4 py-2.5 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl text-center text-lg tracking-widest focus:outline-none focus:ring-2 focus:ring-blue-500 dark:text-white">
                 </div>
-                <div class="flex gap-2 pt-1">
-                    <button type="submit" id="btn-submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2.5 rounded-xl transition text-sm shadow-sm">
-                        ➕ Adicionar à Lista
-                    </button>
-                    <button type="button" id="btn-cancelar" onclick="cancelarEdicao()" class="hidden bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 text-gray-700 dark:text-gray-200 px-4 py-2.5 rounded-xl text-sm transition">
-                        Cancelar
-                    </button>
-                </div>
+                <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-3 rounded-xl transition text-sm shadow-sm mt-2">
+                    Entrar no Sistema
+                </button>
             </form>
+            <p id="erro-senha" class="text-xs text-red-500 hidden font-medium">Senha incorreta! Dica: a senha é 1510.</p>
         </div>
-
-        <!-- LISTA DE ITENS POR SETOR -->
-        <div class="bg-white dark:bg-gray-800 p-5 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 space-y-4">
-            <div class="flex justify-between items-center">
-                <h3 id="status-progresso" class="text-md font-semibold text-gray-900 dark:text-white">Itens na Lista (0)</h3>
-                <span class="text-xs text-gray-400">Toque no quadrado para marcar</span>
-            </div>
-
-            <div id="container-tabela" class="overflow-x-auto">
-                <table class="w-full text-left border-collapse">
-                    <thead>
-                        <tr class="border-b border-gray-100 dark:border-gray-700 text-[11px] font-semibold text-gray-400 uppercase">
-                            <th class="py-2.5 px-2 text-center w-10">Feito</th>
-                            <th class="py-2.5 px-2">Produto / Setor</th>
-                            <th class="py-2.5 px-2 text-center">Qtd</th>
-                            <th class="py-2.5 px-2 text-right">Preço</th>
-                            <th class="py-2.5 px-2 text-right">Total</th>
-                            <th class="py-2.5 px-2 text-center">Ações</th>
-                        </tr>
-                    </thead>
-                    <tbody id="tabela-compras" class="divide-y divide-gray-50 dark:divide-gray-700 text-sm">
-                        <tr>
-                            <td colspan="6" class="py-8 text-center text-gray-400">Nenhum item na lista. Use os botões acima!</td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-        </div>
-
     </div>
 
-    <!-- SCRIPT DA APLICAÇÃO -->
+    <!-- CONTEÚDO DO SITE (Oculto até autenticar) -->
+    <div id="conteudo-site" class="hidden">
+        
+        <!-- TOPO FIXO (Sticky Header) -->
+        <div class="sticky top-0 z-40 bg-white/95 dark:bg-gray-900/95 backdrop-blur-md shadow-sm border-b border-gray-100 dark:border-gray-800 transition-colors">
+            <div class="max-w-4xl mx-auto p-4 space-y-3">
+                
+                <div class="flex justify-between items-center">
+                    <div>
+                        <h1 class="text-xl font-bold text-gray-900 dark:text-white flex items-center gap-1.5">🛒 Lista de Compras</h1>
+                        <p id="saudacao-usuario" class="text-xs text-gray-500 dark:text-gray-400">Olá!</p>
+                    </div>
+                    <div class="flex items-center gap-1.5">
+                        <button onclick="alternarDarkMode()" class="p-2 rounded-xl bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300 text-xs transition" title="Alternar Modo Escuro">
+                            🌙/☀️
+                        </button>
+                        <button onclick="partilharWhatsApp()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-2 rounded-xl text-xs font-medium transition flex items-center gap-1 shadow-sm">
+                            📱 WhatsApp
+                        </button>
+                        <button onclick="bloquearNovamente()" class="bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 text-gray-600 dark:text-gray-300 p-2 rounded-xl text-xs transition" title="Bloquear / Sair">
+                            🔒
+                        </button>
+                    </div>
+                </div>
+
+                <!-- 3 Cards de Resumo -->
+                <div class="grid grid-cols-3 gap-2">
+                    <div class="bg-gray-50 dark:bg-gray-800 p-3 rounded-xl border border-gray-100 dark:border-gray-700">
+                        <p class="text-[10px] font-semibold text-gray-400 uppercase">Total</p>
+                        <p id="total-geral" class="text-base sm:text-lg font-bold text-gray-900 dark:text-white mt-0.5">R$ 0</p>
+                    </div>
+                    <div class="bg-gray-50 dark:bg-gray-800 p-3 rounded-xl border border-gray-100 dark:border-gray-700">
+                        <p class="text-[10px] font-semibold text-emerald-600 dark:text-emerald-400 uppercase">Carrinho</p>
+                        <p id="total-peguei" class="text-base sm:text-lg font-bold text-emerald-600 dark:text-emerald-400 mt-0.5">R$ 0</p>
+                    </div>
+                    <div class="bg-gray-50 dark:bg-gray-800 p-3 rounded-xl border border-gray-100 dark:border-gray-700 relative">
+                        <div class="flex justify-between items-center">
+                            <p class="text-[10px] font-semibold text-indigo-600 dark:text-indigo-400 uppercase">Saldo Ticket</p>
+                            <button onclick="alterarTicket()" class="text-xs text-indigo-500 hover:underline">✏️</button>
+                        </div>
+                        <p id="saldo-ticket" class="text-base sm:text-lg font-bold text-indigo-600 dark:text-indigo-400 mt-0.5">R$ 1.000</p>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- CONTEÚDO PRINCIPAL -->
+        <div class="max-w-4xl mx-auto p-4 sm:p-6 space-y-6">
+            
+            <!-- ITENS FREQUENTES (Cardezinhos Rápidos por Setor) -->
+            <div class="bg-white dark:bg-gray-800 p-4 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 space-y-3">
+                <p class="text-xs font-semibold text-gray-400 uppercase">⚡ Adicionar Frequentes com 1 Clique</p>
+                
+                <!-- Mercearia -->
+                <div>
+                    <span class="text-[11px] font-semibold text-blue-600 dark:text-blue-400 block mb-1">📦 Mercearia & Despensa</span>
+                    <div class="flex flex-wrap gap-1.5">
+                        <button onclick="adicionarFavorito('Arroz 5kg', 1, 28.90, 'Mercearia')" class="px-3 py-1.5 bg-blue-50 dark:bg-blue-950/50 hover:bg-blue-100 text-blue-700 dark:text-blue-300 rounded-lg text-xs font-medium transition border border-blue-100 dark:border-blue-900">+ Arroz</button>
+                        <button onclick="adicionarFavorito('Feijão 1kg', 2, 8.50, 'Mercearia')" class="px-3 py-1.5 bg-blue-50 dark:bg-blue-950/50 hover:bg-blue-100 text-blue-700 dark:text-blue-300 rounded-lg text-xs font-medium transition border border-blue-100 dark:border-blue-900">+ Feijão</button>
+                        <button onclick="adicionarFavorito('Leite 1L', 6, 5.50, 'Mercearia')" class="px-3 py-1.5 bg-blue-50 dark:bg-blue-950/50 hover:bg-blue-100 text-blue-700 dark:text-blue-300 rounded-lg text-xs font-medium transition border border-blue-100 dark:border-blue-900">+ Leite</button>
+                        <button onclick="adicionarFavorito('Café 500g', 1, 18.00, 'Mercearia')" class="px-3 py-1.5 bg-blue-50 dark:bg-blue-950/50 hover:bg-blue-100 text-blue-700 dark:text-blue-300 rounded-lg text-xs font-medium transition border border-blue-100 dark:border-blue-900">+ Café</button>
+                        <button onclick="adicionarFavorito('Óleo de Soja', 2, 7.20, 'Mercearia')" class="px-3 py-1.5 bg-blue-50 dark:bg-blue-950/50 hover:bg-blue-100 text-blue-700 dark:text-blue-300 rounded-lg text-xs font-medium transition border border-blue-100 dark:border-blue-900">+ Óleo</button>
+                    </div>
+                </div>
+
+                <!-- Hortifruti -->
+                <div>
+                    <span class="text-[11px] font-semibold text-emerald-600 dark:text-emerald-400 block mb-1">🍅 Hortifruti</span>
+                    <div class="flex flex-wrap gap-1.5">
+                        <button onclick="adicionarFavorito('Tomate (1kg)', 1, 8.90, 'Hortifruti')" class="px-3 py-1.5 bg-emerald-50 dark:bg-emerald-950/50 hover:bg-emerald-100 text-emerald-700 dark:text-emerald-300 rounded-lg text-xs font-medium transition border border-emerald-100 dark:border-emerald-900">+ Tomate</button>
+                        <button onclick="adicionarFavorito('Cebola (1kg)', 1, 6.50, 'Hortifruti')" class="px-3 py-1.5 bg-emerald-50 dark:bg-emerald-950/50 hover:bg-emerald-100 text-emerald-700 dark:text-emerald-300 rounded-lg text-xs font-medium transition border border-emerald-100 dark:border-emerald-900">+ Cebola</button>
+                        <button onclick="adicionarFavorito('Batata (1kg)', 1, 7.90, 'Hortifruti')" class="px-3 py-1.5 bg-emerald-50 dark:bg-emerald-950/50 hover:bg-emerald-100 text-emerald-700 dark:text-emerald-300 rounded-lg text-xs font-medium transition border border-emerald-100 dark:border-emerald-900">+ Batata</button>
+                        <button onclick="adicionarFavorito('Banana (Dúzia)', 1, 6.00, 'Hortifruti')" class="px-3 py-1.5 bg-emerald-50 dark:bg-emerald-950/50 hover:bg-emerald-100 text-emerald-700 dark:text-emerald-300 rounded-lg text-xs font-medium transition border border-emerald-100 dark:border-emerald-900">+ Banana</button>
+                    </div>
+                </div>
+
+                <!-- Açougue e Frios -->
+                <div>
+                    <span class="text-[11px] font-semibold text-amber-600 dark:text-amber-400 block mb-1">🥩 Açougue & Frios</span>
+                    <div class="flex flex-wrap gap-1.5">
+                        <button onclick="adicionarFavorito('Carne Moída (1kg)', 1, 35.00, 'Açougue/Frios')" class="px-3 py-1.5 bg-amber-50 dark:bg-amber-950/50 hover:bg-amber-100 text-amber-700 dark:text-amber-300 rounded-lg text-xs font-medium transition border border-amber-100 dark:border-amber-900">+ Carne Moída</button>
+                        <button onclick="adicionarFavorito('Peito de Frango (1kg)', 1, 18.50, 'Açougue/Frios')" class="px-3 py-1.5 bg-amber-50 dark:bg-amber-950/50 hover:bg-amber-100 text-amber-700 dark:text-amber-300 rounded-lg text-xs font-medium transition border border-amber-100 dark:border-amber-900">+ Frango</button>
+                        <button onclick="adicionarFavorito('Ovos (Cartela c/ 30)', 1, 21.00, 'Açougue/Frios')" class="px-3 py-1.5 bg-amber-50 dark:bg-amber-950/50 hover:bg-amber-100 text-amber-700 dark:text-amber-300 rounded-lg text-xs font-medium transition border border-amber-100 dark:border-amber-900">+ Ovos</button>
+                        <button onclick="adicionarFavorito('Muçarela (300g)', 1, 14.00, 'Açougue/Frios')" class="px-3 py-1.5 bg-amber-50 dark:bg-amber-950/50 hover:bg-amber-100 text-amber-700 dark:text-amber-300 rounded-lg text-xs font-medium transition border border-amber-100 dark:border-amber-900">+ Muçarela</button>
+                    </div>
+                </div>
+
+                <!-- Limpeza -->
+                <div>
+                    <span class="text-[11px] font-semibold text-purple-600 dark:text-purple-400 block mb-1">🧽 Limpeza & Higiene</span>
+                    <div class="flex flex-wrap gap-1.5">
+                        <button onclick="adicionarFavorito('Detergente Líquido', 3, 2.50, 'Limpeza')" class="px-3 py-1.5 bg-purple-50 dark:bg-purple-950/50 hover:bg-purple-100 text-purple-700 dark:text-purple-300 rounded-lg text-xs font-medium transition border border-purple-100 dark:border-purple-900">+ Detergente</button>
+                        <button onclick="adicionarFavorito('Papel Higiênico (12un)', 1, 22.90, 'Limpeza')" class="px-3 py-1.5 bg-purple-50 dark:bg-purple-950/50 hover:bg-purple-100 text-purple-700 dark:text-purple-300 rounded-lg text-xs font-medium transition border border-purple-100 dark:border-purple-900">+ Papel Higiênico</button>
+                        <button onclick="adicionarFavorito('Pasta de Dentes', 2, 4.50, 'Limpeza')" class="px-3 py-1.5 bg-purple-50 dark:bg-purple-950/50 hover:bg-purple-100 text-purple-700 dark:text-purple-300 rounded-lg text-xs font-medium transition border border-purple-100 dark:border-purple-900">+ Pasta Dentes</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- FORMULÁRIO -->
+            <div class="bg-white dark:bg-gray-800 p-5 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700">
+                <h2 id="form-titulo" class="text-md font-semibold text-gray-900 dark:text-white mb-3">Adicionar Novo Produto</h2>
+                <form id="form-compra" class="space-y-3" onsubmit="salvarItemCompra(event)">
+                    <input type="hidden" id="edit-compra-id">
+                    <div class="grid grid-cols-1 sm:grid-cols-4 gap-3">
+                        <div class="sm:col-span-2">
+                            <label class="block text-[11px] font-semibold text-gray-500 dark:text-gray-400 uppercase mb-1">Produto</label>
+                            <input type="text" id="compra-nome" required placeholder="Ex: Macarrão, Sabão..." class="w-full px-3 py-2 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 dark:text-white">
+                        </div>
+                        <div>
+                            <label class="block text-[11px] font-semibold text-gray-500 dark:text-gray-400 uppercase mb-1">Setor</label>
+                            <select id="compra-setor" class="w-full px-3 py-2 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 dark:text-white">
+                                <option value="Mercearia">Mercearia</option>
+                                <option value="Hortifruti">Hortifruti</option>
+                                <option value="Açougue/Frios">Açougue/Frios</option>
+                                <option value="Limpeza">Limpeza</option>
+                                <option value="Outros">Outros</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-[11px] font-semibold text-gray-500 dark:text-gray-400 uppercase mb-1">Qtd</label>
+                            <input type="number" id="compra-qtd" required min="1" value="1" class="w-full px-3 py-2 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 dark:text-white">
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-[11px] font-semibold text-gray-500 dark:text-gray-400 uppercase mb-1">Preço Unitário (R$)</label>
+                        <input type="number" id="compra-preco" required step="0.01" min="0" placeholder="0,00" class="w-full px-3 py-2 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 dark:text-white">
+                    </div>
+                    <div class="flex gap-2 pt-1">
+                        <button type="submit" id="btn-submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2.5 rounded-xl transition text-sm shadow-sm">
+                            ➕ Adicionar à Lista
+                        </button>
+                        <button type="button" id="btn-cancelar" onclick="cancelarEdicao()" class="hidden bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 text-gray-700 dark:text-gray-200 px-4 py-2.5 rounded-xl text-sm transition">
+                            Cancelar
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- TABELA DE ITENS -->
+            <div class="bg-white dark:bg-gray-800 p-5 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 space-y-4">
+                <div class="flex justify-between items-center">
+                    <h3 id="status-progresso" class="text-md font-semibold text-gray-900 dark:text-white">Itens na Lista (0)</h3>
+                    <div class="flex gap-2">
+                        <button onclick="limparListaCompras()" class="text-xs text-red-500 hover:underline">Limpar Tudo</button>
+                    </div>
+                </div>
+
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse">
+                        <thead>
+                            <tr class="border-b border-gray-100 dark:border-gray-700 text-[11px] font-semibold text-gray-400 uppercase">
+                                <th class="py-2.5 px-2 text-center w-10">Feito</th>
+                                <th class="py-2.5 px-2">Produto / Setor</th>
+                                <th class="py-2.5 px-2 text-center">Qtd</th>
+                                <th class="py-2.5 px-2 text-right">Preço</th>
+                                <th class="py-2.5 px-2 text-right">Total</th>
+                                <th class="py-2.5 px-2 text-center">Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tabela-compras" class="divide-y divide-gray-50 dark:divide-gray-700 text-sm">
+                            <tr>
+                                <td colspan="6" class="py-8 text-center text-gray-400">Nenhum item na lista.</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- SCRIPT DE SEGURANÇA E LÓGICA -->
     <script>
+        const SENHA_MESTRA = "1510";
+
         let listaComprasCache = JSON.parse(localStorage.getItem('minha_lista_compras_turbo') || '[]');
         let valorTicket = parseFloat(localStorage.getItem('meu_valor_ticket_turbo') || '1000.00');
 
-        // Dark Mode State
-        if (localStorage.getItem('dark_mode') === 'true') {
-            document.documentElement.classList.add('dark');
+        window.addEventListener('DOMContentLoaded', () => {
+            if (sessionStorage.getItem('autenticado_site') === 'true') {
+                liberarAcesso();
+            }
+
+            if (localStorage.getItem('dark_mode') === 'true') {
+                document.documentElement.classList.add('dark');
+            }
+        });
+
+        function verificarLogin(e) {
+            e.preventDefault();
+            const usuario = document.getElementById('input-usuario').value.trim();
+            const senhaDigitada = document.getElementById('input-senha').value;
+            const erroEl = document.getElementById('erro-senha');
+
+            if (senhaDigitada === SENHA_MESTRA) {
+                sessionStorage.setItem('autenticado_site', 'true');
+                if (usuario) sessionStorage.setItem('nome_utilizador', usuario);
+                liberarAcesso();
+            } else {
+                erroEl.classList.remove('hidden');
+                document.getElementById('input-senha').value = '';
+                document.getElementById('input-senha').focus();
+            }
+        }
+
+        function liberarAcesso() {
+            document.getElementById('tela-login').classList.add('hidden');
+            document.getElementById('conteudo-site').classList.remove('hidden');
+            
+            const nomeUser = sessionStorage.getItem('nome_utilizador') || 'Mariana';
+            document.getElementById('saudacao-usuario').textContent = `Bem-vinda, ${nomeUser}!`;
+
+            renderizarTabelaCompras();
+        }
+
+        function bloquearNovamente() {
+            sessionStorage.removeItem('autenticado_site');
+            document.getElementById('conteudo-site').classList.add('hidden');
+            document.getElementById('tela-login').classList.remove('hidden');
+            document.getElementById('input-senha').value = '';
+            document.getElementById('erro-senha').classList.add('hidden');
         }
 
         function alternarDarkMode() {
@@ -158,10 +266,6 @@
             const isDark = document.documentElement.classList.contains('dark');
             localStorage.setItem('dark_mode', isDark);
         }
-
-        window.addEventListener('DOMContentLoaded', () => {
-            renderizarTabelaCompras();
-        });
 
         function alterarTicket() {
             let novoValor = prompt("Digite o valor total do seu Ticket/Orçamento (R$):", valorTicket);
@@ -298,9 +402,9 @@
             document.getElementById('status-progresso').textContent = `Itens na Lista (${listaComprasCache.length})`;
 
             if (listaComprasCache.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="6" class="py-8 text-center text-gray-400">Nenhum item na lista ainda. Use os botões acima!</td></tr>`;
-                document.getElementById('total-geral').textContent = 'R$ 0';
-                document.getElementById('total-peguei').textContent = 'R$ 0';
+                tbody.innerHTML = `<tr><td colspan="6" class="py-8 text-center text-gray-400">Nenhum item na lista.</td></tr>`;
+                document.getElementById('total-geral').textContent = `R$ 0`;
+                document.getElementById('total-peguei').textContent = `R$ 0`;
                 let elSaldo = document.getElementById('saldo-ticket');
                 elSaldo.textContent = `R$ ${valorTicket.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
                 elSaldo.className = "text-base sm:text-lg font-bold text-indigo-600 dark:text-indigo-400 mt-0.5";
@@ -335,7 +439,6 @@
                 `;
             }).join('');
 
-            // Saldo do Ticket
             let saldoRestante = valorTicket - totalGeral;
             const elSaldo = document.getElementById('saldo-ticket');
             elSaldo.textContent = `R$ ${saldoRestante.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
