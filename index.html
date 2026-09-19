@@ -87,51 +87,71 @@
         <!-- CONTEÚDO PRINCIPAL -->
         <div class="max-w-4xl mx-auto p-4 sm:p-6 space-y-6">
             
-            <!-- ITENS FREQUENTES (Cardezinhos Rápidos por Setor) -->
+            <!-- GAVETINHA RETRÁTIL DE ITENS FREQUENTES -->
             <div class="bg-white dark:bg-gray-800 p-4 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 space-y-3">
-                <p class="text-xs font-semibold text-gray-400 uppercase">⚡ Adicionar Frequentes com 1 Clique</p>
+                <button onclick="alternarGavetinha()" class="w-full flex justify-between items-center text-xs font-semibold text-gray-700 dark:text-gray-200 uppercase bg-gray-100 dark:bg-gray-700/50 p-3 rounded-xl transition hover:bg-gray-200 dark:hover:bg-gray-700">
+                    <span>⚡ Adicionar Frequentes / Favoritos (Toque para abrir)</span>
+                    <span id="icone-gavetinha" class="text-sm">▼</span>
+                </button>
                 
-                <!-- Mercearia -->
-                <div>
-                    <span class="text-[11px] font-semibold text-blue-600 dark:text-blue-400 block mb-1">📦 Mercearia & Despensa</span>
-                    <div class="flex flex-wrap gap-1.5">
-                        <button onclick="adicionarFavorito('Arroz 5kg', 1, 28.90, 'Mercearia')" class="px-3 py-1.5 bg-blue-50 dark:bg-blue-950/50 hover:bg-blue-100 text-blue-700 dark:text-blue-300 rounded-lg text-xs font-medium transition border border-blue-100 dark:border-blue-900">+ Arroz</button>
-                        <button onclick="adicionarFavorito('Feijão 1kg', 2, 8.50, 'Mercearia')" class="px-3 py-1.5 bg-blue-50 dark:bg-blue-950/50 hover:bg-blue-100 text-blue-700 dark:text-blue-300 rounded-lg text-xs font-medium transition border border-blue-100 dark:border-blue-900">+ Feijão</button>
-                        <button onclick="adicionarFavorito('Leite 1L', 6, 5.50, 'Mercearia')" class="px-3 py-1.5 bg-blue-50 dark:bg-blue-950/50 hover:bg-blue-100 text-blue-700 dark:text-blue-300 rounded-lg text-xs font-medium transition border border-blue-100 dark:border-blue-900">+ Leite</button>
-                        <button onclick="adicionarFavorito('Café 500g', 1, 18.00, 'Mercearia')" class="px-3 py-1.5 bg-blue-50 dark:bg-blue-950/50 hover:bg-blue-100 text-blue-700 dark:text-blue-300 rounded-lg text-xs font-medium transition border border-blue-100 dark:border-blue-900">+ Café</button>
-                        <button onclick="adicionarFavorito('Óleo de Soja', 2, 7.20, 'Mercearia')" class="px-3 py-1.5 bg-blue-50 dark:bg-blue-950/50 hover:bg-blue-100 text-blue-700 dark:text-blue-300 rounded-lg text-xs font-medium transition border border-blue-100 dark:border-blue-900">+ Óleo</button>
+                <!-- Conteúdo da Gavetinha (Oculto por padrão) -->
+                <div id="gavetinha-frequentes" class="hidden space-y-3 pt-2">
+                    <!-- Mercearia & Despensa -->
+                    <div>
+                        <span class="text-[11px] font-semibold text-blue-600 dark:text-blue-400 block mb-1">📦 Mercearia & Despensa</span>
+                        <div class="flex flex-wrap gap-1.5">
+                            <button onclick="adicionarFavorito('Arroz 5kg', 1, 28.90, 'Mercearia')" class="px-3 py-1.5 bg-blue-50 dark:bg-blue-950/50 hover:bg-blue-100 text-blue-700 dark:text-blue-300 rounded-lg text-xs font-medium transition border border-blue-100 dark:border-blue-900">+ Arroz</button>
+                            <button onclick="adicionarFavorito('Feijão 1kg', 2, 8.50, 'Mercearia')" class="px-3 py-1.5 bg-blue-50 dark:bg-blue-950/50 hover:bg-blue-100 text-blue-700 dark:text-blue-300 rounded-lg text-xs font-medium transition border border-blue-100 dark:border-blue-900">+ Feijão</button>
+                            <button onclick="adicionarFavorito('Leite 1L', 6, 5.50, 'Mercearia')" class="px-3 py-1.5 bg-blue-50 dark:bg-blue-950/50 hover:bg-blue-100 text-blue-700 dark:text-blue-300 rounded-lg text-xs font-medium transition border border-blue-100 dark:border-blue-900">+ Leite</button>
+                            <button onclick="adicionarFavorito('Café 500g', 1, 18.00, 'Mercearia')" class="px-3 py-1.5 bg-blue-50 dark:bg-blue-950/50 hover:bg-blue-100 text-blue-700 dark:text-blue-300 rounded-lg text-xs font-medium transition border border-blue-100 dark:border-blue-900">+ Café</button>
+                            <button onclick="adicionarFavorito('Óleo de Soja', 2, 7.20, 'Mercearia')" class="px-3 py-1.5 bg-blue-50 dark:bg-blue-950/50 hover:bg-blue-100 text-blue-700 dark:text-blue-300 rounded-lg text-xs font-medium transition border border-blue-100 dark:border-blue-900">+ Óleo</button>
+                            <button onclick="adicionarFavorito('Azeite', 1, 32.00, 'Mercearia')" class="px-3 py-1.5 bg-blue-50 dark:bg-blue-950/50 hover:bg-blue-100 text-blue-700 dark:text-blue-300 rounded-lg text-xs font-medium transition border border-blue-100 dark:border-blue-900">+ Azeite</button>
+                        </div>
                     </div>
-                </div>
 
-                <!-- Hortifruti -->
-                <div>
-                    <span class="text-[11px] font-semibold text-emerald-600 dark:text-emerald-400 block mb-1">🍅 Hortifruti</span>
-                    <div class="flex flex-wrap gap-1.5">
-                        <button onclick="adicionarFavorito('Tomate (1kg)', 1, 8.90, 'Hortifruti')" class="px-3 py-1.5 bg-emerald-50 dark:bg-emerald-950/50 hover:bg-emerald-100 text-emerald-700 dark:text-emerald-300 rounded-lg text-xs font-medium transition border border-emerald-100 dark:border-emerald-900">+ Tomate</button>
-                        <button onclick="adicionarFavorito('Cebola (1kg)', 1, 6.50, 'Hortifruti')" class="px-3 py-1.5 bg-emerald-50 dark:bg-emerald-950/50 hover:bg-emerald-100 text-emerald-700 dark:text-emerald-300 rounded-lg text-xs font-medium transition border border-emerald-100 dark:border-emerald-900">+ Cebola</button>
-                        <button onclick="adicionarFavorito('Batata (1kg)', 1, 7.90, 'Hortifruti')" class="px-3 py-1.5 bg-emerald-50 dark:bg-emerald-950/50 hover:bg-emerald-100 text-emerald-700 dark:text-emerald-300 rounded-lg text-xs font-medium transition border border-emerald-100 dark:border-emerald-900">+ Batata</button>
-                        <button onclick="adicionarFavorito('Banana (Dúzia)', 1, 6.00, 'Hortifruti')" class="px-3 py-1.5 bg-emerald-50 dark:bg-emerald-950/50 hover:bg-emerald-100 text-emerald-700 dark:text-emerald-300 rounded-lg text-xs font-medium transition border border-emerald-100 dark:border-emerald-900">+ Banana</button>
+                    <!-- Itens da Sofia -->
+                    <div>
+                        <span class="text-[11px] font-semibold text-pink-600 dark:text-pink-400 block mb-1">👧 Itens da Sofia</span>
+                        <div class="flex flex-wrap gap-1.5">
+                            <button onclick="adicionarFavorito('Biscoito da Sofia', 2, 5.50, 'Infantil')" class="px-3 py-1.5 bg-pink-50 dark:bg-pink-950/50 hover:bg-pink-100 text-pink-700 dark:text-pink-300 rounded-lg text-xs font-medium transition border border-pink-100 dark:border-pink-900">+ Biscoito</button>
+                            <button onclick="adicionarFavorito('Lenço Umedecido', 2, 12.00, 'Infantil')" class="px-3 py-1.5 bg-pink-50 dark:bg-pink-950/50 hover:bg-pink-100 text-pink-700 dark:text-pink-300 rounded-lg text-xs font-medium transition border border-pink-100 dark:border-pink-900">+ Lenço Umedecido</button>
+                            <button onclick="adicionarFavorito('Sabonete Infantil', 2, 4.50, 'Infantil')" class="px-3 py-1.5 bg-pink-50 dark:bg-pink-950/50 hover:bg-pink-100 text-pink-700 dark:text-pink-300 rounded-lg text-xs font-medium transition border border-pink-100 dark:border-pink-900">+ Sabonete Infantil</button>
+                        </div>
                     </div>
-                </div>
 
-                <!-- Açougue e Frios -->
-                <div>
-                    <span class="text-[11px] font-semibold text-amber-600 dark:text-amber-400 block mb-1">🥩 Açougue & Frios</span>
-                    <div class="flex flex-wrap gap-1.5">
-                        <button onclick="adicionarFavorito('Carne Moída (1kg)', 1, 35.00, 'Açougue/Frios')" class="px-3 py-1.5 bg-amber-50 dark:bg-amber-950/50 hover:bg-amber-100 text-amber-700 dark:text-amber-300 rounded-lg text-xs font-medium transition border border-amber-100 dark:border-amber-900">+ Carne Moída</button>
-                        <button onclick="adicionarFavorito('Peito de Frango (1kg)', 1, 18.50, 'Açougue/Frios')" class="px-3 py-1.5 bg-amber-50 dark:bg-amber-950/50 hover:bg-amber-100 text-amber-700 dark:text-amber-300 rounded-lg text-xs font-medium transition border border-amber-100 dark:border-amber-900">+ Frango</button>
-                        <button onclick="adicionarFavorito('Ovos (Cartela c/ 30)', 1, 21.00, 'Açougue/Frios')" class="px-3 py-1.5 bg-amber-50 dark:bg-amber-950/50 hover:bg-amber-100 text-amber-700 dark:text-amber-300 rounded-lg text-xs font-medium transition border border-amber-100 dark:border-amber-900">+ Ovos</button>
-                        <button onclick="adicionarFavorito('Muçarela (300g)', 1, 14.00, 'Açougue/Frios')" class="px-3 py-1.5 bg-amber-50 dark:bg-amber-950/50 hover:bg-amber-100 text-amber-700 dark:text-amber-300 rounded-lg text-xs font-medium transition border border-amber-100 dark:border-amber-900">+ Muçarela</button>
+                    <!-- Hortifruti -->
+                    <div>
+                        <span class="text-[11px] font-semibold text-emerald-600 dark:text-emerald-400 block mb-1">🍅 Hortifruti</span>
+                        <div class="flex flex-wrap gap-1.5">
+                            <button onclick="adicionarFavorito('Tomate (1kg)', 1, 8.90, 'Hortifruti')" class="px-3 py-1.5 bg-emerald-50 dark:bg-emerald-950/50 hover:bg-emerald-100 text-emerald-700 dark:text-emerald-300 rounded-lg text-xs font-medium transition border border-emerald-100 dark:border-emerald-900">+ Tomate</button>
+                            <button onclick="adicionarFavorito('Cebola (1kg)', 1, 6.50, 'Hortifruti')" class="px-3 py-1.5 bg-emerald-50 dark:bg-emerald-950/50 hover:bg-emerald-100 text-emerald-700 dark:text-emerald-300 rounded-lg text-xs font-medium transition border border-emerald-100 dark:border-emerald-900">+ Cebola</button>
+                            <button onclick="adicionarFavorito('Batata (1kg)', 1, 7.90, 'Hortifruti')" class="px-3 py-1.5 bg-emerald-50 dark:bg-emerald-950/50 hover:bg-emerald-100 text-emerald-700 dark:text-emerald-300 rounded-lg text-xs font-medium transition border border-emerald-100 dark:border-emerald-900">+ Batata</button>
+                            <button onclick="adicionarFavorito('Banana (Dúzia)', 1, 6.00, 'Hortifruti')" class="px-3 py-1.5 bg-emerald-50 dark:bg-emerald-950/50 hover:bg-emerald-100 text-emerald-700 dark:text-emerald-300 rounded-lg text-xs font-medium transition border border-emerald-100 dark:border-emerald-900">+ Banana</button>
+                        </div>
                     </div>
-                </div>
 
-                <!-- Limpeza -->
-                <div>
-                    <span class="text-[11px] font-semibold text-purple-600 dark:text-purple-400 block mb-1">🧽 Limpeza & Higiene</span>
-                    <div class="flex flex-wrap gap-1.5">
-                        <button onclick="adicionarFavorito('Detergente Líquido', 3, 2.50, 'Limpeza')" class="px-3 py-1.5 bg-purple-50 dark:bg-purple-950/50 hover:bg-purple-100 text-purple-700 dark:text-purple-300 rounded-lg text-xs font-medium transition border border-purple-100 dark:border-purple-900">+ Detergente</button>
-                        <button onclick="adicionarFavorito('Papel Higiênico (12un)', 1, 22.90, 'Limpeza')" class="px-3 py-1.5 bg-purple-50 dark:bg-purple-950/50 hover:bg-purple-100 text-purple-700 dark:text-purple-300 rounded-lg text-xs font-medium transition border border-purple-100 dark:border-purple-900">+ Papel Higiênico</button>
-                        <button onclick="adicionarFavorito('Pasta de Dentes', 2, 4.50, 'Limpeza')" class="px-3 py-1.5 bg-purple-50 dark:bg-purple-950/50 hover:bg-purple-100 text-purple-700 dark:text-purple-300 rounded-lg text-xs font-medium transition border border-purple-100 dark:border-purple-900">+ Pasta Dentes</button>
+                    <!-- Açougue e Frios -->
+                    <div>
+                        <span class="text-[11px] font-semibold text-amber-600 dark:text-amber-400 block mb-1">🥩 Açougue & Frios</span>
+                        <div class="flex flex-wrap gap-1.5">
+                            <button onclick="adicionarFavorito('Carne Moída (1kg)', 1, 35.00, 'Açougue/Frios')" class="px-3 py-1.5 bg-amber-50 dark:bg-amber-950/50 hover:bg-amber-100 text-amber-700 dark:text-amber-300 rounded-lg text-xs font-medium transition border border-amber-100 dark:border-amber-900">+ Carne Moída</button>
+                            <button onclick="adicionarFavorito('Peito de Frango (1kg)', 1, 18.50, 'Açougue/Frios')" class="px-3 py-1.5 bg-amber-50 dark:bg-amber-950/50 hover:bg-amber-100 text-amber-700 dark:text-amber-300 rounded-lg text-xs font-medium transition border border-amber-100 dark:border-amber-900">+ Frango</button>
+                            <button onclick="adicionarFavorito('Ovos (Cartela c/ 30)', 1, 21.00, 'Açougue/Frios')" class="px-3 py-1.5 bg-amber-50 dark:bg-amber-950/50 hover:bg-amber-100 text-amber-700 dark:text-amber-300 rounded-lg text-xs font-medium transition border border-amber-100 dark:border-amber-900">+ Ovos</button>
+                            <button onclick="adicionarFavorito('Muçarela (300g)', 1, 14.00, 'Açougue/Frios')" class="px-3 py-1.5 bg-amber-50 dark:bg-amber-950/50 hover:bg-amber-100 text-amber-700 dark:text-amber-300 rounded-lg text-xs font-medium transition border border-amber-100 dark:border-amber-900">+ Muçarela</button>
+                        </div>
+                    </div>
+
+                    <!-- Limpeza & Higiene Pessoal -->
+                    <div>
+                        <span class="text-[11px] font-semibold text-purple-600 dark:text-purple-400 block mb-1">🧽 Limpeza & Higiene Pessoal</span>
+                        <div class="flex flex-wrap gap-1.5">
+                            <button onclick="adicionarFavorito('Detergente Líquido', 3, 2.50, 'Limpeza')" class="px-3 py-1.5 bg-purple-50 dark:bg-purple-950/50 hover:bg-purple-100 text-purple-700 dark:text-purple-300 rounded-lg text-xs font-medium transition border border-purple-100 dark:border-purple-900">+ Detergente</button>
+                            <button onclick="adicionarFavorito('Sabão Máq. Lavar Louça', 1, 25.00, 'Limpeza')" class="px-3 py-1.5 bg-purple-50 dark:bg-purple-950/50 hover:bg-purple-100 text-purple-700 dark:text-purple-300 rounded-lg text-xs font-medium transition border border-purple-100 dark:border-purple-900">+ Sabão Máq. Louça</button>
+                            <button onclick="adicionarFavorito('Papel Higiênico (12un)', 1, 22.90, 'Limpeza')" class="px-3 py-1.5 bg-purple-50 dark:bg-purple-950/50 hover:bg-purple-100 text-purple-700 dark:text-purple-300 rounded-lg text-xs font-medium transition border border-purple-100 dark:border-purple-900">+ Papel Higiênico</button>
+                            <button onclick="adicionarFavorito('Shampoo', 1, 19.90, 'Higiene')" class="px-3 py-1.5 bg-purple-50 dark:bg-purple-950/50 hover:bg-purple-100 text-purple-700 dark:text-purple-300 rounded-lg text-xs font-medium transition border border-purple-100 dark:border-purple-900">+ Shampoo</button>
+                            <button onclick="adicionarFavorito('Condicionador', 1, 21.00, 'Higiene')" class="px-3 py-1.5 bg-purple-50 dark:bg-purple-950/50 hover:bg-purple-100 text-purple-700 dark:text-purple-300 rounded-lg text-xs font-medium transition border border-purple-100 dark:border-purple-900">+ Condicionador</button>
+                            <button onclick="adicionarFavorito('Aparelho de Barbear Vênus', 1, 26.00, 'Higiene')" class="px-3 py-1.5 bg-purple-50 dark:bg-purple-950/50 hover:bg-purple-100 text-purple-700 dark:text-purple-300 rounded-lg text-xs font-medium transition border border-purple-100 dark:border-purple-900">+ Aparelho Vênus</button>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -150,9 +170,11 @@
                             <label class="block text-[11px] font-semibold text-gray-500 dark:text-gray-400 uppercase mb-1">Setor</label>
                             <select id="compra-setor" class="w-full px-3 py-2 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 dark:text-white">
                                 <option value="Mercearia">Mercearia</option>
+                                <option value="Infantil">Infantil</option>
                                 <option value="Hortifruti">Hortifruti</option>
                                 <option value="Açougue/Frios">Açougue/Frios</option>
                                 <option value="Limpeza">Limpeza</option>
+                                <option value="Higiene">Higiene</option>
                                 <option value="Outros">Outros</option>
                             </select>
                         </div>
@@ -265,6 +287,17 @@
             document.documentElement.classList.toggle('dark');
             const isDark = document.documentElement.classList.contains('dark');
             localStorage.setItem('dark_mode', isDark);
+        }
+
+        function alternarGavetinha() {
+            const gavetinha = document.getElementById('gavetinha-frequentes');
+            const icone = document.getElementById('icone-gavetinha');
+            gavetinha.classList.toggle('hidden');
+            if (gavetinha.classList.contains('hidden')) {
+                icone.textContent = '▼';
+            } else {
+                icone.textContent = '▲';
+            }
         }
 
         function alterarTicket() {
