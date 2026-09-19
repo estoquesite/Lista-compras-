@@ -93,26 +93,33 @@
                     </button>
                 </div>
 
-                <!-- 3 CARDS DE RESUMO LIMPOS -->
-                <div class="grid grid-cols-1 sm:grid-cols-3 gap-2">
+                <!-- 4 CARDS PERFEITAMENTE SEPARADOS -->
+                <div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                    <!-- Total do Mês -->
                     <div class="bg-gray-50 dark:bg-gray-800 p-3 rounded-xl border border-gray-100 dark:border-gray-700">
                         <p class="text-[10px] font-semibold text-gray-400 uppercase">Total do Mês</p>
                         <p id="total-geral" class="text-base sm:text-lg font-bold text-gray-900 dark:text-white mt-0.5">R$ 0</p>
                     </div>
+                    <!-- Caixinha Ticket -->
                     <div class="bg-gray-50 dark:bg-gray-800 p-3 rounded-xl border border-gray-100 dark:border-gray-700 relative">
                         <div class="flex justify-between items-center">
-                            <p class="text-[10px] font-semibold text-indigo-600 dark:text-indigo-400 uppercase">Orçamento (T+D)</p>
-                            <div class="space-x-1">
-                                <button onclick="alterarTicket()" class="text-[10px] text-indigo-500 hover:underline" title="Editar Ticket">💳T</button>
-                                <button onclick="alterarDinheiro()" class="text-[10px] text-amber-500 hover:underline" title="Editar Dinheiro">💵D</button>
-                            </div>
+                            <p class="text-[10px] font-semibold text-indigo-600 dark:text-indigo-400 uppercase">💳 Ticket</p>
+                            <button onclick="alterarTicket()" class="text-xs text-indigo-500 hover:underline">✏️</button>
                         </div>
-                        <p id="info-orcamento" class="text-[10px] text-gray-500 dark:text-gray-400 mt-0.5 truncate">T: R$0 | D: R$0</p>
-                        <p id="saldo-restante" class="text-sm font-bold text-indigo-600 dark:text-indigo-400 mt-0.5">R$ 0</p>
+                        <p id="saldo-ticket" class="text-sm sm:text-base font-bold text-indigo-600 dark:text-indigo-400 mt-0.5">R$ 0</p>
                     </div>
+                    <!-- Caixinha Dinheiro -->
+                    <div class="bg-gray-50 dark:bg-gray-800 p-3 rounded-xl border border-gray-100 dark:border-gray-700 relative">
+                        <div class="flex justify-between items-center">
+                            <p class="text-[10px] font-semibold text-amber-600 dark:text-amber-400 uppercase">💵 Dinheiro</p>
+                            <button onclick="alterarDinheiro()" class="text-xs text-amber-500 hover:underline">✏️</button>
+                        </div>
+                        <p id="saldo-dinheiro" class="text-sm sm:text-base font-bold text-amber-600 dark:text-amber-400 mt-0.5">R$ 0</p>
+                    </div>
+                    <!-- Total Gasto Ano -->
                     <div class="bg-gray-50 dark:bg-gray-800 p-3 rounded-xl border border-gray-100 dark:border-gray-700">
-                        <p class="text-[10px] font-semibold text-amber-600 dark:text-amber-400 uppercase">Total Gasto Ano</p>
-                        <p id="total-ano" class="text-base sm:text-lg font-bold text-amber-600 dark:text-amber-400 mt-0.5">R$ 0</p>
+                        <p class="text-[10px] font-semibold text-emerald-600 dark:text-emerald-400 uppercase">Total Gasto Ano</p>
+                        <p id="total-ano" class="text-base sm:text-lg font-bold text-emerald-600 dark:text-emerald-400 mt-0.5">R$ 0</p>
                     </div>
                 </div>
 
@@ -230,7 +237,7 @@
                 </form>
             </div>
 
-            <!-- TABELA DE ITENS (SEM COLUNA DE TICK) -->
+            <!-- TABELA DE ITENS -->
             <div class="bg-white dark:bg-gray-800 p-5 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 space-y-4">
                 <div class="flex justify-between items-center">
                     <h3 id="status-progresso" class="text-md font-semibold text-gray-900 dark:text-white">Itens na Lista (0)</h3>
@@ -282,7 +289,7 @@
         </div>
     </div>
 
-    <!-- MICROFONE FLUTUANTE LÁ EM BAIXO -->
+    <!-- MICROFONE FLUTUANTE -->
     <button onclick="ouvirVoz()" id="btn-voz-flutuante" class="fixed bottom-6 right-6 z-50 bg-red-600 hover:bg-red-700 text-white w-14 h-14 rounded-full shadow-2xl flex items-center justify-center text-2xl transition transform hover:scale-105 active:scale-95" title="Falar e Adicionar Automaticamente">
         🎤
     </button>
@@ -387,7 +394,7 @@
             return parseFloat(limpo) || 0;
         }
 
-        // RECONHECIMENTO DE VOZ (MICROFONE FLUTUANTE)
+        // RECONHECIMENTO DE VOZ
         function ouvirVoz() {
             const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
             if (!SpeechRecognition) {
@@ -477,7 +484,7 @@
             document.getElementById('tabela-compras').scrollIntoView({ behavior: 'smooth' });
         }
 
-        // TICKET E DINHEIRO
+        // TICKET E DINHEIRO SEPARADOS
         function obterTicketDoMes() {
             let cache = JSON.parse(localStorage.getItem('historico_ticket_mensal') || '{}');
             return cache[chaveMesAno] !== undefined ? cache[chaveMesAno] : null;
@@ -652,7 +659,8 @@
                 texto += `- ${i.nome} (${i.qtd}x) = R$ ${sub.toFixed(2)}%0A`;
             });
             texto += `%0A💰 *Total do Mês:* R$ ${totalGeral.toFixed(2)}`;
-            texto += `%0A💳 *Ticket:* R$ ${ticketVal.toFixed(2)} | *Dinheiro:* R$ ${dinheiroVal.toFixed(2)}`;
+            texto += `%0A💳 *Ticket:* R$ ${ticketVal.toFixed(2)}`;
+            texto += `%0A💵 *Dinheiro:* R$ ${dinheiroVal.toFixed(2)}`;
             let totalOrcamento = ticketVal + dinheiroVal;
             if (totalOrcamento > 0) {
                 texto += `%0A⚖️ *Saldo Restante:* R$ ${(totalOrcamento - totalGeral).toFixed(2)}`;
@@ -666,21 +674,21 @@
             document.getElementById('status-progresso').textContent = `Itens no Mês (${lista.length})`;
             document.getElementById('total-ano').textContent = `R$ ${calcularTotalAno().toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
 
-            let ticketVal = obterTicketDoMes() || 0;
-            let dinheiroVal = obterDinheiroDoMes() || 0;
-            let totalOrcamento = ticketVal + dinheiroVal;
+            let ticketVal = obterTicketDoMes();
+            let dinheiroVal = obterDinheiroDoMes();
 
-            document.getElementById('info-orcamento').textContent = `T: R$${ticketVal.toFixed(2)} | D: R$${dinheiroVal.toFixed(2)}`;
-
-            let elSaldo = document.getElementById('saldo-restante');
-            if (ticketVal === 0 && dinheiroVal === 0) {
-                elSaldo.textContent = `Não def.`;
-                elSaldo.className = "text-sm font-bold text-gray-400 dark:text-gray-500 mt-0.5";
+            let elTicket = document.getElementById('saldo-ticket');
+            if (ticketVal === null) {
+                elTicket.textContent = `Não def.`;
             } else {
-                let totalGeralCalc = lista.reduce((soma, i) => soma + (i.qtd * i.preco), 0);
-                let saldoRestante = totalOrcamento - totalGeralCalc;
-                elSaldo.textContent = `R$ ${saldoRestante.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
-                elSaldo.className = saldoRestante < 0 ? "text-sm font-bold text-red-600 dark:text-red-400 mt-0.5" : "text-sm font-bold text-indigo-600 dark:text-indigo-400 mt-0.5";
+                elTicket.textContent = `R$ ${ticketVal.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+            }
+
+            let elDinheiro = document.getElementById('saldo-dinheiro');
+            if (dinheiroVal === null) {
+                elDinheiro.textContent = `Não def.`;
+            } else {
+                elDinheiro.textContent = `R$ ${dinheiroVal.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
             }
 
             if (lista.length === 0) {
