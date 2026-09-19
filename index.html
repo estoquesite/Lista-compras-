@@ -93,33 +93,29 @@
                     </button>
                 </div>
 
-                <!-- 4 CARDS: TICKET E DINHEIRO LADO A LADO EM CIMA -->
-                <div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
-                    <!-- Caixinha Ticket -->
-                    <div class="bg-gray-50 dark:bg-gray-800 p-3 rounded-xl border border-gray-100 dark:border-gray-700 relative">
-                        <div class="flex justify-between items-center">
-                            <p class="text-[10px] font-semibold text-indigo-600 dark:text-indigo-400 uppercase">💳 Ticket</p>
-                            <button onclick="alterarTicket()" class="text-xs text-indigo-500 hover:underline">✏️</button>
-                        </div>
-                        <p id="saldo-ticket" class="text-sm sm:text-base font-bold text-indigo-600 dark:text-indigo-400 mt-0.5">R$ 0</p>
-                    </div>
-                    <!-- Caixinha Dinheiro -->
-                    <div class="bg-gray-50 dark:bg-gray-800 p-3 rounded-xl border border-gray-100 dark:border-gray-700 relative">
-                        <div class="flex justify-between items-center">
-                            <p class="text-[10px] font-semibold text-amber-600 dark:text-amber-400 uppercase">💵 Dinheiro</p>
-                            <button onclick="alterarDinheiro()" class="text-xs text-amber-500 hover:underline">✏️</button>
-                        </div>
-                        <p id="saldo-dinheiro" class="text-sm sm:text-base font-bold text-amber-600 dark:text-amber-400 mt-0.5">R$ 0</p>
-                    </div>
+                <!-- 3 CARDS ESSENCIAIS: TOTAL DO MÊS | SALDO TICKET (RESTANTE) | DINHEIRO -->
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-2">
                     <!-- Total do Mês -->
                     <div class="bg-gray-50 dark:bg-gray-800 p-3 rounded-xl border border-gray-100 dark:border-gray-700">
                         <p class="text-[10px] font-semibold text-gray-400 uppercase">Total do Mês</p>
                         <p id="total-geral" class="text-base sm:text-lg font-bold text-gray-900 dark:text-white mt-0.5">R$ 0</p>
                     </div>
-                    <!-- Total Gasto Ano -->
-                    <div class="bg-gray-50 dark:bg-gray-800 p-3 rounded-xl border border-gray-100 dark:border-gray-700">
-                        <p class="text-[10px] font-semibold text-emerald-600 dark:text-emerald-400 uppercase">Total Gasto Ano</p>
-                        <p id="total-ano" class="text-base sm:text-lg font-bold text-emerald-600 dark:text-emerald-400 mt-0.5">R$ 0</p>
+                    <!-- Saldo Ticket (Desconta Automaticamente) -->
+                    <div class="bg-gray-50 dark:bg-gray-800 p-3 rounded-xl border border-gray-100 dark:border-gray-700 relative">
+                        <div class="flex justify-between items-center">
+                            <p class="text-[10px] font-semibold text-indigo-600 dark:text-indigo-400 uppercase">💳 Saldo Ticket (Restante)</p>
+                            <button onclick="alterarTicket()" class="text-xs text-indigo-500 hover:underline">✏️ Definir</button>
+                        </div>
+                        <p id="saldo-ticket" class="text-base sm:text-lg font-bold text-indigo-600 dark:text-indigo-400 mt-0.5">R$ 0</p>
+                        <p id="info-ticket-total" class="text-[10px] text-gray-400 mt-0.5">Valor inicial não definido</p>
+                    </div>
+                    <!-- Dinheiro -->
+                    <div class="bg-gray-50 dark:bg-gray-800 p-3 rounded-xl border border-gray-100 dark:border-gray-700 relative">
+                        <div class="flex justify-between items-center">
+                            <p class="text-[10px] font-semibold text-amber-600 dark:text-amber-400 uppercase">💵 Dinheiro</p>
+                            <button onclick="alterarDinheiro()" class="text-xs text-amber-500 hover:underline">✏️ Definir</button>
+                        </div>
+                        <p id="saldo-dinheiro" class="text-base sm:text-lg font-bold text-amber-600 dark:text-amber-400 mt-0.5">R$ 0</p>
                     </div>
                 </div>
 
@@ -414,7 +410,7 @@
             document.getElementById('tabela-compras').scrollIntoView({ behavior: 'smooth' });
         }
 
-        // TICKET E DINHEIRO SEPARADOS
+        // TICKET COM DESCONTO AUTOMÁTICO DO SALDO RESTANTE
         function obterTicketDoMes() {
             let cache = JSON.parse(localStorage.getItem('historico_ticket_mensal') || '{}');
             return cache[chaveMesAno] !== undefined ? cache[chaveMesAno] : null;
@@ -426,7 +422,7 @@
         }
         function alterarTicket() {
             let atual = obterTicketDoMes() || 0;
-            let val = prompt("Digite o valor do TICKET para " + mesSelecionado + " de " + anoSelecionado + " (R$):", atual);
+            let val = prompt("Digite o valor TOTAL do TICKET para " + mesSelecionado + " de " + anoSelecionado + " (R$):", atual);
             if (val !== null) {
                 guardarTicketDoMes(formatarValorInput(val));
                 renderizarTabelaCompras();
@@ -460,17 +456,6 @@
             let cacheGeral = JSON.parse(localStorage.getItem('historico_compras_mensal') || '{}');
             cacheGeral[chaveMesAno] = lista;
             localStorage.setItem('historico_compras_mensal', JSON.stringify(cacheGeral));
-        }
-
-        function calcularTotalAno() {
-            let cacheGeral = JSON.parse(localStorage.getItem('historico_compras_mensal') || '{}');
-            let totalAno = 0;
-            mesesArray.forEach(m => {
-                let chave = `${m}_${anoSelecionado}`;
-                let listaMes = cacheGeral[chave] || [];
-                listaMes.forEach(i => { totalAno += (i.qtd * i.preco); });
-            });
-            return totalAno;
         }
 
         // RELATÓRIO ANUAL
@@ -572,7 +557,7 @@
         function partilharWhatsApp() {
             let lista = obterListaDoMes();
             if (lista.length === 0) { alert('A lista deste mês está vazia.'); return; }
-            let ticketVal = obterTicketDoMes() || 0;
+            let ticketTotal = obterTicketDoMes() || 0;
             let dinheiroVal = obterDinheiroDoMes() || 0;
             let texto = `🛒 *Lista de Compras (${mesSelecionado} / ${anoSelecionado})*%0A%0A`;
             let totalGeral = 0;
@@ -582,12 +567,8 @@
                 texto += `- ${i.nome} (${i.qtd}x) = R$ ${sub.toFixed(2)}%0A`;
             });
             texto += `%0A💰 *Total do Mês:* R$ ${totalGeral.toFixed(2)}`;
-            texto += `%0A💳 *Ticket:* R$ ${ticketVal.toFixed(2)}`;
+            texto += `%0A💳 *Saldo Ticket Restante:* R$ ${(ticketTotal - totalGeral).toFixed(2)} (Total: R$ ${ticketTotal.toFixed(2)})`;
             texto += `%0A💵 *Dinheiro:* R$ ${dinheiroVal.toFixed(2)}`;
-            let totalOrcamento = ticketVal + dinheiroVal;
-            if (totalOrcamento > 0) {
-                texto += `%0A⚖️ *Saldo Restante:* R$ ${(totalOrcamento - totalGeral).toFixed(2)}`;
-            }
             window.open(`https://api.whatsapp.com/send?text=${texto}`, '_blank');
         }
 
@@ -595,36 +576,45 @@
             let lista = obterListaDoMes();
             const tbody = document.getElementById('tabela-compras');
             document.getElementById('status-progresso').textContent = `Itens no Mês (${lista.length})`;
-            document.getElementById('total-ano').textContent = `R$ ${calcularTotalAno().toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
 
-            let ticketVal = obterTicketDoMes();
-            let dinheiroVal = obterDinheiroDoMes();
+            let totalGeral = 0;
+            lista.forEach(i => { totalGeral += (i.qtd * i.preco); });
 
+            document.getElementById('total-geral').textContent = `R$ ${totalGeral.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+
+            // TICKET RESTANTE (TICKET TOTAL - TOTAL GASTO)
+            let ticketTotal = obterTicketDoMes();
             let elTicket = document.getElementById('saldo-ticket');
-            if (ticketVal === null) {
+            let elTicketInfo = document.getElementById('info-ticket-total');
+
+            if (ticketTotal === null) {
                 elTicket.textContent = `Não def.`;
+                elTicketInfo.textContent = `Clique em Definir ✏️`;
+                elTicket.className = "text-base sm:text-lg font-bold text-gray-400 dark:text-gray-500 mt-0.5";
             } else {
-                elTicket.textContent = `R$ ${ticketVal.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+                let ticketRestante = ticketTotal - totalGeral;
+                elTicket.textContent = `R$ ${ticketRestante.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+                elTicketInfo.textContent = `Total inicial: R$ ${ticketTotal.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+                elTicket.className = ticketRestante < 0 ? "text-base sm:text-lg font-bold text-red-600 dark:text-red-400 mt-0.5" : "text-base sm:text-lg font-bold text-indigo-600 dark:text-indigo-400 mt-0.5";
             }
 
+            let dinheiroVal = obterDinheiroDoMes();
             let elDinheiro = document.getElementById('saldo-dinheiro');
             if (dinheiroVal === null) {
                 elDinheiro.textContent = `Não def.`;
+                elDinheiro.className = "text-base sm:text-lg font-bold text-gray-400 dark:text-gray-500 mt-0.5";
             } else {
                 elDinheiro.textContent = `R$ ${dinheiroVal.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+                elDinheiro.className = "text-base sm:text-lg font-bold text-amber-600 dark:text-amber-400 mt-0.5";
             }
 
             if (lista.length === 0) {
                 tbody.innerHTML = `<tr><td colspan="5" class="py-8 text-center text-gray-400">Nenhum item neste mês. Use o microfone abaixo para adicionar!</td></tr>`;
-                document.getElementById('total-geral').textContent = `R$ 0`;
                 return;
             }
 
-            let totalGeral = 0;
-
             tbody.innerHTML = lista.map(i => {
                 const totalItem = i.qtd * i.preco;
-                totalGeral += totalItem;
 
                 return `
                     <tr class="hover:bg-gray-50/50 dark:hover:bg-gray-700/50 transition">
@@ -642,8 +632,6 @@
                     </tr>
                 `;
             }).join('');
-
-            document.getElementById('total-geral').textContent = `R$ ${totalGeral.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
         }
     </script>
 </body>
