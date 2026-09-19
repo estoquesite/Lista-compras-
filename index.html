@@ -40,10 +40,10 @@
         </div>
     </div>
 
-    <!-- CONTEÚDO DO SITE (Oculto até autenticar) -->
+    <!-- CONTEÚDO DO SITE -->
     <div id="conteudo-site" class="hidden">
         
-        <!-- TOPO FIXO (Sticky Header) -->
+        <!-- TOPO FIXO -->
         <div class="sticky top-0 z-40 bg-white/95 dark:bg-gray-900/95 backdrop-blur-md shadow-sm border-b border-gray-100 dark:border-gray-800 transition-colors">
             <div class="max-w-4xl mx-auto p-4 space-y-3">
                 
@@ -98,7 +98,6 @@
                 </button>
                 
                 <div id="gavetinha-frequentes" class="hidden space-y-3 pt-2">
-                    <!-- Mercearia & Despensa -->
                     <div>
                         <span class="text-[11px] font-semibold text-blue-600 dark:text-blue-400 block mb-1">📦 Mercearia & Despensa</span>
                         <div class="flex flex-wrap gap-1.5">
@@ -111,7 +110,6 @@
                         </div>
                     </div>
 
-                    <!-- Itens da Sofia -->
                     <div>
                         <span class="text-[11px] font-semibold text-pink-600 dark:text-pink-400 block mb-1">👧 Itens da Sofia</span>
                         <div class="flex flex-wrap gap-1.5">
@@ -121,7 +119,6 @@
                         </div>
                     </div>
 
-                    <!-- Hortifruti -->
                     <div>
                         <span class="text-[11px] font-semibold text-emerald-600 dark:text-emerald-400 block mb-1">🍅 Hortifruti</span>
                         <div class="flex flex-wrap gap-1.5">
@@ -132,7 +129,6 @@
                         </div>
                     </div>
 
-                    <!-- Açougue e Frios -->
                     <div>
                         <span class="text-[11px] font-semibold text-amber-600 dark:text-amber-400 block mb-1">🥩 Açougue & Frios</span>
                         <div class="flex flex-wrap gap-1.5">
@@ -143,7 +139,6 @@
                         </div>
                     </div>
 
-                    <!-- Limpeza & Higiene Pessoal -->
                     <div>
                         <span class="text-[11px] font-semibold text-purple-600 dark:text-purple-400 block mb-1">🧽 Limpeza & Higiene Pessoal</span>
                         <div class="flex flex-wrap gap-1.5">
@@ -158,9 +153,16 @@
                 </div>
             </div>
 
-            <!-- FORMULÁRIO -->
+            <!-- FORMULÁRIO COM O BOTÃO DE VOZ (MICROFONE) -->
             <div class="bg-white dark:bg-gray-800 p-5 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700">
-                <h2 id="form-titulo" class="text-md font-semibold text-gray-900 dark:text-white mb-3">Adicionar Novo Produto</h2>
+                <div class="flex justify-between items-center mb-3">
+                    <h2 id="form-titulo" class="text-md font-semibold text-gray-900 dark:text-white">Adicionar Novo Produto</h2>
+                    <!-- BOTÃO DO MICROFONE INTELIGENTE -->
+                    <button type="button" onclick="ouvirVoz()" id="btn-voz" class="bg-red-500 hover:bg-red-600 text-white px-3 py-1.5 rounded-xl text-xs font-medium transition flex items-center gap-1.5 shadow-sm">
+                        🎤 Falar Produto
+                    </button>
+                </div>
+                
                 <form id="form-compra" class="space-y-3" onsubmit="salvarItemCompra(event)">
                     <input type="hidden" id="edit-compra-id">
                     <div class="grid grid-cols-1 sm:grid-cols-4 gap-3">
@@ -233,7 +235,7 @@
         </div>
     </div>
 
-    <!-- SCRIPT DE SEGURANÇA E LÓGICA -->
+    <!-- SCRIPT DE SEGURANÇA, LÓGICA E RECONHECIMENTO DE VOZ -->
     <script>
         const SENHA_MESTRA = "1510";
 
@@ -300,6 +302,91 @@
             } else {
                 icone.textContent = '▲';
             }
+        }
+
+        // FUNÇÃO INTELIGENTE DE RECONHECIMENTO DE VOZ
+        function ouvirVoz() {
+            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+            if (!SpeechRecognition) {
+                alert("O seu navegador não suporta reconhecimento de voz. Tente usar pelo Google Chrome no telemóvel.");
+                return;
+            }
+
+            const recognition = new SpeechRecognition();
+            recognition.lang = 'pt-BR';
+            const btnVoz = document.getElementById('btn-voz');
+
+            recognition.onstart = () => {
+                btnVoz.textContent = "🎙️ A escutar... Fale produto e preço";
+                btnVoz.classList.remove('bg-red-500', 'hover:bg-red-600');
+                btnVoz.classList.add('bg-amber-500', 'animate-pulse');
+            };
+
+            recognition.onresult = (event) => {
+                const texto = event.results[0][0].transcript.toLowerCase();
+                processarFalaInteligente(texto);
+            };
+
+            recognition.onerror = () => {
+                resetarBotaoVoz();
+                alert("Não consegui ouvir bem. Tente novamente.");
+            };
+
+            recognition.onend = () => {
+                resetarBotaoVoz();
+            };
+
+            recognition.start();
+        }
+
+        function resetarBotaoVoz() {
+            const btnVoz = document.getElementById('btn-voz');
+            btnVoz.textContent = "🎤 Falar Produto";
+            btnVoz.classList.remove('bg-amber-500', 'animate-pulse');
+            btnVoz.classList.add('bg-red-500', 'hover:bg-red-600');
+        }
+
+        // Tenta extrair o nome, preço e quantidade do que você falou
+        function processarFalaInteligente(texto) {
+            // Exemplo de fala esperada: "arroz 17,90 2" ou "café 18 reais"
+            // Vamos separar por espaços
+            const partes = texto.replace('reais', '').replace('real', '').replace(',', '.').trim().split(/\s+/);
+            
+            let precoEncontrado = 0;
+            let qtdEncontrada = 1;
+            let nomePalavras = [];
+
+            partes.forEach(p => {
+                let numero = parseFloat(p);
+                // Se for um número e ainda não temos preço, assume que é o preço
+                if (!isNaN(numero) && precoEncontrado === 0 && nomePalavras.length > 0) {
+                    precoEncontrado = numero;
+                } else if (!isNaN(numero) && precoEncontrado > 0) {
+                    // Se já temos preço, o próximo número é a quantidade
+                    qtdEncontrada = parseInt(numero) || 1;
+                } else {
+                    nomePalavras.push(p);
+                }
+            });
+
+            let nomeProduto = nomePalavras.join(' ');
+            if (!nomeProduto) nomeProduto = texto; // fallback se falar só números
+
+            // Capitalizar primeira letra
+            nomeProduto = nomeProduto.charAt(0).toUpperCase() + nomeProduto.slice(1);
+
+            // Preencher os campos automaticamente para você ver
+            document.getElementById('compra-nome').value = nomeProduto;
+            document.getElementById('compra-qtd').value = qtdEncontrada;
+            if (precoEncontrado > 0) {
+                document.getElementById('compra-preco').value = precoEncontrado.toFixed(2);
+            }
+
+            // Destaque visual temporário nos campos preenchidos
+            document.getElementById('compra-nome').classList.add('ring-2', 'ring-emerald-500');
+            setTimeout(() => {
+                document.getElementById('compra-nome').classList.remove('ring-2', 'ring-emerald-500');
+            }, 1500);
         }
 
         function alterarTicket() {
