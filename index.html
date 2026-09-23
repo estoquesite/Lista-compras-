@@ -62,9 +62,9 @@
     <!-- CONTEÚDO DO SITE -->
     <div id="conteudo-site" class="hidden">
         
-        <!-- TOPO FIXO COMPACTO -->
+        <!-- TOPO FIXO SUPER COMPACTO -->
         <div class="sticky top-0 z-40 bg-white/95 dark:bg-gray-900/95 backdrop-blur-md shadow-sm border-b border-gray-100 dark:border-gray-800 transition-colors">
-            <div class="max-w-4xl mx-auto p-3 space-y-2.5">
+            <div class="max-w-4xl mx-auto p-3 space-y-2">
                 
                 <!-- LINHA 1: TÍTULO + SINCRONIZAR + RELATÓRIO -->
                 <div class="flex justify-between items-center">
@@ -82,7 +82,7 @@
 
                 <!-- LINHA 2: SELETOR DE MÊS E ANO -->
                 <div class="flex items-center justify-between bg-blue-50 dark:bg-blue-950/40 border border-blue-100 dark:border-blue-900/50 p-2 rounded-xl">
-                    <span class="text-xs font-semibold text-blue-700 dark:text-blue-300 uppercase px-1">📅 Mês de Referência:</span>
+                    <span class="text-xs font-semibold text-blue-700 dark:text-blue-300 uppercase px-1">📅 Mês:</span>
                     <div class="flex gap-1">
                         <select id="filtro-mes-ano" onchange="mudarMesReferencia()" class="bg-white dark:bg-gray-900 text-gray-800 dark:text-white px-2.5 py-1 rounded-lg text-xs font-semibold border border-blue-200 dark:border-blue-800 focus:outline-none focus:ring-1 focus:ring-blue-500">
                             <option value="Janeiro">Janeiro</option>
@@ -105,45 +105,30 @@
                     </div>
                 </div>
 
-                <!-- LINHA 3: ENTRADAS DE ORÇAMENTO (ALELO + DINHEIRO + SOMA) -->
+                <!-- LINHA 3: ORÇAMENTOS DISPONÍVEIS (ALELO + ESPÉCIE + SOMA) -->
                 <div class="grid grid-cols-3 gap-2">
-                    <!-- 1. Alelo / Ticket -->
+                    <!-- Alelo -->
                     <div class="bg-rose-50/70 dark:bg-rose-950/30 p-2 rounded-xl border border-rose-200/60 dark:border-rose-900/50 relative">
                         <div class="flex justify-between items-center">
-                            <p class="text-[10px] font-bold text-[#d60036] dark:text-rose-400 uppercase tracking-tight flex items-center gap-1">💳 Alelo</p>
+                            <p class="text-[10px] font-bold text-[#d60036] dark:text-rose-400 uppercase tracking-tight">💳 Alelo</p>
                             <button onclick="alterarTicket()" class="text-[10px] text-[#d60036] dark:text-rose-400 font-bold hover:underline">✏️</button>
                         </div>
-                        <p id="saldo-ticket" class="text-xs sm:text-sm font-black text-[#d60036] dark:text-rose-300 mt-1">R$ 0,00</p>
-                        <p class="text-[9px] text-rose-500/70 dark:text-rose-400/60">Cartão benefício</p>
+                        <p id="saldo-ticket" class="text-xs sm:text-sm font-black text-[#d60036] dark:text-rose-300 mt-0.5">R$ 0,00</p>
                     </div>
 
-                    <!-- 2. Dinheiro em Espécie -->
+                    <!-- Dinheiro em Espécie -->
                     <div class="bg-emerald-50/70 dark:bg-emerald-950/30 p-2 rounded-xl border border-emerald-200/60 dark:border-emerald-900/50 relative">
                         <div class="flex justify-between items-center">
-                            <p class="text-[10px] font-bold text-emerald-700 dark:text-emerald-400 uppercase tracking-tight flex items-center gap-1">💵 Espécie</p>
+                            <p class="text-[10px] font-bold text-emerald-700 dark:text-emerald-400 uppercase tracking-tight">💵 Espécie</p>
                             <button onclick="alterarDinheiro()" class="text-[10px] text-emerald-700 dark:text-emerald-400 font-bold hover:underline">✏️</button>
                         </div>
-                        <p id="saldo-dinheiro" class="text-xs sm:text-sm font-black text-emerald-700 dark:text-emerald-300 mt-1">R$ 0,00</p>
-                        <p class="text-[9px] text-emerald-600/70 dark:text-emerald-400/60">Notas / Moedas</p>
+                        <p id="saldo-dinheiro" class="text-xs sm:text-sm font-black text-emerald-700 dark:text-emerald-300 mt-0.5">R$ 0,00</p>
                     </div>
 
-                    <!-- 3. Total Orçado (Soma dos Dois) -->
+                    <!-- Total Inicial Somado -->
                     <div class="bg-blue-50/70 dark:bg-blue-950/30 p-2 rounded-xl border border-blue-200/60 dark:border-blue-900/50">
-                        <p class="text-[10px] font-bold text-blue-700 dark:text-blue-400 uppercase tracking-tight">∑ Orçamento</p>
-                        <p id="orcamento-total-combinado" class="text-xs sm:text-sm font-black text-blue-800 dark:text-blue-300 mt-1">R$ 0,00</p>
-                        <p class="text-[9px] text-blue-500/80 dark:text-blue-400/70 truncate">Alelo + Dinheiro</p>
-                    </div>
-                </div>
-
-                <!-- LINHA 4: RESUMO DE GASTOS E RESTANTE -->
-                <div class="grid grid-cols-2 gap-2 bg-gray-100/70 dark:bg-gray-800/80 p-2 rounded-xl border border-gray-200/60 dark:border-gray-700">
-                    <div class="border-r border-gray-200 dark:border-gray-700 pr-2">
-                        <p class="text-[10px] font-semibold text-gray-500 dark:text-gray-400 uppercase">🛒 Total Gasto no Mês</p>
-                        <p id="total-geral" class="text-sm font-bold text-gray-900 dark:text-white">R$ 0,00</p>
-                    </div>
-                    <div class="pl-1">
-                        <p class="text-[10px] font-semibold text-gray-500 dark:text-gray-400 uppercase">✨ Sobra / Restante</p>
-                        <p id="saldo-restante-final" class="text-sm font-bold text-emerald-600 dark:text-emerald-400">R$ 0,00</p>
+                        <p class="text-[10px] font-bold text-blue-700 dark:text-blue-400 uppercase tracking-tight">∑ Orçado</p>
+                        <p id="orcamento-total-combinado" class="text-xs sm:text-sm font-black text-blue-800 dark:text-blue-300 mt-0.5">R$ 0,00</p>
                     </div>
                 </div>
 
@@ -151,9 +136,9 @@
         </div>
 
         <!-- CONTEÚDO PRINCIPAL -->
-        <div class="max-w-4xl mx-auto p-4 sm:p-6 space-y-6">
+        <div class="max-w-4xl mx-auto p-4 sm:p-6 space-y-4">
             
-            <!-- FORMULÁRIO COMPACTO -->
+            <!-- FORMULÁRIO DE ADIÇÃO -->
             <div class="bg-white dark:bg-gray-800 p-4 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700">
                 <div class="flex justify-between items-center mb-2">
                     <h2 id="form-titulo" class="text-sm font-semibold text-gray-900 dark:text-white">Adicionar Novo Produto</h2>
@@ -186,6 +171,19 @@
                         </button>
                     </div>
                 </form>
+            </div>
+
+            <!-- PAINEL DE RESUMO: TOTAL GASTO E RESTANTE (EM CIMA DA LISTA) -->
+            <div class="bg-gradient-to-r from-gray-900 to-gray-800 dark:from-gray-800 dark:to-gray-950 text-white p-3.5 rounded-2xl shadow-md flex justify-between items-center px-4">
+                <div>
+                    <span class="block text-[10px] font-semibold uppercase tracking-wider text-gray-400">Total Gasto no Mês</span>
+                    <span id="total-geral" class="text-base sm:text-lg font-black text-white">R$ 0,00</span>
+                </div>
+                <div class="h-8 w-px bg-gray-700/80"></div>
+                <div class="text-right">
+                    <span class="block text-[10px] font-semibold uppercase tracking-wider text-gray-400">Sobra / Restante</span>
+                    <span id="saldo-restante-final" class="text-base sm:text-lg font-black text-emerald-400">R$ 0,00</span>
+                </div>
             </div>
 
             <!-- TABELA DE ITENS -->
@@ -261,7 +259,6 @@
 
     <!-- LÓGICA COM SUPABASE -->
     <script>
-        // CONFIGURAÇÃO SUPABASE
         const SUPABASE_URL = 'https://jmeepzdvmmjngxwvayqb.supabase.co';
         const SUPABASE_ANON_KEY = 'sb_publishable_54ORrLbP7naW7n-KlKCdUA_hZnpjguH';
         const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
@@ -711,7 +708,7 @@
             let totalGeral = 0;
             lista.forEach(i => { totalGeral += (i.qtd * i.preco); });
 
-            // Atualiza o gasto total do mês
+            // Atualiza o valor gasto no resumo
             document.getElementById('total-geral').textContent = `R$ ${totalGeral.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
 
             let ticketTotal = obterTicketDoMes() || 0;
@@ -719,19 +716,19 @@
             let orcamentoTotal = ticketTotal + dinheiroVal;
             let restante = orcamentoTotal - totalGeral;
 
-            // Valores nas caixas superiores
+            // Atualiza caixinhas superiores
             document.getElementById('saldo-ticket').textContent = `R$ ${ticketTotal.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
             document.getElementById('saldo-dinheiro').textContent = `R$ ${dinheiroVal.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
             document.getElementById('orcamento-total-combinado').textContent = `R$ ${orcamentoTotal.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
 
-            // Restante no resumo
+            // Atualiza a sobra/restante no painel de resumo
             let elRestante = document.getElementById('saldo-restante-final');
             elRestante.textContent = `R$ ${restante.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
             
-            // Alerta visual de saldo: vermelho se estourou, verde se ainda sobrou
+            // Vermelho se estourar o orçamento; verde esmeralda se ainda tiver margem
             elRestante.className = restante < 0 
-                ? "text-sm font-bold text-red-600 dark:text-red-400" 
-                : "text-sm font-bold text-emerald-600 dark:text-emerald-400";
+                ? "text-base sm:text-lg font-black text-rose-500" 
+                : "text-base sm:text-lg font-black text-emerald-400";
 
             if (lista.length === 0) {
                 tbody.innerHTML = `<tr><td colspan="2" class="py-6 text-center text-gray-400 text-xs">Nenhum item neste mês. Use o microfone abaixo para adicionar!</td></tr>`;
