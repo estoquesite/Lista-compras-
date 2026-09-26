@@ -35,7 +35,7 @@
 </head>
 <body class="bg-slate-50 dark:bg-slate-950 min-h-screen text-slate-800 dark:text-slate-100 transition-colors duration-200 pb-36 select-none antialiased">
 
-    <!-- AVISO TOAST FLUTUANTE (MENSAGENS NA MESMA TELA) -->
+    <!-- AVISO TOAST FLUTUANTE -->
     <div id="toast-aviso" class="fixed top-4 left-1/2 -translate-x-1/2 z-50 bg-slate-900 text-white px-4 py-2.5 rounded-2xl shadow-xl text-xs font-medium flex items-center gap-2 transition-all duration-300 opacity-0 pointer-events-none -translate-y-4 max-w-xs text-center border border-slate-700">
         <span id="toast-icone">ℹ️</span>
         <span id="toast-texto">Mensagem</span>
@@ -89,6 +89,9 @@
                         <p id="saudacao-usuario" class="text-[11px] text-slate-500 dark:text-slate-400">Pronta para o mercado</p>
                     </div>
                     <div class="flex gap-2">
+                        <button onclick="abrirModalConfigIA()" class="bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 text-slate-700 dark:text-slate-200 p-2 rounded-xl text-xs font-semibold transition" title="Configurar IA da Câmera">
+                            ⚙️
+                        </button>
                         <button onclick="sincronizarComNuvemManual()" class="bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 px-3 py-1.5 rounded-xl text-xs font-semibold transition flex items-center gap-1">
                             🔄 Nuvem
                         </button>
@@ -150,33 +153,41 @@
         <!-- CONTEÚDO PRINCIPAL -->
         <main class="max-w-3xl mx-auto p-4 space-y-4">
             
-            <!-- FORMULÁRIO COM BUSCA NA INTERNET + CÂMERA INTEGRADA -->
+            <!-- FORMULÁRIO COM BUSCA + FOTO -->
             <section class="bg-white dark:bg-slate-900 p-4 rounded-3xl shadow-sm border border-slate-200/80 dark:border-slate-800">
                 <div class="flex justify-between items-center mb-2.5">
                     <h2 id="form-titulo" class="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Adicionar Produto</h2>
-                    <span class="text-[10px] text-slate-400">Código de barras é opcional</span>
+                    <span class="text-[10px] text-slate-400">Código de barras opcional</span>
                 </div>
                 
                 <form id="form-compra" class="space-y-3" onsubmit="salvarItemCompra(event)">
                     <input type="hidden" id="edit-compra-id">
                     <input type="hidden" id="compra-ean">
+                    <input type="hidden" id="compra-foto">
                     
-                    <!-- LINHA 1: CAMPO INTELIGENTE COM BOTÃO BUSCAR E CÂMERA -->
+                    <!-- LINHA 1: CAMPO COM PRÉVIA DE FOTO, BUSCA E CÂMERA -->
                     <div>
                         <label class="block text-[10px] font-semibold text-slate-500 uppercase mb-1">Produto ou Código de Barras</label>
-                        <div class="flex gap-1.5">
+                        <div class="flex items-center gap-1.5">
+                            
+                            <!-- Miniatura da foto se tiver sido tirada -->
+                            <div id="preview-foto-container" class="hidden relative shrink-0">
+                                <img id="preview-foto-img" src="" class="w-10 h-10 rounded-xl object-cover border border-blue-500 shadow-sm">
+                                <button type="button" onclick="removerFotoCapturada()" class="absolute -top-1 -right-1 bg-rose-500 text-white rounded-full w-4 h-4 flex items-center justify-center text-[10px] font-bold leading-none">✕</button>
+                            </div>
+
                             <div class="relative flex-1">
                                 <input type="text" id="compra-nome" required placeholder="Digite o nome ou os números do código..." class="w-full px-3 py-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs focus:ring-2 focus:ring-blue-500 text-slate-900 dark:text-white" onkeydown="tratarEnterNoCampo(event)">
                             </div>
                             
                             <!-- BOTÃO BUSCAR NA INTERNET -->
-                            <button type="button" onclick="pesquisarProdutoOuCodigo()" class="bg-blue-600 hover:bg-blue-700 active:scale-95 text-white px-3 py-2 rounded-xl text-xs font-bold transition flex items-center gap-1 shadow-sm shrink-0" title="Procurar na Internet">
+                            <button type="button" onclick="pesquisarProdutoOuCodigo()" class="bg-blue-600 hover:bg-blue-700 active:scale-95 text-white px-3 py-2.5 rounded-xl text-xs font-bold transition flex items-center gap-1 shadow-sm shrink-0" title="Procurar na Internet">
                                 <span>🔍</span>
                                 <span class="hidden sm:inline">Buscar</span>
                             </button>
 
                             <!-- BOTÃO DE CÂMERA -->
-                            <button type="button" onclick="iniciarLeitorCodigoBarras()" class="bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 active:scale-95 text-slate-700 dark:text-slate-300 px-3 py-2 rounded-xl text-xs font-bold transition flex items-center gap-1 border border-slate-200 dark:border-slate-700 shrink-0" title="Abrir Câmera">
+                            <button type="button" onclick="iniciarLeitorCodigoBarras()" class="bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 active:scale-95 text-slate-700 dark:text-slate-300 px-3 py-2.5 rounded-xl text-xs font-bold transition flex items-center gap-1 border border-slate-200 dark:border-slate-700 shrink-0" title="Bipar ou Fotografar">
                                 <span>📷</span>
                             </button>
                         </div>
@@ -246,24 +257,30 @@
         </main>
     </div>
 
-    <!-- MODAL DO SCANNER (QUANDO QUISER USAR A CÂMERA) -->
+    <!-- MODAL DA CÂMERA HÍBRIDA (BIPAR + TIRAR FOTO DO PRODUTO) -->
     <div id="modal-scanner" class="fixed inset-0 z-50 bg-slate-950/95 backdrop-blur-md hidden flex items-center justify-center p-4">
         <div class="bg-white dark:bg-slate-900 rounded-3xl shadow-2xl max-w-sm w-full overflow-hidden border border-slate-200 dark:border-slate-800 flex flex-col">
             <div class="p-4 border-b border-slate-100 dark:border-slate-800 flex justify-between items-center">
                 <div class="flex items-center gap-2">
                     <span class="text-base">📷</span>
-                    <h3 class="text-sm font-bold text-slate-900 dark:text-white">Leitor de Código de Barras</h3>
+                    <h3 class="text-sm font-bold text-slate-900 dark:text-white">Câmera Inteligente</h3>
                 </div>
                 <button onclick="fecharLeitorCodigoBarras()" class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 text-lg font-bold">✕</button>
             </div>
             
             <div class="p-4 space-y-3">
-                <p class="text-[11px] text-slate-500 dark:text-slate-400 text-center">Aponte a câmera para o código:</p>
+                <p class="text-[11px] text-slate-500 dark:text-slate-400 text-center">Bipe o código ou fotografe a embalagem:</p>
                 
                 <div class="relative w-full rounded-2xl overflow-hidden bg-slate-950 aspect-[4/3] flex items-center justify-center border border-slate-700 shadow-inner">
                     <video id="video-camera-stream" autoplay playsinline muted class="w-full h-full object-cover"></video>
+                    <!-- Linha guia de mira -->
                     <div class="absolute inset-x-4 top-1/2 -translate-y-1/2 h-0.5 bg-rose-500 shadow-[0_0_10px_#f43f5e] pointer-events-none"></div>
                     <div class="absolute inset-4 border border-white/20 rounded-xl pointer-events-none"></div>
+
+                    <!-- BOTÃO DISPARADOR DE FOTO (ESTILO INSTAGRAM) -->
+                    <button type="button" onclick="capturarFotoProduto()" class="absolute bottom-3 bg-white/90 hover:bg-white text-slate-900 px-4 py-2 rounded-2xl shadow-xl font-bold text-xs flex items-center gap-1.5 active:scale-95 transition">
+                        <span>📸</span> Fotografar Produto
+                    </button>
                 </div>
             </div>
 
@@ -271,6 +288,25 @@
                 <button onclick="fecharLeitorCodigoBarras()" class="w-full bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-200 py-2 rounded-xl text-xs font-semibold">
                     Fechar Câmera
                 </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL DE CONFIGURAÇÃO DE IA (OPCIONAL) -->
+    <div id="modal-config-ia" class="fixed inset-0 z-50 bg-slate-950/70 backdrop-blur-sm hidden flex items-center justify-center p-4">
+        <div class="bg-white dark:bg-slate-900 p-6 rounded-3xl shadow-2xl max-w-sm w-full space-y-4 border border-slate-200 dark:border-slate-800">
+            <div class="flex items-center gap-2">
+                <span class="text-xl">✨</span>
+                <h3 class="text-base font-bold text-slate-900 dark:text-white">Identificação por IA</h3>
+            </div>
+            <p class="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">
+                Para a câmera reconhecer frutas, legumes e produtos sem código por foto, você pode colar uma chave gratuita do <strong>Google Gemini API</strong>:
+            </p>
+            <input type="password" id="input-gemini-key" placeholder="Cole sua Gemini API Key (opcional)" class="w-full px-3 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs text-slate-900 dark:text-white">
+            
+            <div class="flex gap-2">
+                <button onclick="fecharModalConfigIA()" class="flex-1 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 py-2.5 rounded-xl text-xs font-semibold">Fechar</button>
+                <button onclick="salvarConfigIA()" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white py-2.5 rounded-xl text-xs font-semibold">Salvar Chave</button>
             </div>
         </div>
     </div>
@@ -341,6 +377,9 @@
         </div>
     </nav>
 
+    <!-- CANVAS OCULTO PARA CAPTURA DE FOTOS -->
+    <canvas id="canvas-captura" class="hidden"></canvas>
+
     <!-- SCRIPT GERAL -->
     <script>
         const SUPABASE_URL = 'https://jmeepzdvmmjngxwvayqb.supabase.co';
@@ -362,7 +401,7 @@
         let orcamentoModalTipo = null;
         let acaoConfirmacaoPendente = null;
 
-        // Câmera
+        // Câmera e Scanner
         let streamCameraNativa = null;
         let loopEscaneamentoAtivo = false;
         let detectorNativo = null;
@@ -515,7 +554,191 @@
             }
         }
 
-        // --- BUSCA INTELIGENTE NA INTERNET (CÓDIGO OU NOME) ---
+        // --- CONFIGURAÇÃO DA IA (GEMINI API) ---
+        function abrirModalConfigIA() {
+            document.getElementById('input-gemini-key').value = localStorage.getItem('gemini_api_key') || '';
+            document.getElementById('modal-config-ia').classList.remove('hidden');
+        }
+
+        function fecharModalConfigIA() {
+            document.getElementById('modal-config-ia').classList.add('hidden');
+        }
+
+        function salvarConfigIA() {
+            const key = document.getElementById('input-gemini-key').value.trim();
+            localStorage.setItem('gemini_api_key', key);
+            fecharModalConfigIA();
+            mostrarToast(key ? "IA do Gemini ativada!" : "Chave removida.", "✨");
+        }
+
+        // --- CÂMERA & FOTOGRAFIA DO PRODUTO ---
+        async function iniciarLeitorCodigoBarras() {
+            document.getElementById('modal-scanner').classList.remove('hidden');
+            const video = document.getElementById('video-camera-stream');
+
+            try {
+                streamCameraNativa = await navigator.mediaDevices.getUserMedia({
+                    video: { facingMode: { ideal: "environment" }, width: { ideal: 1280 }, height: { ideal: 720 } },
+                    audio: false
+                });
+
+                video.srcObject = streamCameraNativa;
+                await video.play();
+
+                loopEscaneamentoAtivo = true;
+
+                // Tenta leitor nativo acelerado
+                if ('BarcodeDetector' in window) {
+                    try {
+                        detectorNativo = new BarcodeDetector({ formats: ['ean_13', 'ean_8', 'upc_a', 'upc_e', 'code_128', 'qr_code'] });
+                        iniciarLoopDetectorNativo(video);
+                        return;
+                    } catch(e) {
+                        detectorNativo = null;
+                    }
+                }
+
+                // Fallback ZXing
+                if (window.ZXing) {
+                    zxingCodeReader = new ZXing.BrowserMultiFormatReader();
+                    zxingCodeReader.decodeFromVideoElement(video, (result) => {
+                        if (result && loopEscaneamentoAtivo) {
+                            loopEscaneamentoAtivo = false;
+                            onCodigoBarrasLidoPelaCamera(result.getText());
+                        }
+                    });
+                }
+            } catch (err) {
+                mostrarToast("Não foi possível acessar a câmera.", "⚠️");
+                fecharLeitorCodigoBarras();
+            }
+        }
+
+        async function iniciarLoopDetectorNativo(video) {
+            while (loopEscaneamentoAtivo) {
+                if (video.readyState >= 2) {
+                    try {
+                        const barcodes = await detectorNativo.detect(video);
+                        if (barcodes.length > 0 && loopEscaneamentoAtivo) {
+                            loopEscaneamentoAtivo = false;
+                            onCodigoBarrasLidoPelaCamera(barcodes[0].rawValue);
+                            break;
+                        }
+                    } catch (err) {}
+                }
+                await new Promise(r => setTimeout(r, 120));
+            }
+        }
+
+        async function onCodigoBarrasLidoPelaCamera(codigo) {
+            tocarBipeLeitor();
+            await fecharLeitorCodigoBarras();
+            document.getElementById('compra-nome').value = codigo;
+            await buscarPorCodigoDeBarras(codigo);
+        }
+
+        // TIRA A FOTO DO PRODUTO E IDENTIFICA
+        async function capturarFotoProduto() {
+            const video = document.getElementById('video-camera-stream');
+            if (!video || video.readyState < 2) return;
+
+            tocarBipeLeitor();
+
+            // Captura o frame no canvas e comprime para JPEG leve
+            const canvas = document.getElementById('canvas-captura');
+            canvas.width = 400;
+            canvas.height = Math.floor(400 * (video.videoHeight / video.videoWidth));
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+            const fotoBase64 = canvas.toDataURL('image/jpeg', 0.7);
+
+            await fecharLeitorCodigoBarras();
+
+            // Salva a foto para o produto
+            definirFotoNoFormulario(fotoBase64);
+
+            const geminiKey = localStorage.getItem('gemini_api_key');
+
+            if (geminiKey) {
+                // Chama a IA do Google Gemini Vision
+                mostrarToast("IA analisando a foto...", "✨", 5000);
+                await identificarComGeminiVision(fotoBase64, geminiKey);
+            } else {
+                mostrarToast("Foto capturada! Digite o nome do produto.", "📸", 3500);
+                document.getElementById('compra-nome').focus();
+            }
+        }
+
+        async function identificarComGeminiVision(base64Data, apiKey) {
+            const limpaBase64 = base64Data.replace(/^data:image\/[a-z]+;base64,/, '');
+
+            try {
+                const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
+                const payload = {
+                    contents: [{
+                        parts: [
+                            { text: "Identifique o produto de supermercado nesta foto. Retorne estritamente um JSON no formato: {\"produto\": \"Nome do produto com marca e peso\", \"preco\": null ou numero se houver etiqueta de preco visivel}." },
+                            { inline_data: { mime_type: "image/jpeg", data: limpaBase64 } }
+                        ]
+                    }],
+                    generationConfig: { response_mime_type: "application/json" }
+                };
+
+                const res = await fetch(url, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                if (res.ok) {
+                    const data = await res.json();
+                    const textoJson = data.candidates[0].content.parts[0].text;
+                    const parsed = JSON.parse(textoJson);
+
+                    if (parsed.produto) {
+                        document.getElementById('compra-nome').value = parsed.produto;
+                        if (parsed.preco) document.getElementById('compra-preco').value = parsed.preco;
+                        mostrarToast(`IA identificou: ${parsed.produto}!`, "✨");
+                        document.getElementById('compra-preco').focus();
+                        return;
+                    }
+                }
+            } catch(e) {
+                console.warn("Falha Gemini:", e);
+            }
+            mostrarToast("Foto salva! Digite o nome do produto.", "✏️");
+            document.getElementById('compra-nome').focus();
+        }
+
+        function definirFotoNoFormulario(base64) {
+            document.getElementById('compra-foto').value = base64;
+            document.getElementById('preview-foto-img').src = base64;
+            document.getElementById('preview-foto-container').classList.remove('hidden');
+        }
+
+        function removerFotoCapturada() {
+            document.getElementById('compra-foto').value = '';
+            document.getElementById('preview-foto-img').src = '';
+            document.getElementById('preview-foto-container').classList.add('hidden');
+        }
+
+        async function fecharLeitorCodigoBarras() {
+            loopEscaneamentoAtivo = false;
+            if (zxingCodeReader) {
+                try { zxingCodeReader.reset(); } catch(e) {}
+                zxingCodeReader = null;
+            }
+            if (streamCameraNativa) {
+                streamCameraNativa.getTracks().forEach(track => track.stop());
+                streamCameraNativa = null;
+            }
+            const video = document.getElementById('video-camera-stream');
+            if (video) video.srcObject = null;
+            document.getElementById('modal-scanner').classList.add('hidden');
+        }
+
+        // --- BUSCA NA INTERNET (CÓDIGO OU NOME) ---
         function tratarEnterNoCampo(e) {
             if (e.key === 'Enter') {
                 e.preventDefault();
@@ -528,16 +751,12 @@
             const termo = input.value.trim();
             if (!termo) return mostrarToast("Digite algo para buscar!", "⚠️");
 
-            // Se for número (código de barras)
             const ehCodigo = /^\d{8,14}$/.test(termo);
-
             mostrarToast(`Buscando "${termo}" na internet...`, "⏳", 3500);
 
             if (ehCodigo) {
-                // Busca por código de barras
                 await buscarPorCodigoDeBarras(termo);
             } else {
-                // Busca por nome de produto (auto-completar na internet)
                 await buscarPorNomeDeProduto(termo);
             }
         }
@@ -545,11 +764,9 @@
         async function buscarPorCodigoDeBarras(codigo) {
             let nomeEncontrado = null;
 
-            // 1. Memória local
             const catalogo = JSON.parse(localStorage.getItem('catalogo_codigos_barras') || '{}');
             if (catalogo[codigo]) nomeEncontrado = catalogo[codigo];
 
-            // 2. Open Food Facts
             if (!nomeEncontrado) {
                 try {
                     const res = await fetch(`https://world.openfoodfacts.org/api/v2/product/${codigo}.json`);
@@ -557,19 +774,6 @@
                         const data = await res.json();
                         if (data.status === 1 && data.product) {
                             nomeEncontrado = data.product.product_name_pt || data.product.product_name || data.product.generic_name;
-                        }
-                    }
-                } catch(e) {}
-            }
-
-            // 3. Open Beauty Facts
-            if (!nomeEncontrado) {
-                try {
-                    const res = await fetch(`https://world.openbeautyfacts.org/api/v0/product/${codigo}.json`);
-                    if (res.ok) {
-                        const data = await res.json();
-                        if (data.status === 1 && data.product) {
-                            nomeEncontrado = data.product.product_name_pt || data.product.product_name;
                         }
                     }
                 } catch(e) {}
@@ -610,87 +814,8 @@
                 }
             } catch(e) {}
 
-            mostrarToast("Nenhuma sugestão encontrada. Use o nome digitado!", "ℹ️");
+            mostrarToast("Use o nome digitado!", "ℹ️");
             document.getElementById('compra-preco').focus();
-        }
-
-        // --- CÂMERA (QUANDO QUISER BIPAR) ---
-        async function iniciarLeitorCodigoBarras() {
-            document.getElementById('modal-scanner').classList.remove('hidden');
-            const video = document.getElementById('video-camera-stream');
-
-            try {
-                streamCameraNativa = await navigator.mediaDevices.getUserMedia({
-                    video: { facingMode: { ideal: "environment" }, width: { ideal: 1280 }, height: { ideal: 720 } },
-                    audio: false
-                });
-
-                video.srcObject = streamCameraNativa;
-                await video.play();
-
-                loopEscaneamentoAtivo = true;
-
-                if ('BarcodeDetector' in window) {
-                    try {
-                        detectorNativo = new BarcodeDetector({ formats: ['ean_13', 'ean_8', 'upc_a', 'upc_e', 'code_128', 'qr_code'] });
-                        iniciarLoopDetectorNativo(video);
-                        return;
-                    } catch(e) {
-                        detectorNativo = null;
-                    }
-                }
-
-                if (window.ZXing) {
-                    zxingCodeReader = new ZXing.BrowserMultiFormatReader();
-                    zxingCodeReader.decodeFromVideoElement(video, (result) => {
-                        if (result && loopEscaneamentoAtivo) {
-                            loopEscaneamentoAtivo = false;
-                            onCodigoBarrasLidoPelaCamera(result.getText());
-                        }
-                    });
-                }
-            } catch (err) {
-                mostrarToast("Não foi possível acessar a câmera.", "⚠️");
-                fecharLeitorCodigoBarras();
-            }
-        }
-
-        async function iniciarLoopDetectorNativo(video) {
-            while (loopEscaneamentoAtivo) {
-                if (video.readyState >= 2) {
-                    try {
-                        const barcodes = await detectorNativo.detect(video);
-                        if (barcodes.length > 0 && loopEscaneamentoAtivo) {
-                            loopEscaneamentoAtivo = false;
-                            onCodigoBarrasLidoPelaCamera(barcodes[0].rawValue);
-                            break;
-                        }
-                    } catch (err) {}
-                }
-                await new Promise(r => setTimeout(r, 120));
-            }
-        }
-
-        async function onCodigoBarrasLidoPelaCamera(codigo) {
-            tocarBipeLeitor();
-            await fecharLeitorCodigoBarras();
-            document.getElementById('compra-nome').value = codigo;
-            await buscarPorCodigoDeBarras(codigo);
-        }
-
-        async function fecharLeitorCodigoBarras() {
-            loopEscaneamentoAtivo = false;
-            if (zxingCodeReader) {
-                try { zxingCodeReader.reset(); } catch(e) {}
-                zxingCodeReader = null;
-            }
-            if (streamCameraNativa) {
-                streamCameraNativa.getTracks().forEach(track => track.stop());
-                streamCameraNativa = null;
-            }
-            const video = document.getElementById('video-camera-stream');
-            if (video) video.srcObject = null;
-            document.getElementById('modal-scanner').classList.add('hidden');
         }
 
         // --- NUVEM & STORAGE ---
@@ -822,6 +947,7 @@
             e.preventDefault();
             const editId = document.getElementById('edit-compra-id').value;
             const ean = document.getElementById('compra-ean').value;
+            const foto = document.getElementById('compra-foto').value;
             const nome = document.getElementById('compra-nome').value.trim();
             const qtd = parseFloat(document.getElementById('compra-qtd').value) || 1;
             const preco = parseFloat(document.getElementById('compra-preco').value) || 0;
@@ -835,9 +961,23 @@
             let lista = obterListaDoMes();
             if (editId) {
                 const item = lista.find(i => i.id == editId);
-                if (item) { item.nome = nome; item.qtd = qtd; item.preco = preco; if (ean) item.ean = ean; }
+                if (item) {
+                    item.nome = nome;
+                    item.qtd = qtd;
+                    item.preco = preco;
+                    if (ean) item.ean = ean;
+                    if (foto) item.foto = foto;
+                }
             } else {
-                lista.push({ id: Date.now(), nome, qtd, preco, ean: ean || null, comprado: false });
+                lista.push({
+                    id: Date.now(),
+                    nome,
+                    qtd,
+                    preco,
+                    ean: ean || null,
+                    foto: foto || null,
+                    comprado: false
+                });
             }
 
             guardarListaDoMes(lista);
@@ -858,6 +998,12 @@
             document.getElementById('compra-qtd').value = item.qtd;
             document.getElementById('compra-preco').value = item.preco;
 
+            if (item.foto) {
+                definirFotoNoFormulario(item.foto);
+            } else {
+                removerFotoCapturada();
+            }
+
             document.getElementById('form-titulo').textContent = 'Editar Produto';
             document.getElementById('btn-submit').textContent = 'Atualizar Item';
             document.getElementById('btn-cancelar').classList.remove('hidden');
@@ -869,6 +1015,7 @@
             document.getElementById('edit-compra-id').value = '';
             document.getElementById('compra-ean').value = '';
             document.getElementById('compra-qtd').value = '1';
+            removerFotoCapturada();
             document.getElementById('compra-nome').placeholder = 'Digite o nome ou os números do código...';
             document.getElementById('form-titulo').textContent = 'Adicionar Produto';
             document.getElementById('btn-submit').textContent = '➕ Adicionar à Lista';
@@ -907,7 +1054,7 @@
             });
         }
 
-        // --- RENDERIZAÇÃO DA TABELA ---
+        // --- RENDERIZAÇÃO DA TABELA COM MINIATURA DE FOTO ---
         function renderizarTabelaCompras() {
             const listaOriginal = obterListaDoMes();
             const termoBusca = (document.getElementById('campo-busca-itens')?.value || '').toLowerCase().trim();
@@ -966,9 +1113,13 @@
             container.innerHTML = listaFiltrada.map(i => {
                 const sub = i.qtd * i.preco;
                 return `
-                    <div class="py-2.5 flex items-center justify-between gap-3 ${i.comprado ? 'opacity-40' : ''}">
-                        <div class="flex items-center gap-3 min-w-0">
-                            <input type="checkbox" onchange="alternarComprado(${i.id})" ${i.comprado ? 'checked' : ''} class="w-4 h-4 rounded text-blue-600 focus:ring-0 cursor-pointer">
+                    <div class="py-2.5 flex items-center justify-between gap-2.5 ${i.comprado ? 'opacity-40' : ''}">
+                        <div class="flex items-center gap-2.5 min-w-0">
+                            <input type="checkbox" onchange="alternarComprado(${i.id})" ${i.comprado ? 'checked' : ''} class="w-4 h-4 rounded text-blue-600 focus:ring-0 cursor-pointer shrink-0">
+                            
+                            <!-- MINIATURA DA FOTO SE TIVER -->
+                            ${i.foto ? `<img src="${i.foto}" class="w-9 h-9 rounded-xl object-cover shrink-0 border border-slate-200 dark:border-slate-700 shadow-xs">` : ''}
+
                             <div class="min-w-0">
                                 <div class="flex items-center gap-1.5">
                                     <p class="text-xs font-semibold text-slate-900 dark:text-white truncate ${i.comprado ? 'line-through' : ''}">${i.nome}</p>
@@ -1074,7 +1225,7 @@
             let preco = nums.length >= 2 ? nums : (nums.length === 1 ? nums[0] : 0);
 
             let lista = obterListaDoMes();
-            lista.push({ id: Date.now(), nome, qtd: qtd > 0 ? qtd : 1, preco, ean: null, comprado: false });
+            lista.push({ id: Date.now(), nome, qtd: qtd > 0 ? qtd : 1, preco, ean: null, foto: null, comprado: false });
             guardarListaDoMes(lista);
             await salvarNaNuvem();
             renderizarTabelaCompras();
