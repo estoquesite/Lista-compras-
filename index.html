@@ -19,7 +19,7 @@
     <!-- Supabase JS Client -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
-    <!-- Leitor ZXing de Alta Precisão (Compatível com Android e iPhone) -->
+    <!-- Leitor ZXing de Alta Precisão (Android e iPhone) -->
     <script src="https://unpkg.com/@zxing/library@latest"></script>
 
     <!-- Manifesto Dinâmico PWA -->
@@ -35,7 +35,7 @@
 </head>
 <body class="bg-slate-50 dark:bg-slate-950 min-h-screen text-slate-800 dark:text-slate-100 transition-colors duration-200 pb-36 select-none antialiased">
 
-    <!-- AVISO TOAST FLUTUANTE (MENSAGENS NA MESMA TELA) -->
+    <!-- AVISO TOAST FLUTUANTE (MENSAGENS NA TELA) -->
     <div id="toast-aviso" class="fixed top-4 left-1/2 -translate-x-1/2 z-50 bg-slate-900 text-white px-4 py-2.5 rounded-2xl shadow-xl text-xs font-medium flex items-center gap-2 transition-all duration-300 opacity-0 pointer-events-none -translate-y-4 max-w-xs text-center border border-slate-700">
         <span id="toast-icone">ℹ️</span>
         <span id="toast-texto">Mensagem</span>
@@ -74,7 +74,7 @@
         </div>
     </div>
 
-    <!-- CONTEÚDO DO SITE -->
+    <!-- CONTEÚDO PRINCIPAL -->
     <div id="conteudo-site" class="hidden">
         
         <!-- TOPO FIXO -->
@@ -89,7 +89,7 @@
                         <p id="saudacao-usuario" class="text-[11px] text-slate-500 dark:text-slate-400">Pronta para o mercado</p>
                     </div>
                     <div class="flex gap-2">
-                        <button onclick="abrirModalConfigIA()" class="bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 text-slate-700 dark:text-slate-200 p-2 rounded-xl text-xs font-semibold transition" title="Configurar IA da Câmera">
+                        <button onclick="abrirModalConfigIA()" class="bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 text-slate-700 dark:text-slate-200 p-2 rounded-xl text-xs font-semibold transition" title="Configurar Chave da IA">
                             ⚙️
                         </button>
                         <button onclick="sincronizarComNuvemManual()" class="bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 px-3 py-1.5 rounded-xl text-xs font-semibold transition flex items-center gap-1">
@@ -163,21 +163,13 @@
                 <form id="form-compra" class="space-y-3" onsubmit="salvarItemCompra(event)">
                     <input type="hidden" id="edit-compra-id">
                     <input type="hidden" id="compra-ean">
-                    <input type="hidden" id="compra-foto">
                     
-                    <!-- LINHA 1: CAMPO COM PRÉVIA DE FOTO, BUSCA E CÂMERA -->
+                    <!-- LINHA 1: PRODUTO COM BOTÃO BUSCA E CÂMERA -->
                     <div>
                         <label class="block text-[10px] font-semibold text-slate-500 uppercase mb-1">Produto ou Código de Barras</label>
                         <div class="flex items-center gap-1.5">
-                            
-                            <!-- Miniatura da foto capturada -->
-                            <div id="preview-foto-container" class="hidden relative shrink-0">
-                                <img id="preview-foto-img" src="" class="w-10 h-10 rounded-xl object-cover border border-blue-500 shadow-sm">
-                                <button type="button" onclick="removerFotoCapturada()" class="absolute -top-1 -right-1 bg-rose-500 text-white rounded-full w-4 h-4 flex items-center justify-center text-[10px] font-bold leading-none">✕</button>
-                            </div>
-
                             <div class="relative flex-1">
-                                <input type="text" id="compra-nome" required placeholder="Digite o nome ou os números do código..." class="w-full px-3 py-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs focus:ring-2 focus:ring-blue-500 text-slate-900 dark:text-white" onkeydown="tratarEnterNoCampo(event)">
+                                <input type="text" id="compra-nome" required placeholder="Digite o nome ou código de barras..." class="w-full px-3 py-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs focus:ring-2 focus:ring-blue-500 text-slate-900 dark:text-white" onkeydown="tratarEnterNoCampo(event)">
                             </div>
                             
                             <!-- BOTÃO BUSCAR NA INTERNET -->
@@ -257,7 +249,7 @@
         </main>
     </div>
 
-    <!-- MODAL DA CÂMERA (BIPAR OU FOTOGRAFAR) -->
+    <!-- MODAL DA CÂMERA (BIPAR OU FOTOGRAFAR PARA A IA) -->
     <div id="modal-scanner" class="fixed inset-0 z-50 bg-slate-950/95 backdrop-blur-md hidden flex items-center justify-center p-4">
         <div class="bg-white dark:bg-slate-900 rounded-3xl shadow-2xl max-w-sm w-full overflow-hidden border border-slate-200 dark:border-slate-800 flex flex-col">
             <div class="p-4 border-b border-slate-100 dark:border-slate-800 flex justify-between items-center">
@@ -269,7 +261,7 @@
             </div>
             
             <div class="p-4 space-y-3">
-                <p class="text-[11px] text-slate-500 dark:text-slate-400 text-center">Bipe o código ou fotografe a embalagem:</p>
+                <p class="text-[11px] text-slate-500 dark:text-slate-400 text-center">Aponte para o código ou tire a foto para a IA identificar:</p>
                 
                 <div class="relative w-full rounded-2xl overflow-hidden bg-slate-950 aspect-[4/3] flex items-center justify-center border border-slate-700 shadow-inner">
                     <video id="video-camera-stream" autoplay playsinline muted class="w-full h-full object-cover"></video>
@@ -277,7 +269,7 @@
                     <div class="absolute inset-x-4 top-1/2 -translate-y-1/2 h-0.5 bg-rose-500 shadow-[0_0_10px_#f43f5e] pointer-events-none"></div>
                     <div class="absolute inset-4 border border-white/20 rounded-xl pointer-events-none"></div>
 
-                    <!-- BOTÃO FOTOGRAFAR PRODUTO -->
+                    <!-- BOTÃO FOTOGRAFAR PRODUTO PARA A IA -->
                     <button type="button" onclick="capturarFotoProduto()" class="absolute bottom-3 bg-white/95 hover:bg-white text-slate-900 px-4 py-2 rounded-2xl shadow-xl font-bold text-xs flex items-center gap-1.5 active:scale-95 transition">
                         <span>📸</span> Fotografar Produto
                     </button>
@@ -300,7 +292,7 @@
                 <h3 class="text-base font-bold text-slate-900 dark:text-white">Identificação por IA</h3>
             </div>
             <p class="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">
-                Cole sua chave gratuita do <strong>Google Gemini API</strong> para reconhecer produtos por foto:
+                Cole a sua chave gratuita do <strong>Google Gemini API</strong>:
             </p>
             <input type="password" id="input-gemini-key" placeholder="Cole sua Gemini API Key" class="w-full px-3 py-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs text-slate-900 dark:text-white font-mono">
             
@@ -568,10 +560,10 @@
             const key = document.getElementById('input-gemini-key').value.trim();
             localStorage.setItem('gemini_api_key', key);
             fecharModalConfigIA();
-            mostrarToast(key ? "IA do Gemini ativada com sucesso!" : "Chave removida.", "✨");
+            mostrarToast(key ? "IA ativada com sucesso!" : "Chave removida.", "✨");
         }
 
-        // --- CÂMERA & IDENTIFICAÇÃO DE PRODUTOS ---
+        // --- CÂMERA & RECONHECIMENTO DE PRODUTOS ---
         async function iniciarLeitorCodigoBarras() {
             document.getElementById('modal-scanner').classList.remove('hidden');
             const video = document.getElementById('video-camera-stream');
@@ -637,14 +629,14 @@
             await buscarPorCodigoDeBarras(codigo);
         }
 
-        // TIRA A FOTO DO PRODUTO E IDENTIFICA
+        // TIRA A FOTO, MANDA PRA IA E DESCARDA NA HORA (ZERO PESO NO SUPABASE)
         async function capturarFotoProduto() {
             const video = document.getElementById('video-camera-stream');
             if (!video || video.readyState < 2) return;
 
             tocarBipeLeitor();
 
-            // Captura o frame no canvas e comprime para JPEG leve
+            // Captura temporariamente na memória
             const canvas = document.getElementById('canvas-captura');
             canvas.width = 400;
             canvas.height = Math.floor(400 * (video.videoHeight / video.videoWidth));
@@ -653,10 +645,8 @@
 
             const fotoBase64 = canvas.toDataURL('image/jpeg', 0.7);
 
+            // Fecha a câmera imediatamente
             await fecharLeitorCodigoBarras();
-
-            // Salva a foto para o produto
-            definirFotoNoFormulario(fotoBase64);
 
             const geminiKey = localStorage.getItem('gemini_api_key');
 
@@ -664,12 +654,12 @@
                 mostrarToast("IA analisando a foto...", "✨", 5000);
                 await identificarComGeminiVision(fotoBase64, geminiKey);
             } else {
-                mostrarToast("Foto capturada! Digite o nome do produto.", "📸", 3500);
+                mostrarToast("Cole a chave na engrenagem ⚙️ para a IA ler!", "ℹ️", 4000);
                 document.getElementById('compra-nome').focus();
             }
         }
 
-        // CHAMADA CORRIGIDA DA IA GOOGLE GEMINI VISION
+        // CHAMADA DA IA GOOGLE GEMINI VISION
         async function identificarComGeminiVision(base64Data, apiKey) {
             const limpaBase64 = base64Data.replace(/^data:image\/[a-z]+;base64,/, '');
             const chaveLimpa = apiKey.trim();
@@ -717,18 +707,6 @@
             }
 
             document.getElementById('compra-nome').focus();
-        }
-
-        function definirFotoNoFormulario(base64) {
-            document.getElementById('compra-foto').value = base64;
-            document.getElementById('preview-foto-img').src = base64;
-            document.getElementById('preview-foto-container').classList.remove('hidden');
-        }
-
-        function removerFotoCapturada() {
-            document.getElementById('compra-foto').value = '';
-            document.getElementById('preview-foto-img').src = '';
-            document.getElementById('preview-foto-container').classList.add('hidden');
         }
 
         async function fecharLeitorCodigoBarras() {
@@ -838,7 +816,7 @@
             document.getElementById('compra-preco').focus();
         }
 
-        // --- NUVEM & STORAGE ---
+        // --- NUVEM & STORAGE (LEVE, APENAS DADOS DE TEXTO) ---
         async function sincronizarComNuvem() {
             try {
                 let { data } = await supabaseClient
@@ -967,7 +945,6 @@
             e.preventDefault();
             const editId = document.getElementById('edit-compra-id').value;
             const ean = document.getElementById('compra-ean').value;
-            const foto = document.getElementById('compra-foto').value;
             const nome = document.getElementById('compra-nome').value.trim();
             const qtd = parseFloat(document.getElementById('compra-qtd').value) || 1;
             const preco = parseFloat(document.getElementById('compra-preco').value) || 0;
@@ -986,7 +963,6 @@
                     item.qtd = qtd;
                     item.preco = preco;
                     if (ean) item.ean = ean;
-                    if (foto) item.foto = foto;
                 }
             } else {
                 lista.push({
@@ -995,7 +971,6 @@
                     qtd,
                     preco,
                     ean: ean || null,
-                    foto: foto || null,
                     comprado: false
                 });
             }
@@ -1018,12 +993,6 @@
             document.getElementById('compra-qtd').value = item.qtd;
             document.getElementById('compra-preco').value = item.preco;
 
-            if (item.foto) {
-                definirFotoNoFormulario(item.foto);
-            } else {
-                removerFotoCapturada();
-            }
-
             document.getElementById('form-titulo').textContent = 'Editar Produto';
             document.getElementById('btn-submit').textContent = 'Atualizar Item';
             document.getElementById('btn-cancelar').classList.remove('hidden');
@@ -1035,8 +1004,7 @@
             document.getElementById('edit-compra-id').value = '';
             document.getElementById('compra-ean').value = '';
             document.getElementById('compra-qtd').value = '1';
-            removerFotoCapturada();
-            document.getElementById('compra-nome').placeholder = 'Digite o nome ou os números do código...';
+            document.getElementById('compra-nome').placeholder = 'Digite o nome ou código de barras...';
             document.getElementById('form-titulo').textContent = 'Adicionar Produto';
             document.getElementById('btn-submit').textContent = '➕ Adicionar à Lista';
             document.getElementById('btn-cancelar').classList.add('hidden');
@@ -1074,7 +1042,7 @@
             });
         }
 
-        // --- RENDERIZAÇÃO DA TABELA COM MINIATURA DE FOTO ---
+        // --- RENDERIZAÇÃO DA TABELA ---
         function renderizarTabelaCompras() {
             const listaOriginal = obterListaDoMes();
             const termoBusca = (document.getElementById('campo-busca-itens')?.value || '').toLowerCase().trim();
@@ -1137,9 +1105,6 @@
                         <div class="flex items-center gap-2.5 min-w-0">
                             <input type="checkbox" onchange="alternarComprado(${i.id})" ${i.comprado ? 'checked' : ''} class="w-4 h-4 rounded text-blue-600 focus:ring-0 cursor-pointer shrink-0">
                             
-                            <!-- MINIATURA DA FOTO -->
-                            ${i.foto ? `<img src="${i.foto}" class="w-9 h-9 rounded-xl object-cover shrink-0 border border-slate-200 dark:border-slate-700 shadow-xs">` : ''}
-
                             <div class="min-w-0">
                                 <div class="flex items-center gap-1.5">
                                     <p class="text-xs font-semibold text-slate-900 dark:text-white truncate ${i.comprado ? 'line-through' : ''}">${i.nome}</p>
@@ -1245,7 +1210,7 @@
             let preco = nums.length >= 2 ? nums : (nums.length === 1 ? nums[0] : 0);
 
             let lista = obterListaDoMes();
-            lista.push({ id: Date.now(), nome, qtd: qtd > 0 ? qtd : 1, preco, ean: null, foto: null, comprado: false });
+            lista.push({ id: Date.now(), nome, qtd: qtd > 0 ? qtd : 1, preco, ean: null, comprado: false });
             guardarListaDoMes(lista);
             await salvarNaNuvem();
             renderizarTabelaCompras();
