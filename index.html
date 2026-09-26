@@ -19,7 +19,7 @@
     <!-- Supabase JS Client -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
-    <!-- Leitor ZXing de Alta Precisão (Compatível com Android e iPhone) -->
+    <!-- Leitor ZXing de Alta Precisão -->
     <script src="https://unpkg.com/@zxing/library@latest"></script>
 
     <!-- Manifesto Dinâmico PWA -->
@@ -35,7 +35,7 @@
 </head>
 <body class="bg-slate-50 dark:bg-slate-950 min-h-screen text-slate-800 dark:text-slate-100 transition-colors duration-200 pb-36 select-none antialiased">
 
-    <!-- AVISO TOAST FLUTUANTE -->
+    <!-- AVISO TOAST FLUTUANTE (MENSAGENS NA MESMA TELA) -->
     <div id="toast-aviso" class="fixed top-4 left-1/2 -translate-x-1/2 z-50 bg-slate-900 text-white px-4 py-2.5 rounded-2xl shadow-xl text-xs font-medium flex items-center gap-2 transition-all duration-300 opacity-0 pointer-events-none -translate-y-4 max-w-xs text-center border border-slate-700">
         <span id="toast-icone">ℹ️</span>
         <span id="toast-texto">Mensagem</span>
@@ -150,37 +150,52 @@
         <!-- CONTEÚDO PRINCIPAL -->
         <main class="max-w-3xl mx-auto p-4 space-y-4">
             
-            <!-- FORMULÁRIO -->
+            <!-- FORMULÁRIO COM BUSCA NA INTERNET + CÂMERA INTEGRADA -->
             <section class="bg-white dark:bg-slate-900 p-4 rounded-3xl shadow-sm border border-slate-200/80 dark:border-slate-800">
                 <div class="flex justify-between items-center mb-2.5">
                     <h2 id="form-titulo" class="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Adicionar Produto</h2>
-                    <!-- BOTÃO BIPAR CÓDIGO -->
-                    <button type="button" onclick="iniciarLeitorCodigoBarras()" class="bg-blue-50 dark:bg-blue-950/50 hover:bg-blue-100 text-blue-600 dark:text-blue-400 px-3 py-1.5 rounded-xl text-xs font-bold transition flex items-center gap-1.5 border border-blue-200 dark:border-blue-800 active:scale-95">
-                        <span>📷</span> Bipar Código
-                    </button>
+                    <span class="text-[10px] text-slate-400">Código de barras é opcional</span>
                 </div>
                 
-                <form id="form-compra" class="space-y-2.5" onsubmit="salvarItemCompra(event)">
+                <form id="form-compra" class="space-y-3" onsubmit="salvarItemCompra(event)">
                     <input type="hidden" id="edit-compra-id">
                     <input type="hidden" id="compra-ean">
                     
-                    <div class="grid grid-cols-12 gap-2 items-end">
-                        <div class="col-span-6">
-                            <label class="block text-[10px] font-semibold text-slate-500 uppercase mb-1">Produto</label>
-                            <input type="text" id="compra-nome" required placeholder="Ex: Arroz, Café..." class="w-full px-3 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs focus:ring-2 focus:ring-blue-500 text-slate-900 dark:text-white">
+                    <!-- LINHA 1: CAMPO INTELIGENTE COM BOTÃO BUSCAR E CÂMERA -->
+                    <div>
+                        <label class="block text-[10px] font-semibold text-slate-500 uppercase mb-1">Produto ou Código de Barras</label>
+                        <div class="flex gap-1.5">
+                            <div class="relative flex-1">
+                                <input type="text" id="compra-nome" required placeholder="Digite o nome ou os números do código..." class="w-full px-3 py-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs focus:ring-2 focus:ring-blue-500 text-slate-900 dark:text-white" onkeydown="tratarEnterNoCampo(event)">
+                            </div>
+                            
+                            <!-- BOTÃO BUSCAR NA INTERNET -->
+                            <button type="button" onclick="pesquisarProdutoOuCodigo()" class="bg-blue-600 hover:bg-blue-700 active:scale-95 text-white px-3 py-2 rounded-xl text-xs font-bold transition flex items-center gap-1 shadow-sm shrink-0" title="Procurar na Internet">
+                                <span>🔍</span>
+                                <span class="hidden sm:inline">Buscar</span>
+                            </button>
+
+                            <!-- BOTÃO DE CÂMERA -->
+                            <button type="button" onclick="iniciarLeitorCodigoBarras()" class="bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 active:scale-95 text-slate-700 dark:text-slate-300 px-3 py-2 rounded-xl text-xs font-bold transition flex items-center gap-1 border border-slate-200 dark:border-slate-700 shrink-0" title="Abrir Câmera">
+                                <span>📷</span>
+                            </button>
                         </div>
-                        <div class="col-span-3">
-                            <label class="block text-[10px] font-semibold text-slate-500 uppercase mb-1">Qtd</label>
-                            <input type="number" id="compra-qtd" required min="0.1" step="any" value="1" class="w-full px-2 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs text-center focus:ring-2 focus:ring-blue-500 text-slate-900 dark:text-white">
+                    </div>
+
+                    <!-- LINHA 2: QUANTIDADE E PREÇO -->
+                    <div class="grid grid-cols-2 gap-2">
+                        <div>
+                            <label class="block text-[10px] font-semibold text-slate-500 uppercase mb-1">Quantidade</label>
+                            <input type="number" id="compra-qtd" required min="0.1" step="any" value="1" class="w-full px-3 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs text-center focus:ring-2 focus:ring-blue-500 text-slate-900 dark:text-white">
                         </div>
-                        <div class="col-span-3">
+                        <div>
                             <label class="block text-[10px] font-semibold text-slate-500 uppercase mb-1">Preço Un (R$)</label>
                             <input type="number" id="compra-preco" required step="0.01" min="0" placeholder="0,00" class="w-full px-3 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs focus:ring-2 focus:ring-blue-500 text-slate-900 dark:text-white">
                         </div>
                     </div>
 
                     <div class="flex gap-2 pt-1">
-                        <button type="submit" id="btn-submit" class="w-full bg-blue-600 hover:bg-blue-700 active:scale-98 text-white font-medium py-2.5 rounded-xl transition text-xs shadow-sm">
+                        <button type="submit" id="btn-submit" class="w-full bg-emerald-600 hover:bg-emerald-700 active:scale-98 text-white font-medium py-2.5 rounded-xl transition text-xs shadow-sm">
                             ➕ Adicionar à Lista
                         </button>
                         <button type="button" id="btn-cancelar" onclick="cancelarEdicao()" class="hidden bg-slate-200 dark:bg-slate-800 hover:bg-slate-300 text-slate-700 dark:text-slate-300 px-4 py-2.5 rounded-xl text-xs transition">
@@ -221,9 +236,8 @@
                     </div>
                 </div>
 
-                <!-- Campo de busca rápida -->
                 <div class="relative">
-                    <input type="text" id="campo-busca-itens" oninput="renderizarTabelaCompras()" placeholder="🔍 Buscar na lista..." class="w-full px-3 py-1.5 bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700/80 rounded-xl text-xs text-slate-800 dark:text-white focus:outline-none focus:ring-1 focus:ring-blue-500">
+                    <input type="text" id="campo-busca-itens" oninput="renderizarTabelaCompras()" placeholder="🔍 Filtrar itens na lista..." class="w-full px-3 py-1.5 bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700/80 rounded-xl text-xs text-slate-800 dark:text-white focus:outline-none focus:ring-1 focus:ring-blue-500">
                 </div>
 
                 <div id="container-itens" class="divide-y divide-slate-100 dark:divide-slate-800"></div>
@@ -232,7 +246,7 @@
         </main>
     </div>
 
-    <!-- MODAL DO SCANNER COM VÍDEO DIRETO E NATIVO -->
+    <!-- MODAL DO SCANNER (QUANDO QUISER USAR A CÂMERA) -->
     <div id="modal-scanner" class="fixed inset-0 z-50 bg-slate-950/95 backdrop-blur-md hidden flex items-center justify-center p-4">
         <div class="bg-white dark:bg-slate-900 rounded-3xl shadow-2xl max-w-sm w-full overflow-hidden border border-slate-200 dark:border-slate-800 flex flex-col">
             <div class="p-4 border-b border-slate-100 dark:border-slate-800 flex justify-between items-center">
@@ -246,23 +260,10 @@
             <div class="p-4 space-y-3">
                 <p class="text-[11px] text-slate-500 dark:text-slate-400 text-center">Aponte a câmera para o código:</p>
                 
-                <!-- ÁREA DE VÍDEO REAL DIRETA (SEM CAIXA PRETA) -->
                 <div class="relative w-full rounded-2xl overflow-hidden bg-slate-950 aspect-[4/3] flex items-center justify-center border border-slate-700 shadow-inner">
                     <video id="video-camera-stream" autoplay playsinline muted class="w-full h-full object-cover"></video>
-                    <!-- Linha vermelha de mira laser -->
                     <div class="absolute inset-x-4 top-1/2 -translate-y-1/2 h-0.5 bg-rose-500 shadow-[0_0_10px_#f43f5e] pointer-events-none"></div>
                     <div class="absolute inset-4 border border-white/20 rounded-xl pointer-events-none"></div>
-                </div>
-
-                <!-- Campo manual caso o código esteja rasurado -->
-                <div class="pt-2 border-t border-slate-100 dark:border-slate-800 text-center">
-                    <p class="text-[10px] text-slate-400 mb-1">Embalagem amassada? Digite o código:</p>
-                    <div class="flex gap-1.5">
-                        <input type="number" id="input-ean-manual" placeholder="Ex: 7891000..." class="w-full text-xs px-2.5 py-1.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-slate-900 dark:text-white">
-                        <button type="button" onclick="pesquisarEanManual()" class="bg-blue-600 hover:bg-blue-700 text-white text-xs px-3 py-1.5 rounded-xl font-medium shrink-0">
-                            Buscar
-                        </button>
-                    </div>
                 </div>
             </div>
 
@@ -334,10 +335,7 @@
         </div>
 
         <div class="flex items-center gap-2">
-            <button onclick="iniciarLeitorCodigoBarras()" class="bg-blue-600 hover:bg-blue-700 text-white w-11 h-11 rounded-2xl shadow-lg flex items-center justify-center text-lg transition active:scale-90" title="Bipar Código">
-                📷
-            </button>
-            <button onclick="ouvirVoz()" id="btn-voz-flutuante" class="bg-rose-600 hover:bg-rose-700 text-white w-11 h-11 rounded-2xl shadow-lg flex items-center justify-center text-lg transition active:scale-90" title="Voz">
+            <button onclick="ouvirVoz()" id="btn-voz-flutuante" class="bg-rose-600 hover:bg-rose-700 text-white w-11 h-11 rounded-2xl shadow-lg flex items-center justify-center text-lg transition active:scale-90" title="Adicionar por Voz">
                 🎤
             </button>
         </div>
@@ -364,13 +362,13 @@
         let orcamentoModalTipo = null;
         let acaoConfirmacaoPendente = null;
 
-        // Variáveis da Câmera Nativa
+        // Câmera
         let streamCameraNativa = null;
         let loopEscaneamentoAtivo = false;
         let detectorNativo = null;
         let zxingCodeReader = null;
 
-        // --- SISTEMA DE TOAST (AVISOS NA MESMA TELA) ---
+        // --- SISTEMA DE TOAST ---
         function mostrarToast(mensagem, icone = 'ℹ️', duracao = 3000) {
             const toast = document.getElementById('toast-aviso');
             document.getElementById('toast-icone').textContent = icone;
@@ -385,7 +383,6 @@
             }, duracao);
         }
 
-        // --- BIPE DO CAIXA DO MERCADO ---
         function tocarBipeLeitor() {
             try {
                 const ctx = new (window.AudioContext || window.webkitAudioContext)();
@@ -401,9 +398,7 @@
                 osc.stop(ctx.currentTime + 0.12);
             } catch (e) {}
 
-            if ('vibrate' in navigator) {
-                navigator.vibrate(80);
-            }
+            if ('vibrate' in navigator) navigator.vibrate(80);
         }
 
         // --- INICIALIZAÇÃO ---
@@ -520,21 +515,113 @@
             }
         }
 
-        // --- CÂMERA REAL E SCANNER DE ALTA VELOCIDADE ---
+        // --- BUSCA INTELIGENTE NA INTERNET (CÓDIGO OU NOME) ---
+        function tratarEnterNoCampo(e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                pesquisarProdutoOuCodigo();
+            }
+        }
+
+        async function pesquisarProdutoOuCodigo() {
+            const input = document.getElementById('compra-nome');
+            const termo = input.value.trim();
+            if (!termo) return mostrarToast("Digite algo para buscar!", "⚠️");
+
+            // Se for número (código de barras)
+            const ehCodigo = /^\d{8,14}$/.test(termo);
+
+            mostrarToast(`Buscando "${termo}" na internet...`, "⏳", 3500);
+
+            if (ehCodigo) {
+                // Busca por código de barras
+                await buscarPorCodigoDeBarras(termo);
+            } else {
+                // Busca por nome de produto (auto-completar na internet)
+                await buscarPorNomeDeProduto(termo);
+            }
+        }
+
+        async function buscarPorCodigoDeBarras(codigo) {
+            let nomeEncontrado = null;
+
+            // 1. Memória local
+            const catalogo = JSON.parse(localStorage.getItem('catalogo_codigos_barras') || '{}');
+            if (catalogo[codigo]) nomeEncontrado = catalogo[codigo];
+
+            // 2. Open Food Facts
+            if (!nomeEncontrado) {
+                try {
+                    const res = await fetch(`https://world.openfoodfacts.org/api/v2/product/${codigo}.json`);
+                    if (res.ok) {
+                        const data = await res.json();
+                        if (data.status === 1 && data.product) {
+                            nomeEncontrado = data.product.product_name_pt || data.product.product_name || data.product.generic_name;
+                        }
+                    }
+                } catch(e) {}
+            }
+
+            // 3. Open Beauty Facts
+            if (!nomeEncontrado) {
+                try {
+                    const res = await fetch(`https://world.openbeautyfacts.org/api/v0/product/${codigo}.json`);
+                    if (res.ok) {
+                        const data = await res.json();
+                        if (data.status === 1 && data.product) {
+                            nomeEncontrado = data.product.product_name_pt || data.product.product_name;
+                        }
+                    }
+                } catch(e) {}
+            }
+
+            document.getElementById('compra-ean').value = codigo;
+
+            if (nomeEncontrado) {
+                document.getElementById('compra-nome').value = nomeEncontrado;
+                tocarBipeLeitor();
+                mostrarToast(`Encontrado: ${nomeEncontrado}`, "✅");
+                document.getElementById('compra-preco').focus();
+            } else {
+                document.getElementById('compra-nome').value = '';
+                document.getElementById('compra-nome').placeholder = `Código ${codigo} - Digite o nome:`;
+                mostrarToast("Não achou na base. Digite o nome aqui uma vez!", "✏️", 4000);
+                document.getElementById('compra-nome').focus();
+            }
+        }
+
+        async function buscarPorNomeDeProduto(nome) {
+            try {
+                const url = `https://world.openfoodfacts.org/cgi/search.pl?search_terms=${encodeURIComponent(nome)}&search_simple=1&action=process&json=1&page_size=1`;
+                const res = await fetch(url);
+                if (res.ok) {
+                    const data = await res.json();
+                    if (data.products && data.products.length > 0) {
+                        const p = data.products[0];
+                        const nomeCompleto = p.product_name_pt || p.product_name || p.generic_name;
+                        if (nomeCompleto) {
+                            document.getElementById('compra-nome').value = nomeCompleto;
+                            if (p.code) document.getElementById('compra-ean').value = p.code;
+                            mostrarToast(`Sugerido: ${nomeCompleto}`, "✅");
+                            document.getElementById('compra-preco').focus();
+                            return;
+                        }
+                    }
+                }
+            } catch(e) {}
+
+            mostrarToast("Nenhuma sugestão encontrada. Use o nome digitado!", "ℹ️");
+            document.getElementById('compra-preco').focus();
+        }
+
+        // --- CÂMERA (QUANDO QUISER BIPAR) ---
         async function iniciarLeitorCodigoBarras() {
             document.getElementById('modal-scanner').classList.remove('hidden');
-            document.getElementById('input-ean-manual').value = '';
-
             const video = document.getElementById('video-camera-stream');
 
             try {
-                // Inicia o stream da câmera traseira de forma direta
                 streamCameraNativa = await navigator.mediaDevices.getUserMedia({
-                    video: {
-                        facingMode: { ideal: "environment" },
-                        width: { ideal: 1280 },
-                        height: { ideal: 720 }
-                    },
+                    video: { facingMode: { ideal: "environment" }, width: { ideal: 1280 }, height: { ideal: 720 } },
                     audio: false
                 });
 
@@ -543,12 +630,9 @@
 
                 loopEscaneamentoAtivo = true;
 
-                // 1. Tenta usar o leitor nativo acelerado do Android (Google Lens / Chrome)
                 if ('BarcodeDetector' in window) {
                     try {
-                        detectorNativo = new BarcodeDetector({
-                            formats: ['ean_13', 'ean_8', 'upc_a', 'upc_e', 'code_128', 'qr_code']
-                        });
+                        detectorNativo = new BarcodeDetector({ formats: ['ean_13', 'ean_8', 'upc_a', 'upc_e', 'code_128', 'qr_code'] });
                         iniciarLoopDetectorNativo(video);
                         return;
                     } catch(e) {
@@ -556,19 +640,18 @@
                     }
                 }
 
-                // 2. Fallback para ZXing caso o celular não tenha BarcodeDetector
                 if (window.ZXing) {
                     zxingCodeReader = new ZXing.BrowserMultiFormatReader();
-                    zxingCodeReader.decodeFromVideoElement(video, (result, err) => {
+                    zxingCodeReader.decodeFromVideoElement(video, (result) => {
                         if (result && loopEscaneamentoAtivo) {
                             loopEscaneamentoAtivo = false;
-                            onCodigoBarrasDetectado(result.getText());
+                            onCodigoBarrasLidoPelaCamera(result.getText());
                         }
                     });
                 }
             } catch (err) {
-                console.error("Erro na câmera:", err);
-                mostrarToast("Não foi possível acessar a câmera. Digite o código abaixo.", "⚠️", 4000);
+                mostrarToast("Não foi possível acessar a câmera.", "⚠️");
+                fecharLeitorCodigoBarras();
             }
         }
 
@@ -579,92 +662,34 @@
                         const barcodes = await detectorNativo.detect(video);
                         if (barcodes.length > 0 && loopEscaneamentoAtivo) {
                             loopEscaneamentoAtivo = false;
-                            onCodigoBarrasDetectado(barcodes[0].rawValue);
+                            onCodigoBarrasLidoPelaCamera(barcodes[0].rawValue);
                             break;
                         }
                     } catch (err) {}
                 }
-                await new Promise(r => setTimeout(r, 120)); // analisa 8 frames por segundo
+                await new Promise(r => setTimeout(r, 120));
             }
         }
 
-        function pesquisarEanManual() {
-            const val = document.getElementById('input-ean-manual').value.trim();
-            if (!val) return mostrarToast("Digite os números do código.", "⚠️");
-            onCodigoBarrasDetectado(val);
-        }
-
-        async function onCodigoBarrasDetectado(codigo) {
+        async function onCodigoBarrasLidoPelaCamera(codigo) {
             tocarBipeLeitor();
             await fecharLeitorCodigoBarras();
-
-            mostrarToast(`Código lido: ${codigo}. Buscando...`, "⏳", 3000);
-
-            let nomeEncontrado = null;
-
-            // 1. Consulta no catálogo de produtos já salvos pelo usuário
-            const catalogo = JSON.parse(localStorage.getItem('catalogo_codigos_barras') || '{}');
-            if (catalogo[codigo]) {
-                nomeEncontrado = catalogo[codigo];
-            }
-
-            // 2. Consulta Open Food Facts (Brasil)
-            if (!nomeEncontrado) {
-                try {
-                    const res = await fetch(`https://world.openfoodfacts.org/api/v2/product/${codigo}.json`);
-                    if (res.ok) {
-                        const data = await res.json();
-                        if (data.status === 1 && data.product) {
-                            nomeEncontrado = data.product.product_name_pt || data.product.product_name || data.product.generic_name;
-                        }
-                    }
-                } catch (e) {}
-            }
-
-            // 3. Consulta Open Beauty Facts (Cosméticos e Higiene)
-            if (!nomeEncontrado) {
-                try {
-                    const res = await fetch(`https://world.openbeautyfacts.org/api/v0/product/${codigo}.json`);
-                    if (res.ok) {
-                        const data = await res.json();
-                        if (data.status === 1 && data.product) {
-                            nomeEncontrado = data.product.product_name_pt || data.product.product_name;
-                        }
-                    }
-                } catch (e) {}
-            }
-
-            // Preenche os campos diretamente na tela
-            document.getElementById('compra-ean').value = codigo;
-
-            if (nomeEncontrado) {
-                document.getElementById('compra-nome').value = nomeEncontrado;
-                mostrarToast(`Localizado: ${nomeEncontrado}`, "✅");
-                document.getElementById('compra-preco').focus();
-            } else {
-                document.getElementById('compra-nome').value = '';
-                document.getElementById('compra-nome').placeholder = `Código ${codigo} - Digite o nome:`;
-                mostrarToast("Item novo. Digite o nome dele para salvar!", "✏️", 4000);
-                document.getElementById('compra-nome').focus();
-            }
+            document.getElementById('compra-nome').value = codigo;
+            await buscarPorCodigoDeBarras(codigo);
         }
 
         async function fecharLeitorCodigoBarras() {
             loopEscaneamentoAtivo = false;
-            
             if (zxingCodeReader) {
                 try { zxingCodeReader.reset(); } catch(e) {}
                 zxingCodeReader = null;
             }
-
             if (streamCameraNativa) {
                 streamCameraNativa.getTracks().forEach(track => track.stop());
                 streamCameraNativa = null;
             }
-
             const video = document.getElementById('video-camera-stream');
             if (video) video.srcObject = null;
-
             document.getElementById('modal-scanner').classList.add('hidden');
         }
 
@@ -743,7 +768,6 @@
             await salvarNaNuvem();
         }
 
-        // --- MODAIS DE ORÇAMENTO ---
         function abrirModalOrcamento(tipo) {
             orcamentoModalTipo = tipo;
             const titulo = tipo === 'alelo' ? '💳 Orçamento Cartão Alelo' : '💵 Orçamento em Espécie';
@@ -763,7 +787,6 @@
             renderizarTabelaCompras();
         }
 
-        // --- CONFIRMAÇÕES ---
         function abrirModalConfirma(titulo, msg, callback) {
             document.getElementById('modal-confirma-titulo').textContent = titulo;
             document.getElementById('modal-confirma-msg').textContent = msg;
@@ -781,7 +804,6 @@
             fecharModalConfirma();
         };
 
-        // --- FILTROS VISUAIS ---
         function definirFiltroVisual(tipo) {
             filtroVisualAtual = tipo;
             ['todos', 'pendentes', 'comprados'].forEach(f => {
@@ -822,7 +844,7 @@
             await salvarNaNuvem();
             renderizarTabelaCompras();
             cancelarEdicao();
-            mostrarToast("Item adicionado!", "🛒");
+            mostrarToast("Item salvo com sucesso!", "🛒");
         }
 
         function prepararEdicao(id) {
@@ -847,7 +869,7 @@
             document.getElementById('edit-compra-id').value = '';
             document.getElementById('compra-ean').value = '';
             document.getElementById('compra-qtd').value = '1';
-            document.getElementById('compra-nome').placeholder = 'Ex: Arroz, Café...';
+            document.getElementById('compra-nome').placeholder = 'Digite o nome ou os números do código...';
             document.getElementById('form-titulo').textContent = 'Adicionar Produto';
             document.getElementById('btn-submit').textContent = '➕ Adicionar à Lista';
             document.getElementById('btn-cancelar').classList.add('hidden');
