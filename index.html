@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Lista de Compras Segura</title>
+    <title>Lista de Compras Inteligente</title>
     
     <!-- Ícone e PWA -->
     <link rel="icon" href="https://cdn-icons-png.flaticon.com/512/1170/1170576.png" type="image/png">
@@ -19,6 +19,9 @@
     <!-- Supabase JS Client -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
+    <!-- Leitor de Código de Barras (HTML5-QRCode) -->
+    <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
+
     <!-- Manifesto Dinâmico PWA -->
     <link id="pwa-manifest" rel="manifest" href="data:application/manifest+json;charset=utf-8,{
         %22name%22:%22Lista%20de%20Compras%20Segura%22,
@@ -30,7 +33,7 @@
         %22icons%22:[{%22src%22:%22https://cdn-icons-png.flaticon.com/512/1170/1170576.png%22,%22sizes%22:%22512x512%22,%22type%22:%22image/png%22}]
     }">
 </head>
-<body class="bg-slate-50 dark:bg-slate-950 min-h-screen text-slate-800 dark:text-slate-100 transition-colors duration-200 pb-32 select-none antialiased">
+<body class="bg-slate-50 dark:bg-slate-950 min-h-screen text-slate-800 dark:text-slate-100 transition-colors duration-200 pb-36 select-none antialiased">
 
     <!-- TELA DE LOGIN (BIOMETRIA OU PIN) -->
     <div id="tela-login" class="fixed inset-0 z-50 bg-slate-900/90 backdrop-blur-md flex items-center justify-center p-4">
@@ -40,23 +43,20 @@
             </div>
             <div>
                 <h2 class="text-xl font-bold text-slate-900 dark:text-white">Acesso Seguro</h2>
-                <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">Valide sua identidade para ver a lista</p>
+                <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">Valide sua identidade para abrir a lista</p>
             </div>
 
-            <!-- Botão Biometria -->
             <button type="button" onclick="entrarComBiometria()" class="w-full bg-emerald-600 hover:bg-emerald-700 active:scale-95 text-white font-semibold py-3 rounded-2xl transition text-sm shadow-md flex items-center justify-center gap-2">
                 <span class="text-lg">👆</span>
                 <span>Usar Biometria</span>
             </button>
 
-            <!-- Divisor -->
             <div class="flex items-center gap-2">
                 <div class="h-px bg-slate-200 dark:bg-slate-800 flex-1"></div>
                 <span class="text-[10px] text-slate-400 uppercase tracking-wider">ou PIN</span>
                 <div class="h-px bg-slate-200 dark:bg-slate-800 flex-1"></div>
             </div>
 
-            <!-- Entrada de PIN Fallback -->
             <div class="space-y-2">
                 <input type="password" id="input-pin" maxlength="6" placeholder="Digite seu PIN (padrão: 1234)" class="w-full text-center tracking-widest text-sm px-3 py-2.5 bg-slate-100 dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500 text-slate-900 dark:text-white">
                 <button type="button" onclick="entrarComPin()" class="w-full bg-slate-800 dark:bg-slate-700 hover:bg-slate-700 text-white font-medium py-2 rounded-xl text-xs transition">
@@ -68,24 +68,23 @@
         </div>
     </div>
 
-    <!-- CONTEÚDO PRINCIPAL -->
+    <!-- CONTEÚDO DO SITE -->
     <div id="conteudo-site" class="hidden">
         
         <!-- TOPO FIXO -->
-        <header class="sticky top-0 z-40 bg-white/90 dark:bg-slate-900/90 backdrop-blur-md shadow-sm border-b border-slate-200/80 dark:border-slate-800/80">
+        <header class="sticky top-0 z-40 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md shadow-sm border-b border-slate-200/80 dark:border-slate-800/80">
             <div class="max-w-3xl mx-auto p-3.5 space-y-2.5">
                 
-                <!-- Barra superior -->
                 <div class="flex justify-between items-center">
                     <div>
                         <h1 class="text-base sm:text-lg font-bold text-slate-900 dark:text-white flex items-center gap-1.5">
                             <span>🛒</span> Lista de Compras
                         </h1>
-                        <p id="saudacao-usuario" class="text-[11px] text-slate-500 dark:text-slate-400">Pronta para as compras</p>
+                        <p id="saudacao-usuario" class="text-[11px] text-slate-500 dark:text-slate-400">Pronta para economizar</p>
                     </div>
                     <div class="flex gap-2">
                         <button onclick="sincronizarComNuvemManual()" class="bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 px-3 py-1.5 rounded-xl text-xs font-semibold transition flex items-center gap-1">
-                            🔄 Sync
+                            🔄 Nuvem
                         </button>
                         <button onclick="abrirRelatorioAnual()" class="bg-amber-600 hover:bg-amber-700 text-white px-3 py-1.5 rounded-xl text-xs font-semibold transition shadow-sm flex items-center gap-1">
                             📊 Relatório
@@ -97,7 +96,7 @@
                 <div class="flex items-center justify-between bg-blue-50/80 dark:bg-blue-950/30 border border-blue-100 dark:border-blue-900/40 p-2 rounded-2xl">
                     <span class="text-xs font-semibold text-blue-700 dark:text-blue-300 uppercase px-1">📅 Período:</span>
                     <div class="flex gap-1.5">
-                        <select id="filtro-mes-ano" onchange="mudarMesReferencia()" class="bg-white dark:bg-slate-900 text-slate-800 dark:text-white px-2.5 py-1.5 rounded-xl text-xs font-semibold border border-blue-200 dark:border-blue-800 focus:ring-1 focus:ring-blue-500">
+                        <select id="filtro-mes-ano" onchange="mudarMesReferencia()" class="bg-white dark:bg-slate-900 text-slate-800 dark:text-white px-2.5 py-1 rounded-xl text-xs font-semibold border border-blue-200 dark:border-blue-800 focus:ring-1 focus:ring-blue-500">
                             <option value="Janeiro">Janeiro</option>
                             <option value="Fevereiro">Fevereiro</option>
                             <option value="Março">Março</option>
@@ -111,16 +110,13 @@
                             <option value="Novembro">Novembro</option>
                             <option value="Dezembro">Dezembro</option>
                         </select>
-                        <select id="filtro-ano" onchange="mudarMesReferencia()" class="bg-white dark:bg-slate-900 text-slate-800 dark:text-white px-2.5 py-1.5 rounded-xl text-xs font-semibold border border-blue-200 dark:border-blue-800 focus:ring-1 focus:ring-blue-500">
-                            <!-- Preenchido via script -->
-                        </select>
+                        <select id="filtro-ano" onchange="mudarMesReferencia()" class="bg-white dark:bg-slate-900 text-slate-800 dark:text-white px-2 py-1 rounded-xl text-xs font-semibold border border-blue-200 dark:border-blue-800 focus:ring-1 focus:ring-blue-500"></select>
                     </div>
                 </div>
 
                 <!-- Cards de Orçamento -->
                 <div class="grid grid-cols-3 gap-2">
-                    <!-- Alelo -->
-                    <div onclick="abrirModalOrcamento('alelo')" class="bg-rose-50/80 dark:bg-rose-950/20 p-2.5 rounded-2xl border border-rose-200/70 dark:border-rose-900/40 cursor-pointer active:scale-98 transition">
+                    <div onclick="abrirModalOrcamento('alelo')" class="bg-rose-50/80 dark:bg-rose-950/20 p-2 rounded-2xl border border-rose-200/70 dark:border-rose-900/40 cursor-pointer active:scale-98 transition">
                         <div class="flex justify-between items-center">
                             <p class="text-[10px] font-bold text-[#d60036] dark:text-rose-400 uppercase">💳 Alelo</p>
                             <span class="text-[10px] text-rose-500">✏️</span>
@@ -128,8 +124,7 @@
                         <p id="saldo-ticket" class="text-xs sm:text-sm font-black text-[#d60036] dark:text-rose-300 mt-0.5">R$ 0,00</p>
                     </div>
 
-                    <!-- Dinheiro -->
-                    <div onclick="abrirModalOrcamento('dinheiro')" class="bg-emerald-50/80 dark:bg-emerald-950/20 p-2.5 rounded-2xl border border-emerald-200/70 dark:border-emerald-900/40 cursor-pointer active:scale-98 transition">
+                    <div onclick="abrirModalOrcamento('dinheiro')" class="bg-emerald-50/80 dark:bg-emerald-950/20 p-2 rounded-2xl border border-emerald-200/70 dark:border-emerald-900/40 cursor-pointer active:scale-98 transition">
                         <div class="flex justify-between items-center">
                             <p class="text-[10px] font-bold text-emerald-700 dark:text-emerald-400 uppercase">💵 Espécie</p>
                             <span class="text-[10px] text-emerald-500">✏️</span>
@@ -137,8 +132,7 @@
                         <p id="saldo-dinheiro" class="text-xs sm:text-sm font-black text-emerald-700 dark:text-emerald-300 mt-0.5">R$ 0,00</p>
                     </div>
 
-                    <!-- Total Orçado -->
-                    <div class="bg-blue-50/80 dark:bg-blue-950/20 p-2.5 rounded-2xl border border-blue-200/70 dark:border-blue-900/40">
+                    <div class="bg-blue-50/80 dark:bg-blue-950/20 p-2 rounded-2xl border border-blue-200/70 dark:border-blue-900/40">
                         <p class="text-[10px] font-bold text-blue-700 dark:text-blue-400 uppercase">∑ Orçado</p>
                         <p id="orcamento-total-combinado" class="text-xs sm:text-sm font-black text-blue-800 dark:text-blue-300 mt-0.5">R$ 0,00</p>
                     </div>
@@ -147,27 +141,34 @@
             </div>
         </header>
 
-        <!-- CORPO DA PÁGINA -->
+        <!-- CONTEÚDO PRINCIPAL -->
         <main class="max-w-3xl mx-auto p-4 space-y-4">
             
-            <!-- FORMULÁRIO -->
+            <!-- FORMULÁRIO COM ATALHO DE CÓDIGO DE BARRAS -->
             <section class="bg-white dark:bg-slate-900 p-4 rounded-3xl shadow-sm border border-slate-200/80 dark:border-slate-800">
-                <h2 id="form-titulo" class="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-2.5">Adicionar Novo Produto</h2>
+                <div class="flex justify-between items-center mb-2.5">
+                    <h2 id="form-titulo" class="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Adicionar Produto</h2>
+                    <!-- BOTÃO BIPAR CÓDIGO DE BARRAS -->
+                    <button type="button" onclick="iniciarLeitorCodigoBarras()" class="bg-blue-50 dark:bg-blue-950/50 hover:bg-blue-100 text-blue-600 dark:text-blue-400 px-3 py-1 rounded-xl text-xs font-bold transition flex items-center gap-1.5 border border-blue-200 dark:border-blue-800 active:scale-95">
+                        <span>📷</span> Bipar Código
+                    </button>
+                </div>
                 
                 <form id="form-compra" class="space-y-2.5" onsubmit="salvarItemCompra(event)">
                     <input type="hidden" id="edit-compra-id">
+                    <input type="hidden" id="compra-ean">
                     
                     <div class="grid grid-cols-12 gap-2 items-end">
                         <div class="col-span-6">
                             <label class="block text-[10px] font-semibold text-slate-500 uppercase mb-1">Produto</label>
-                            <input type="text" id="compra-nome" required placeholder="Ex: Arroz, Café..." class="w-full px-3 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs focus:ring-2 focus:ring-blue-500 text-slate-900 dark:text-white">
+                            <input type="text" id="compra-nome" required placeholder="Ex: Café Torrado 500g" class="w-full px-3 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs focus:ring-2 focus:ring-blue-500 text-slate-900 dark:text-white">
                         </div>
                         <div class="col-span-3">
                             <label class="block text-[10px] font-semibold text-slate-500 uppercase mb-1">Qtd</label>
                             <input type="number" id="compra-qtd" required min="0.1" step="any" value="1" class="w-full px-2 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs text-center focus:ring-2 focus:ring-blue-500 text-slate-900 dark:text-white">
                         </div>
                         <div class="col-span-3">
-                            <label class="block text-[10px] font-semibold text-slate-500 uppercase mb-1">Preço Un (R$)</label>
+                            <label class="block text-[10px] font-semibold text-slate-500 uppercase mb-1">Preço (R$)</label>
                             <input type="number" id="compra-preco" required step="0.01" min="0" placeholder="0,00" class="w-full px-3 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs focus:ring-2 focus:ring-blue-500 text-slate-900 dark:text-white">
                         </div>
                     </div>
@@ -183,8 +184,8 @@
                 </form>
             </section>
 
-            <!-- RESUMO EM CARDS (CARRINHO, TOTAL E SOBRA) -->
-            <section class="bg-gradient-to-br from-slate-900 via-slate-800 to-slate-950 text-white p-4 rounded-3xl shadow-lg grid grid-cols-3 gap-2 text-center divide-x divide-slate-800">
+            <!-- RESUMO EM 3 CARDS -->
+            <section id="card-painel-orcamento" class="bg-gradient-to-br from-slate-900 via-slate-800 to-slate-950 text-white p-4 rounded-3xl shadow-lg grid grid-cols-3 gap-2 text-center divide-x divide-slate-800 transition">
                 <div class="px-1">
                     <span class="block text-[9px] font-semibold uppercase tracking-wider text-slate-400">No Carrinho</span>
                     <span id="total-carrinho" class="text-xs sm:text-base font-black text-emerald-400 mt-1 block">R$ 0,00</span>
@@ -199,29 +200,71 @@
                 </div>
             </section>
 
-            <!-- TABELA / LISTA DE PRODUTOS -->
+            <!-- LISTAGEM COM FILTRO E BUSCA -->
             <section class="bg-white dark:bg-slate-900 p-4 rounded-3xl shadow-sm border border-slate-200/80 dark:border-slate-800 space-y-3">
-                <div class="flex justify-between items-center">
-                    <h3 id="status-progresso" class="text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wide">Itens na Lista (0)</h3>
-                    <button onclick="solicitarLimparLista()" class="text-xs text-rose-500 hover:text-rose-600 font-medium">Limpar Mês</button>
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-100 dark:border-slate-800 pb-3">
+                    <div class="flex items-center gap-2">
+                        <h3 id="status-progresso" class="text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wide">Itens (0)</h3>
+                        <button onclick="solicitarLimparLista()" class="text-[11px] text-rose-500 hover:underline">Limpar Mês</button>
+                    </div>
+                    
+                    <!-- Filtros de exibição (Todos / Pendentes / Comprados) -->
+                    <div class="flex gap-1 bg-slate-100 dark:bg-slate-800 p-1 rounded-xl text-[11px]">
+                        <button onclick="definirFiltroVisual('todos')" id="btn-filtro-todos" class="px-2.5 py-1 rounded-lg font-bold bg-white dark:bg-slate-900 text-blue-600 shadow-xs">Todos</button>
+                        <button onclick="definirFiltroVisual('pendentes')" id="btn-filtro-pendentes" class="px-2.5 py-1 rounded-lg text-slate-500 hover:text-slate-800 dark:hover:text-slate-200">Pendentes</button>
+                        <button onclick="definirFiltroVisual('comprados')" id="btn-filtro-comprados" class="px-2.5 py-1 rounded-lg text-slate-500 hover:text-slate-800 dark:hover:text-slate-200">No Carrinho</button>
+                    </div>
+                </div>
+
+                <!-- Campo de busca rápida -->
+                <div class="relative">
+                    <input type="text" id="campo-busca-itens" oninput="renderizarTabelaCompras()" placeholder="🔍 Buscar na lista..." class="w-full px-3 py-1.5 bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700/80 rounded-xl text-xs text-slate-800 dark:text-white focus:outline-none focus:ring-1 focus:ring-blue-500">
                 </div>
 
                 <div id="container-itens" class="divide-y divide-slate-100 dark:divide-slate-800">
-                    <!-- Itens inseridos via script -->
+                    <!-- Itens via JS -->
                 </div>
             </section>
 
         </main>
     </div>
 
-    <!-- MODAL DE ORÇAMENTO (SUBSTITUI PROMPT) -->
+    <!-- MODAL DO SCANNER DE CÓDIGO DE BARRAS -->
+    <div id="modal-scanner" class="fixed inset-0 z-50 bg-slate-950/90 backdrop-blur-md hidden flex items-center justify-center p-4">
+        <div class="bg-white dark:bg-slate-900 rounded-3xl shadow-2xl max-w-sm w-full overflow-hidden border border-slate-200 dark:border-slate-800 flex flex-col">
+            <div class="p-4 border-b border-slate-100 dark:border-slate-800 flex justify-between items-center">
+                <div class="flex items-center gap-2">
+                    <span class="text-base">📷</span>
+                    <h3 class="text-sm font-bold text-slate-900 dark:text-white">Escanear Código de Barras</h3>
+                </div>
+                <button onclick="fecharLeitorCodigoBarras()" class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 text-lg font-bold">✕</button>
+            </div>
+            
+            <div class="p-4 space-y-3">
+                <p class="text-[11px] text-slate-500 dark:text-slate-400 text-center">Aponte a câmera para o código do produto.</p>
+                
+                <!-- Área do Vídeo da Câmera -->
+                <div id="scanner-camera-view" class="w-full rounded-2xl overflow-hidden bg-black aspect-square flex items-center justify-center border-2 border-dashed border-blue-500"></div>
+
+                <div id="scanner-status" class="text-xs text-center text-blue-600 dark:text-blue-400 font-semibold hidden">
+                    Buscando informações do produto...
+                </div>
+            </div>
+
+            <div class="p-3 bg-slate-50 dark:bg-slate-800/50 border-t border-slate-100 dark:border-slate-800 flex justify-end">
+                <button onclick="fecharLeitorCodigoBarras()" class="w-full bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-200 py-2 rounded-xl text-xs font-semibold">
+                    Fechar Câmera
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL DE ORÇAMENTO -->
     <div id="modal-orcamento" class="fixed inset-0 z-50 bg-slate-950/70 backdrop-blur-sm hidden flex items-center justify-center p-4">
         <div class="bg-white dark:bg-slate-900 p-6 rounded-3xl shadow-2xl max-w-xs w-full space-y-4 border border-slate-200 dark:border-slate-800">
             <h3 id="modal-orcamento-titulo" class="text-base font-bold text-slate-900 dark:text-white">Ajustar Orçamento</h3>
             <p id="modal-orcamento-desc" class="text-xs text-slate-500">Defina o valor para este mês:</p>
-            
             <input type="number" step="0.01" min="0" id="input-orcamento-valor" class="w-full px-3 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-sm focus:ring-2 focus:ring-blue-500 text-slate-900 dark:text-white font-bold">
-            
             <div class="flex gap-2">
                 <button onclick="fecharModalOrcamento()" class="flex-1 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 py-2.5 rounded-xl text-xs font-semibold">Cancelar</button>
                 <button onclick="confirmarModalOrcamento()" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white py-2.5 rounded-xl text-xs font-semibold">Salvar</button>
@@ -229,16 +272,15 @@
         </div>
     </div>
 
-    <!-- MODAL DE CONFIRMAÇÃO (SUBSTITUI CONFIRM) -->
+    <!-- MODAL DE CONFIRMAÇÃO -->
     <div id="modal-confirmacao" class="fixed inset-0 z-50 bg-slate-950/70 backdrop-blur-sm hidden flex items-center justify-center p-4">
         <div class="bg-white dark:bg-slate-900 p-6 rounded-3xl shadow-2xl max-w-xs w-full space-y-4 text-center border border-slate-200 dark:border-slate-800">
             <div class="text-3xl">⚠️</div>
             <h3 id="modal-confirma-titulo" class="text-base font-bold text-slate-900 dark:text-white">Confirmação</h3>
             <p id="modal-confirma-msg" class="text-xs text-slate-500">Tem certeza que deseja prosseguir?</p>
-            
             <div class="flex gap-2 pt-2">
                 <button onclick="fecharModalConfirma()" class="flex-1 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 py-2.5 rounded-xl text-xs font-semibold">Não</button>
-                <button id="btn-confirma-acao" class="flex-1 bg-rose-600 hover:bg-rose-700 text-white py-2.5 rounded-xl text-xs font-semibold">Sim, Excluir</button>
+                <button id="btn-confirma-acao" class="flex-1 bg-rose-600 hover:bg-rose-700 text-white py-2.5 rounded-xl text-xs font-semibold">Sim</button>
             </div>
         </div>
     </div>
@@ -250,22 +292,17 @@
                 <h3 id="titulo-modal-ano" class="text-base font-bold text-slate-900 dark:text-white">📊 Relatório Mês a Mês</h3>
                 <button onclick="fecharRelatorioAnual()" class="text-slate-400 hover:text-slate-600 text-lg font-bold">✕</button>
             </div>
-            
             <div id="conteudo-relatorio-meses" class="space-y-2 text-sm overflow-y-auto flex-1 pr-1"></div>
-            
             <div class="border-t pt-3 flex justify-between items-center font-bold text-sm dark:border-slate-800">
                 <span>Total Acumulado:</span>
                 <span id="modal-total-ano" class="text-amber-600 dark:text-amber-400">R$ 0,00</span>
             </div>
-            
-            <button onclick="fecharRelatorioAnual()" class="w-full bg-blue-600 hover:bg-blue-700 text-white py-2.5 rounded-xl text-xs font-semibold">
-                Fechar
-            </button>
+            <button onclick="fecharRelatorioAnual()" class="w-full bg-blue-600 hover:bg-blue-700 text-white py-2.5 rounded-xl text-xs font-semibold">Fechar</button>
         </div>
     </div>
 
     <!-- BARRA INFERIOR FIXA -->
-    <nav class="fixed bottom-0 left-0 right-0 z-40 bg-white/90 dark:bg-slate-900/90 backdrop-blur-md border-t border-slate-200/80 dark:border-slate-800/80 px-4 py-2 flex justify-between items-center max-w-3xl mx-auto rounded-t-3xl shadow-xl">
+    <nav class="fixed bottom-0 left-0 right-0 z-40 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border-t border-slate-200/80 dark:border-slate-800/80 px-4 py-2 flex justify-between items-center max-w-3xl mx-auto rounded-t-3xl shadow-xl">
         <div class="flex items-center gap-1.5 overflow-x-auto">
             <button onclick="alternarDarkMode()" class="px-2.5 py-1.5 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 text-xs font-medium" title="Tema">
                 🌙/☀️
@@ -281,19 +318,25 @@
             </button>
         </div>
 
-        <!-- Botão de Voz -->
-        <button onclick="ouvirVoz()" id="btn-voz-flutuante" class="bg-rose-600 hover:bg-rose-700 text-white w-12 h-12 rounded-2xl shadow-lg flex items-center justify-center text-xl transition active:scale-90 ml-2 shrink-0" title="Falar e Adicionar">
-            🎤
-        </button>
+        <div class="flex items-center gap-2">
+            <!-- BOTÃO BIPAR DIRETO NA BARRA -->
+            <button onclick="iniciarLeitorCodigoBarras()" class="bg-blue-600 hover:bg-blue-700 text-white w-11 h-11 rounded-2xl shadow-lg flex items-center justify-center text-lg transition active:scale-90" title="Bipar Código de Barras">
+                📷
+            </button>
+            <!-- BOTÃO DE VOZ -->
+            <button onclick="ouvirVoz()" id="btn-voz-flutuante" class="bg-rose-600 hover:bg-rose-700 text-white w-11 h-11 rounded-2xl shadow-lg flex items-center justify-center text-lg transition active:scale-90" title="Falar e Adicionar">
+                🎤
+            </button>
+        </div>
     </nav>
 
-    <!-- SCRIPTS -->
+    <!-- LÓGICA JAVASCRIPT -->
     <script>
         const SUPABASE_URL = 'https://jmeepzdvmmjngxwvayqb.supabase.co';
         const SUPABASE_ANON_KEY = 'sb_publishable_54ORrLbP7naW7n-KlKCdUA_hZnpjguH';
         const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-        const PIN_PADRAO = '1234'; // Altere conforme desejar
+        const PIN_PADRAO = '1234';
         const mesesArray = ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'];
         const dataHoje = new Date();
         const mesRealAtual = mesesArray[dataHoje.getMonth()];
@@ -302,10 +345,33 @@
         let mesSelecionado = localStorage.getItem('ultimo_mes') || mesRealAtual;
         let anoSelecionado = localStorage.getItem('ultimo_ano') || anoRealAtual;
         let chaveMesAno = `${mesSelecionado}_${anoSelecionado}`;
+        let filtroVisualAtual = 'todos';
 
         let deferredPrompt = null;
         let orcamentoModalTipo = null;
         let acaoConfirmacaoPendente = null;
+        let html5QrCodeScanner = null;
+
+        // --- SISTEMA DE ÁUDIO (BIPE DE MERCADO) ---
+        function tocarBipeLeitor() {
+            try {
+                const ctx = new (window.AudioContext || window.webkitAudioContext)();
+                const osc = ctx.createOscillator();
+                const gain = ctx.createGain();
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(1800, ctx.currentTime);
+                gain.gain.setValueAtTime(0.15, ctx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.12);
+                osc.connect(gain);
+                gain.connect(ctx.destination);
+                osc.start();
+                osc.stop(ctx.currentTime + 0.12);
+            } catch (e) {}
+
+            if ('vibrate' in navigator) {
+                navigator.vibrate(80);
+            }
+        }
 
         // --- INICIALIZAÇÃO ---
         window.addEventListener('DOMContentLoaded', () => {
@@ -318,7 +384,6 @@
                 liberarAcesso();
             } else {
                 bloquearApp();
-                // Tenta biometria automática em celulares compatíveis
                 if (window.innerWidth < 768 && window.PublicKeyCredential) {
                     setTimeout(entrarComBiometria, 400);
                 }
@@ -338,7 +403,7 @@
             }
         }
 
-        // --- SISTEMA DE AUTENTICAÇÃO ---
+        // --- AUTENTICAÇÃO ---
         function bloquearApp() {
             sessionStorage.removeItem('autenticado_site');
             document.getElementById('conteudo-site').classList.add('hidden');
@@ -374,7 +439,7 @@
             erroEl.classList.add('hidden');
 
             if (!window.PublicKeyCredential) {
-                erroEl.textContent = "Biometria indisponível neste navegador. Use o PIN.";
+                erroEl.textContent = "Biometria indisponível. Use o PIN.";
                 erroEl.classList.remove('hidden');
                 return;
             }
@@ -382,7 +447,7 @@
             try {
                 const available = await PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable();
                 if (!available) {
-                    erroEl.textContent = "Nenhum leitor biométrico detectado. Use o PIN.";
+                    erroEl.textContent = "Biometria não configurada. Use o PIN.";
                     erroEl.classList.remove('hidden');
                     return;
                 }
@@ -416,13 +481,99 @@
                 if (cred) liberarAcesso();
             } catch (err) {
                 if (err.name !== "NotAllowedError") {
-                    erroEl.textContent = "Falha na leitura biométrica. Use o PIN.";
+                    erroEl.textContent = "Falha biométrica. Use o PIN.";
                     erroEl.classList.remove('hidden');
                 }
             }
         }
 
-        // --- SINCRONIZAÇÃO COM SUPABASE ---
+        // --- SCANNER DE CÓDIGO DE BARRAS & BUSCA DE PRODUTOS ---
+        async function iniciarLeitorCodigoBarras() {
+            document.getElementById('modal-scanner').classList.remove('hidden');
+            document.getElementById('scanner-status').classList.add('hidden');
+
+            try {
+                html5QrCodeScanner = new Html5Qrcode("scanner-camera-view");
+                const config = {
+                    fps: 10,
+                    qrbox: { width: 250, height: 160 },
+                    aspectRatio: 1.0,
+                    formatsToSupport: [
+                        Html5QrcodeSupportedFormats.EAN_13,
+                        Html5QrcodeSupportedFormats.EAN_8,
+                        Html5QrcodeSupportedFormats.UPC_A,
+                        Html5QrcodeSupportedFormats.UPC_E,
+                        Html5QrcodeSupportedFormats.CODE_128
+                    ]
+                };
+
+                await html5QrCodeScanner.start(
+                    { facingMode: "environment" },
+                    config,
+                    onCodigoBarrasDetectado
+                );
+            } catch (err) {
+                alert("Não foi possível acessar a câmera. Verifique as permissões do navegador.");
+                fecharLeitorCodigoBarras();
+            }
+        }
+
+        async function onCodigoBarrasDetectado(decodedText) {
+            tocarBipeLeitor();
+            
+            // Pausa a câmera para processar a busca
+            if (html5QrCodeScanner) {
+                try { await html5QrCodeScanner.stop(); } catch(e) {}
+            }
+
+            document.getElementById('scanner-status').textContent = `Código lido: ${decodedText}. Buscando produto...`;
+            document.getElementById('scanner-status').classList.remove('hidden');
+
+            // 1. Verifica no cache local de produtos já salvos pelo usuário
+            const cacheProdutos = JSON.parse(localStorage.getItem('catalogo_codigos_barras') || '{}');
+            let nomeEncontrado = cacheProdutos[decodedText];
+
+            // 2. Se não estiver no cache, busca na API pública do Open Food Facts
+            if (!nomeEncontrado) {
+                try {
+                    const res = await fetch(`https://world.openfoodfacts.org/api/v2/product/${decodedText}.json`);
+                    if (res.ok) {
+                        const data = await res.json();
+                        if (data.status === 1 && data.product) {
+                            nomeEncontrado = data.product.product_name_pt || data.product.product_name || data.product.generic_name;
+                        }
+                    }
+                } catch (e) {
+                    console.warn("Erro ao buscar produto na nuvem:", e);
+                }
+            }
+
+            fecharLeitorCodigoBarras();
+
+            // Preenche o formulário
+            document.getElementById('compra-ean').value = decodedText;
+            if (nomeEncontrado) {
+                document.getElementById('compra-nome').value = nomeEncontrado;
+                document.getElementById('compra-preco').focus();
+            } else {
+                document.getElementById('compra-nome').value = '';
+                document.getElementById('compra-nome').placeholder = `Código ${decodedText} (digite o nome)`;
+                document.getElementById('compra-nome').focus();
+            }
+        }
+
+        async function fecharLeitorCodigoBarras() {
+            if (html5QrCodeScanner) {
+                try {
+                    await html5QrCodeScanner.stop();
+                    html5QrCodeScanner.clear();
+                } catch (e) {}
+                html5QrCodeScanner = null;
+            }
+            document.getElementById('modal-scanner').classList.add('hidden');
+        }
+
+        // --- NUVEM & STORAGE ---
         async function sincronizarComNuvem() {
             try {
                 let { data } = await supabaseClient
@@ -439,7 +590,7 @@
                     await salvarNaNuvem();
                 }
             } catch (e) {
-                console.warn("Offline ou erro de nuvem:", e);
+                console.warn("Modo offline:", e);
             }
         }
 
@@ -459,9 +610,9 @@
         async function sincronizarComNuvemManual() {
             await sincronizarComNuvem();
             renderizarTabelaCompras();
+            alert("✅ Sincronizado com a nuvem!");
         }
 
-        // --- NAVEGAÇÃO DE PERÍODO ---
         function mudarMesReferencia() {
             mesSelecionado = document.getElementById('filtro-mes-ano').value;
             anoSelecionado = document.getElementById('filtro-ano').value;
@@ -474,7 +625,6 @@
             cancelarEdicao();
         }
 
-        // --- GETTERS E SETTERS ---
         function obterListaDoMes() {
             const cache = JSON.parse(localStorage.getItem('historico_compras_mensal') || '{}');
             return cache[chaveMesAno] || [];
@@ -520,7 +670,7 @@
             renderizarTabelaCompras();
         }
 
-        // --- MODAIS DE CONFIRMAÇÃO ---
+        // --- CONFIRMAÇÕES ---
         function abrirModalConfirma(titulo, msg, callback) {
             document.getElementById('modal-confirma-titulo').textContent = titulo;
             document.getElementById('modal-confirma-msg').textContent = msg;
@@ -538,20 +688,42 @@
             fecharModalConfirma();
         };
 
+        // --- FILTROS VISUAIS (TODOS / PENDENTES / NO CARRINHO) ---
+        function definirFiltroVisual(tipo) {
+            filtroVisualAtual = tipo;
+            ['todos', 'pendentes', 'comprados'].forEach(f => {
+                const btn = document.getElementById(`btn-filtro-${f}`);
+                if (f === tipo) {
+                    btn.className = "px-2.5 py-1 rounded-lg font-bold bg-white dark:bg-slate-900 text-blue-600 shadow-xs";
+                } else {
+                    btn.className = "px-2.5 py-1 rounded-lg text-slate-500 hover:text-slate-800 dark:hover:text-slate-200";
+                }
+            });
+            renderizarTabelaCompras();
+        }
+
         // --- CRUD DE ITENS ---
         async function salvarItemCompra(e) {
             e.preventDefault();
             const editId = document.getElementById('edit-compra-id').value;
+            const ean = document.getElementById('compra-ean').value;
             const nome = document.getElementById('compra-nome').value.trim();
             const qtd = parseFloat(document.getElementById('compra-qtd').value) || 1;
             const preco = parseFloat(document.getElementById('compra-preco').value) || 0;
 
+            // Se o item tem código de barras, guarda no catálogo local para futuras buscas
+            if (ean && nome) {
+                const catalogo = JSON.parse(localStorage.getItem('catalogo_codigos_barras') || '{}');
+                catalogo[ean] = nome;
+                localStorage.setItem('catalogo_codigos_barras', JSON.stringify(catalogo));
+            }
+
             let lista = obterListaDoMes();
             if (editId) {
                 const item = lista.find(i => i.id == editId);
-                if (item) { item.nome = nome; item.qtd = qtd; item.preco = preco; }
+                if (item) { item.nome = nome; item.qtd = qtd; item.preco = preco; if (ean) item.ean = ean; }
             } else {
-                lista.push({ id: Date.now(), nome, qtd, preco, comprado: false });
+                lista.push({ id: Date.now(), nome, qtd, preco, ean: ean || null, comprado: false });
             }
 
             guardarListaDoMes(lista);
@@ -566,6 +738,7 @@
             if (!item) return;
 
             document.getElementById('edit-compra-id').value = item.id;
+            document.getElementById('compra-ean').value = item.ean || '';
             document.getElementById('compra-nome').value = item.nome;
             document.getElementById('compra-qtd').value = item.qtd;
             document.getElementById('compra-preco').value = item.preco;
@@ -579,8 +752,9 @@
         function cancelarEdicao() {
             document.getElementById('form-compra').reset();
             document.getElementById('edit-compra-id').value = '';
+            document.getElementById('compra-ean').value = '';
             document.getElementById('compra-qtd').value = '1';
-            document.getElementById('form-titulo').textContent = 'Adicionar Novo Produto';
+            document.getElementById('form-titulo').textContent = 'Adicionar Produto';
             document.getElementById('btn-submit').textContent = '➕ Adicionar à Lista';
             document.getElementById('btn-cancelar').classList.add('hidden');
         }
@@ -590,6 +764,7 @@
             const item = lista.find(i => i.id === id);
             if (item) {
                 item.comprado = !item.comprado;
+                tocarBipeLeitor();
                 guardarListaDoMes(lista);
                 await salvarNaNuvem();
                 renderizarTabelaCompras();
@@ -614,19 +789,20 @@
             });
         }
 
-        // --- RENDERIZAÇÃO DA TABELA ---
+        // --- RENDERIZAÇÃO DA TABELA COM FILTROS ---
         function renderizarTabelaCompras() {
-            const lista = obterListaDoMes();
+            const listaOriginal = obterListaDoMes();
+            const termoBusca = (document.getElementById('campo-busca-itens')?.value || '').toLowerCase().trim();
             const container = document.getElementById('container-itens');
             
-            const totalItens = lista.length;
-            const compradosCount = lista.filter(i => i.comprado).length;
+            const totalItens = listaOriginal.length;
+            const compradosCount = listaOriginal.filter(i => i.comprado).length;
             document.getElementById('status-progresso').textContent = `Itens: ${compradosCount}/${totalItens} no carrinho`;
 
             let totalGeral = 0;
             let totalCarrinho = 0;
 
-            lista.forEach(i => {
+            listaOriginal.forEach(i => {
                 const sub = i.qtd * i.preco;
                 totalGeral += sub;
                 if (i.comprado) totalCarrinho += sub;
@@ -646,21 +822,42 @@
             
             const elRestante = document.getElementById('saldo-restante-final');
             elRestante.textContent = `R$ ${restante.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`;
-            elRestante.className = restante < 0 ? "text-xs sm:text-base font-black text-rose-400 mt-1 block" : "text-xs sm:text-base font-black text-emerald-400 mt-1 block";
+            
+            // Alerta visual de orçamento estourado
+            const painel = document.getElementById('card-painel-orcamento');
+            if (restante < 0) {
+                elRestante.className = "text-xs sm:text-base font-black text-rose-400 mt-1 block animate-pulse";
+                painel.classList.add('ring-2', 'ring-rose-500/80');
+            } else {
+                elRestante.className = "text-xs sm:text-base font-black text-emerald-400 mt-1 block";
+                painel.classList.remove('ring-2', 'ring-rose-500/80');
+            }
 
-            if (lista.length === 0) {
-                container.innerHTML = `<div class="py-8 text-center text-slate-400 text-xs">Nenhum item cadastrado neste mês. Toque no microfone para falar!</div>`;
+            // Aplica filtros de pesquisa e abas
+            let listaFiltrada = listaOriginal.filter(i => {
+                const bateBusca = !termoBusca || i.nome.toLowerCase().includes(termoBusca);
+                if (!bateBusca) return false;
+                if (filtroVisualAtual === 'pendentes') return !i.comprado;
+                if (filtroVisualAtual === 'comprados') return i.comprado;
+                return true;
+            });
+
+            if (listaFiltrada.length === 0) {
+                container.innerHTML = `<div class="py-8 text-center text-slate-400 text-xs">Nenhum item corresponde aos critérios.</div>`;
                 return;
             }
 
-            container.innerHTML = lista.map(i => {
+            container.innerHTML = listaFiltrada.map(i => {
                 const sub = i.qtd * i.preco;
                 return `
-                    <div class="py-3 flex items-center justify-between gap-3 ${i.comprado ? 'opacity-50' : ''}">
+                    <div class="py-2.5 flex items-center justify-between gap-3 ${i.comprado ? 'opacity-40' : ''}">
                         <div class="flex items-center gap-3 min-w-0">
                             <input type="checkbox" onchange="alternarComprado(${i.id})" ${i.comprado ? 'checked' : ''} class="w-4 h-4 rounded text-blue-600 focus:ring-0 cursor-pointer">
                             <div class="min-w-0">
-                                <p class="text-xs font-semibold text-slate-900 dark:text-white truncate ${i.comprado ? 'line-through' : ''}">${i.nome}</p>
+                                <div class="flex items-center gap-1.5">
+                                    <p class="text-xs font-semibold text-slate-900 dark:text-white truncate ${i.comprado ? 'line-through' : ''}">${i.nome}</p>
+                                    ${i.ean ? '<span class="text-[9px] bg-slate-100 dark:bg-slate-800 text-slate-400 px-1 py-0.2 rounded font-mono">EAN</span>' : ''}
+                                </div>
                                 <p class="text-[11px] text-slate-400">
                                     ${i.qtd}x R$ ${i.preco.toFixed(2)} = <span class="font-bold text-slate-700 dark:text-slate-300">R$ ${sub.toFixed(2)}</span>
                                 </p>
@@ -763,13 +960,13 @@
             let preco = nums.length >= 2 ? nums[1] : (nums.length === 1 ? nums[0] : 0);
 
             let lista = obterListaDoMes();
-            lista.push({ id: Date.now(), nome, qtd: qtd > 0 ? qtd : 1, preco, comprado: false });
+            lista.push({ id: Date.now(), nome, qtd: qtd > 0 ? qtd : 1, preco, ean: null, comprado: false });
             guardarListaDoMes(lista);
             await salvarNaNuvem();
             renderizarTabelaCompras();
         }
 
-        // --- TEMA E INSTALAÇÃO ---
+        // --- TEMA E INSTALAÇÃO PWA ---
         function alternarDarkMode() {
             document.documentElement.classList.toggle('dark');
             localStorage.setItem('dark_mode', document.documentElement.classList.contains('dark'));
