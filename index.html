@@ -249,7 +249,7 @@
         </main>
     </div>
 
-    <!-- MODAL DA CÂMERA (BIPAR OU FOTOGRAFAR PARA A IA) -->
+    <!-- MODAL DA CÂMERA -->
     <div id="modal-scanner" class="fixed inset-0 z-50 bg-slate-950/95 backdrop-blur-md hidden flex items-center justify-center p-4">
         <div class="bg-white dark:bg-slate-900 rounded-3xl shadow-2xl max-w-sm w-full overflow-hidden border border-slate-200 dark:border-slate-800 flex flex-col">
             <div class="p-4 border-b border-slate-100 dark:border-slate-800 flex justify-between items-center">
@@ -261,15 +261,14 @@
             </div>
             
             <div class="p-4 space-y-3">
-                <p class="text-[11px] text-slate-500 dark:text-slate-400 text-center">Aponte para o código ou tire a foto para a IA identificar:</p>
+                <p class="text-[11px] text-slate-500 dark:text-slate-400 text-center">Aponte para o código ou fotografe o produto:</p>
                 
                 <div class="relative w-full rounded-2xl overflow-hidden bg-slate-950 aspect-[4/3] flex items-center justify-center border border-slate-700 shadow-inner">
                     <video id="video-camera-stream" autoplay playsinline muted class="w-full h-full object-cover"></video>
-                    <!-- Linha guia de mira -->
                     <div class="absolute inset-x-4 top-1/2 -translate-y-1/2 h-0.5 bg-rose-500 shadow-[0_0_10px_#f43f5e] pointer-events-none"></div>
                     <div class="absolute inset-4 border border-white/20 rounded-xl pointer-events-none"></div>
 
-                    <!-- BOTÃO FOTOGRAFAR PRODUTO PARA A IA -->
+                    <!-- BOTÃO FOTOGRAFAR PARA A IA -->
                     <button type="button" onclick="capturarFotoProduto()" class="absolute bottom-3 bg-white/95 hover:bg-white text-slate-900 px-4 py-2 rounded-2xl shadow-xl font-bold text-xs flex items-center gap-1.5 active:scale-95 transition">
                         <span>📸</span> Fotografar Produto
                     </button>
@@ -292,7 +291,7 @@
                 <h3 class="text-base font-bold text-slate-900 dark:text-white">Identificação por IA</h3>
             </div>
             <p class="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">
-                Cole a sua chave gratuita do <strong>Google Gemini API</strong>:
+                Sua chave do <strong>Google Gemini API</strong>:
             </p>
             <input type="password" id="input-gemini-key" placeholder="Cole sua Gemini API Key" class="w-full px-3 py-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs text-slate-900 dark:text-white font-mono">
             
@@ -579,7 +578,6 @@
 
                 loopEscaneamentoAtivo = true;
 
-                // Tenta leitor nativo acelerado (Google Lens / Chrome)
                 if ('BarcodeDetector' in window) {
                     try {
                         detectorNativo = new BarcodeDetector({ formats: ['ean_13', 'ean_8', 'upc_a', 'upc_e', 'code_128', 'qr_code'] });
@@ -590,7 +588,6 @@
                     }
                 }
 
-                // Fallback ZXing
                 if (window.ZXing) {
                     zxingCodeReader = new ZXing.BrowserMultiFormatReader();
                     zxingCodeReader.decodeFromVideoElement(video, (result) => {
@@ -629,7 +626,7 @@
             await buscarPorCodigoDeBarras(codigo);
         }
 
-        // TIRA A FOTO, MANDA PRA IA E DESCARDA NA HORA (ZERO PESO NO SUPABASE)
+        // TIRA A FOTO, MANDA PRA IA E DESCARDA NA HORA (ZERO ESPAÇO NO SUPABASE)
         async function capturarFotoProduto() {
             const video = document.getElementById('video-camera-stream');
             if (!video || video.readyState < 2) return;
@@ -645,13 +642,12 @@
 
             const fotoBase64 = canvas.toDataURL('image/jpeg', 0.7);
 
-            // Fecha a câmera imediatamente
             await fecharLeitorCodigoBarras();
 
             const geminiKey = localStorage.getItem('gemini_api_key');
 
             if (geminiKey) {
-                mostrarToast("IA analisando a foto...", "✨", 5000);
+                mostrarToast("IA analisando a foto...", "✨", 6000);
                 await identificarComGeminiVision(fotoBase64, geminiKey);
             } else {
                 mostrarToast("Cole a chave na engrenagem ⚙️ para a IA ler!", "ℹ️", 4000);
@@ -659,13 +655,38 @@
             }
         }
 
-        // CHAMADA DA IA GOOGLE GEMINI VISION
+        // DETECÇÃO AUTOMÁTICA DO MODELO MAIS RECENTE DA SUA CONTA
         async function identificarComGeminiVision(base64Data, apiKey) {
             const limpaBase64 = base64Data.replace(/^data:image\/[a-z]+;base64,/, '');
             const chaveLimpa = apiKey.trim();
 
+            // Lista de modelos suportados em ordem de preferência
+            const modelosPossiveis = ['gemini-2.0-flash', 'gemini-2.5-flash', 'gemini-1.5-flash-latest', 'gemini-1.5-flash'];
+            let modeloEscolhido = modelosPossiveis[0];
+
             try {
-                const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${chaveLimpa}`;
+                // Descobre dinamicamente os modelos disponíveis na sua chave
+                const resLista = await fetch(`https://generativelanguage.googleapis.com/v1beta/models?key=${chaveLimpa}`);
+                if (resLista.ok) {
+                    const dadosLista = await resLista.json();
+                    if (dadosLista.models && Array.isArray(dadosLista.models)) {
+                        const encontrado = dadosLista.models.find(m => 
+                            m.supportedGenerationMethods && 
+                            m.supportedGenerationMethods.includes('generateContent') && 
+                            m.name.includes('flash')
+                        ) || dadosLista.models.find(m => 
+                            m.supportedGenerationMethods && 
+                            m.supportedGenerationMethods.includes('generateContent')
+                        );
+                        if (encontrado) {
+                            modeloEscolhido = encontrado.name.replace('models/', '');
+                        }
+                    }
+                }
+            } catch(e) {}
+
+            try {
+                const url = `https://generativelanguage.googleapis.com/v1beta/models/${modeloEscolhido}:generateContent?key=${chaveLimpa}`;
                 
                 const payload = {
                     contents: [{
@@ -816,7 +837,7 @@
             document.getElementById('compra-preco').focus();
         }
 
-        // --- NUVEM & STORAGE (LEVE, APENAS DADOS DE TEXTO) ---
+        // --- NUVEM & STORAGE (APENAS TEXTO LEVE) ---
         async function sincronizarComNuvem() {
             try {
                 let { data } = await supabaseClient
