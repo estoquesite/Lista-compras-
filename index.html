@@ -2,81 +2,105 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Lista de Compras Segura (Nuvem)</title>
-    <!-- Ícone personalizado -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Lista de Compras Segura</title>
+    
+    <!-- Ícone e PWA -->
     <link rel="icon" href="https://cdn-icons-png.flaticon.com/512/1170/1170576.png" type="image/png">
     <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/1170/1170576.png">
+    <meta name="theme-color" content="#2563eb">
+
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = { darkMode: 'class' }
     </script>
+
     <!-- Supabase JS Client -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <!-- Manifesto Dinâmico para Instalação como App no Celular -->
+
+    <!-- Manifesto Dinâmico PWA -->
     <link id="pwa-manifest" rel="manifest" href="data:application/manifest+json;charset=utf-8,{
-        %22name%22: %22Lista de Compras Segura%22,
-        %22short_name%22: %22Compras%22,
-        %22start_url%22: %22.%22,
-        %22display%22: %22standalone%22,
-        %22background_color%22: %22%23f9f9f9%22,
-        %22theme_color%22: %22%232563eb%22,
-        %22icons%22: [{%22src%22: %22https://cdn-icons-png.flaticon.com/512/1170/1170576.png%22, %22sizes%22: %22512x512%22, %22type%22: %22image/png%22}]
+        %22name%22:%22Lista%20de%20Compras%20Segura%22,
+        %22short_name%22:%22Compras%22,
+        %22start_url%22:%22.%22,
+        %22display%22:%22standalone%22,
+        %22background_color%22:%22%230f172a%22,
+        %22theme_color%22:%22%232563eb%22,
+        %22icons%22:[{%22src%22:%22https://cdn-icons-png.flaticon.com/512/1170/1170576.png%22,%22sizes%22:%22512x512%22,%22type%22:%22image/png%22}]
     }">
 </head>
-<body class="bg-gray-50 dark:bg-gray-900 min-h-screen text-gray-800 dark:text-gray-100 transition-colors duration-200 pb-28">
+<body class="bg-slate-50 dark:bg-slate-950 min-h-screen text-slate-800 dark:text-slate-100 transition-colors duration-200 pb-32 select-none antialiased">
 
-    <!-- TELA DE LOGIN / CAPA EXCLUSIVA POR BIOMETRIA (SOMENTE CELULAR: md:hidden) -->
-    <div id="tela-login" class="fixed inset-0 z-50 bg-gray-900/90 backdrop-blur-sm hidden flex items-center justify-center p-4 md:hidden">
-        <div class="bg-white dark:bg-gray-800 p-8 rounded-3xl shadow-2xl max-w-xs w-full text-center space-y-5 border border-gray-100 dark:border-gray-700">
-            <div class="w-16 h-16 bg-blue-50 dark:bg-blue-950/50 rounded-2xl mx-auto flex items-center justify-center text-3xl shadow-inner">
+    <!-- TELA DE LOGIN (BIOMETRIA OU PIN) -->
+    <div id="tela-login" class="fixed inset-0 z-50 bg-slate-900/90 backdrop-blur-md flex items-center justify-center p-4">
+        <div class="bg-white dark:bg-slate-900 p-8 rounded-3xl shadow-2xl max-w-xs w-full text-center space-y-5 border border-slate-200 dark:border-slate-800">
+            <div class="w-16 h-16 bg-blue-50 dark:bg-blue-950/60 rounded-2xl mx-auto flex items-center justify-center text-3xl shadow-inner">
                 🛒
             </div>
             <div>
-                <h2 class="text-xl font-bold text-gray-900 dark:text-white">Acesso por Digital</h2>
-                <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Valide a sua biometria para abrir a lista</p>
+                <h2 class="text-xl font-bold text-slate-900 dark:text-white">Acesso Seguro</h2>
+                <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">Valide sua identidade para ver a lista</p>
             </div>
 
-            <!-- BOTÃO ÚNICO DE BIOMETRIA / DIGITAL -->
-            <button type="button" onclick="entrarComBiometria()" class="w-full bg-emerald-600 hover:bg-emerald-700 active:scale-95 text-white font-bold py-3.5 rounded-2xl transition text-sm shadow-md flex items-center justify-center gap-2 cursor-pointer">
+            <!-- Botão Biometria -->
+            <button type="button" onclick="entrarComBiometria()" class="w-full bg-emerald-600 hover:bg-emerald-700 active:scale-95 text-white font-semibold py-3 rounded-2xl transition text-sm shadow-md flex items-center justify-center gap-2">
                 <span class="text-lg">👆</span>
-                <span>Validar Digital</span>
+                <span>Usar Biometria</span>
             </button>
 
-            <p id="erro-senha" class="text-xs text-red-500 hidden font-medium">Leitura não reconhecida. Tente novamente.</p>
+            <!-- Divisor -->
+            <div class="flex items-center gap-2">
+                <div class="h-px bg-slate-200 dark:bg-slate-800 flex-1"></div>
+                <span class="text-[10px] text-slate-400 uppercase tracking-wider">ou PIN</span>
+                <div class="h-px bg-slate-200 dark:bg-slate-800 flex-1"></div>
+            </div>
+
+            <!-- Entrada de PIN Fallback -->
+            <div class="space-y-2">
+                <input type="password" id="input-pin" maxlength="6" placeholder="Digite seu PIN (padrão: 1234)" class="w-full text-center tracking-widest text-sm px-3 py-2.5 bg-slate-100 dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500 text-slate-900 dark:text-white">
+                <button type="button" onclick="entrarComPin()" class="w-full bg-slate-800 dark:bg-slate-700 hover:bg-slate-700 text-white font-medium py-2 rounded-xl text-xs transition">
+                    Entrar com PIN
+                </button>
+            </div>
+
+            <p id="erro-login" class="text-xs text-rose-500 hidden font-medium"></p>
         </div>
     </div>
 
-    <!-- CONTEÚDO DO SITE -->
+    <!-- CONTEÚDO PRINCIPAL -->
     <div id="conteudo-site" class="hidden">
         
-        <!-- TOPO FIXO SUPER COMPACTO -->
-        <div class="sticky top-0 z-40 bg-white/95 dark:bg-gray-900/95 backdrop-blur-md shadow-sm border-b border-gray-100 dark:border-gray-800 transition-colors">
-            <div class="max-w-4xl mx-auto p-3 space-y-2">
+        <!-- TOPO FIXO -->
+        <header class="sticky top-0 z-40 bg-white/90 dark:bg-slate-900/90 backdrop-blur-md shadow-sm border-b border-slate-200/80 dark:border-slate-800/80">
+            <div class="max-w-3xl mx-auto p-3.5 space-y-2.5">
                 
-                <!-- LINHA 1: TÍTULO + SINCRONIZAR + RELATÓRIO -->
+                <!-- Barra superior -->
                 <div class="flex justify-between items-center">
                     <div>
-                        <h1 class="text-base sm:text-lg font-bold text-gray-900 dark:text-white flex items-center gap-1.5">🛒 Lista de Compras</h1>
-                        <p id="saudacao-usuario" class="text-[11px] text-gray-500 dark:text-gray-400">Olá!</p>
+                        <h1 class="text-base sm:text-lg font-bold text-slate-900 dark:text-white flex items-center gap-1.5">
+                            <span>🛒</span> Lista de Compras
+                        </h1>
+                        <p id="saudacao-usuario" class="text-[11px] text-slate-500 dark:text-slate-400">Pronta para as compras</p>
                     </div>
-                    <div class="flex gap-1.5">
-                        <button onclick="sincronizarComNuvemManual()" class="bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 text-gray-700 dark:text-gray-200 px-2.5 py-1.5 rounded-xl text-xs font-bold transition" title="Sincronizar com Nuvem">🔄 Sincronizar</button>
-                        <button onclick="abrirRelatorioAnual()" class="bg-amber-600 hover:bg-amber-700 text-white px-3 py-1.5 rounded-xl text-xs font-medium transition shadow-sm flex items-center gap-1">
-                            📊 Relatório Anual
+                    <div class="flex gap-2">
+                        <button onclick="sincronizarComNuvemManual()" class="bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 px-3 py-1.5 rounded-xl text-xs font-semibold transition flex items-center gap-1">
+                            🔄 Sync
+                        </button>
+                        <button onclick="abrirRelatorioAnual()" class="bg-amber-600 hover:bg-amber-700 text-white px-3 py-1.5 rounded-xl text-xs font-semibold transition shadow-sm flex items-center gap-1">
+                            📊 Relatório
                         </button>
                     </div>
                 </div>
 
-                <!-- LINHA 2: SELETOR DE MÊS E ANO -->
-                <div class="flex items-center justify-between bg-blue-50 dark:bg-blue-950/40 border border-blue-100 dark:border-blue-900/50 p-2 rounded-xl">
-                    <span class="text-xs font-semibold text-blue-700 dark:text-blue-300 uppercase px-1">📅 Mês:</span>
-                    <div class="flex gap-1">
-                        <select id="filtro-mes-ano" onchange="mudarMesReferencia()" class="bg-white dark:bg-gray-900 text-gray-800 dark:text-white px-2.5 py-1 rounded-lg text-xs font-semibold border border-blue-200 dark:border-blue-800 focus:outline-none focus:ring-1 focus:ring-blue-500">
+                <!-- Seletor Mês e Ano -->
+                <div class="flex items-center justify-between bg-blue-50/80 dark:bg-blue-950/30 border border-blue-100 dark:border-blue-900/40 p-2 rounded-2xl">
+                    <span class="text-xs font-semibold text-blue-700 dark:text-blue-300 uppercase px-1">📅 Período:</span>
+                    <div class="flex gap-1.5">
+                        <select id="filtro-mes-ano" onchange="mudarMesReferencia()" class="bg-white dark:bg-slate-900 text-slate-800 dark:text-white px-2.5 py-1.5 rounded-xl text-xs font-semibold border border-blue-200 dark:border-blue-800 focus:ring-1 focus:ring-blue-500">
                             <option value="Janeiro">Janeiro</option>
                             <option value="Fevereiro">Fevereiro</option>
-                            <option value="Marco">Março</option>
+                            <option value="Março">Março</option>
                             <option value="Abril">Abril</option>
                             <option value="Maio">Maio</option>
                             <option value="Junho">Junho</option>
@@ -87,244 +111,190 @@
                             <option value="Novembro">Novembro</option>
                             <option value="Dezembro">Dezembro</option>
                         </select>
-                        <select id="filtro-ano" onchange="mudarMesReferencia()" class="bg-white dark:bg-gray-900 text-gray-800 dark:text-white px-2 py-1 rounded-lg text-xs font-semibold border border-blue-200 dark:border-blue-800 focus:outline-none focus:ring-1 focus:ring-blue-500">
-                            <option value="2026">2026</option>
-                            <option value="2027">2027</option>
+                        <select id="filtro-ano" onchange="mudarMesReferencia()" class="bg-white dark:bg-slate-900 text-slate-800 dark:text-white px-2.5 py-1.5 rounded-xl text-xs font-semibold border border-blue-200 dark:border-blue-800 focus:ring-1 focus:ring-blue-500">
+                            <!-- Preenchido via script -->
                         </select>
                     </div>
                 </div>
 
-                <!-- LINHA 3: ORÇAMENTOS DISPONÍVEIS (ALELO + ESPÉCIE + SOMA) -->
+                <!-- Cards de Orçamento -->
                 <div class="grid grid-cols-3 gap-2">
                     <!-- Alelo -->
-                    <div class="bg-rose-50/70 dark:bg-rose-950/30 p-2 rounded-xl border border-rose-200/60 dark:border-rose-900/50 relative">
+                    <div onclick="abrirModalOrcamento('alelo')" class="bg-rose-50/80 dark:bg-rose-950/20 p-2.5 rounded-2xl border border-rose-200/70 dark:border-rose-900/40 cursor-pointer active:scale-98 transition">
                         <div class="flex justify-between items-center">
-                            <p class="text-[10px] font-bold text-[#d60036] dark:text-rose-400 uppercase tracking-tight">💳 Alelo</p>
-                            <button onclick="alterarTicket()" class="text-[10px] text-[#d60036] dark:text-rose-400 font-bold hover:underline">✏️</button>
+                            <p class="text-[10px] font-bold text-[#d60036] dark:text-rose-400 uppercase">💳 Alelo</p>
+                            <span class="text-[10px] text-rose-500">✏️</span>
                         </div>
                         <p id="saldo-ticket" class="text-xs sm:text-sm font-black text-[#d60036] dark:text-rose-300 mt-0.5">R$ 0,00</p>
                     </div>
 
-                    <!-- Dinheiro em Espécie -->
-                    <div class="bg-emerald-50/70 dark:bg-emerald-950/30 p-2 rounded-xl border border-emerald-200/60 dark:border-emerald-900/50 relative">
+                    <!-- Dinheiro -->
+                    <div onclick="abrirModalOrcamento('dinheiro')" class="bg-emerald-50/80 dark:bg-emerald-950/20 p-2.5 rounded-2xl border border-emerald-200/70 dark:border-emerald-900/40 cursor-pointer active:scale-98 transition">
                         <div class="flex justify-between items-center">
-                            <p class="text-[10px] font-bold text-emerald-700 dark:text-emerald-400 uppercase tracking-tight">💵 Espécie</p>
-                            <button onclick="alterarDinheiro()" class="text-[10px] text-emerald-700 dark:text-emerald-400 font-bold hover:underline">✏️</button>
+                            <p class="text-[10px] font-bold text-emerald-700 dark:text-emerald-400 uppercase">💵 Espécie</p>
+                            <span class="text-[10px] text-emerald-500">✏️</span>
                         </div>
                         <p id="saldo-dinheiro" class="text-xs sm:text-sm font-black text-emerald-700 dark:text-emerald-300 mt-0.5">R$ 0,00</p>
                     </div>
 
-                    <!-- Total Inicial Somado -->
-                    <div class="bg-blue-50/70 dark:bg-blue-950/30 p-2 rounded-xl border border-blue-200/60 dark:border-blue-900/50">
-                        <p class="text-[10px] font-bold text-blue-700 dark:text-blue-400 uppercase tracking-tight">∑ Orçado</p>
+                    <!-- Total Orçado -->
+                    <div class="bg-blue-50/80 dark:bg-blue-950/20 p-2.5 rounded-2xl border border-blue-200/70 dark:border-blue-900/40">
+                        <p class="text-[10px] font-bold text-blue-700 dark:text-blue-400 uppercase">∑ Orçado</p>
                         <p id="orcamento-total-combinado" class="text-xs sm:text-sm font-black text-blue-800 dark:text-blue-300 mt-0.5">R$ 0,00</p>
                     </div>
                 </div>
 
             </div>
-        </div>
+        </header>
 
-        <!-- CONTEÚDO PRINCIPAL -->
-        <div class="max-w-4xl mx-auto p-4 sm:p-6 space-y-4">
+        <!-- CORPO DA PÁGINA -->
+        <main class="max-w-3xl mx-auto p-4 space-y-4">
             
-            <!-- FORMULÁRIO DE ADIÇÃO -->
-            <div class="bg-white dark:bg-gray-800 p-4 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700">
-                <div class="flex justify-between items-center mb-2">
-                    <h2 id="form-titulo" class="text-sm font-semibold text-gray-900 dark:text-white">Adicionar Novo Produto</h2>
-                </div>
+            <!-- FORMULÁRIO -->
+            <section class="bg-white dark:bg-slate-900 p-4 rounded-3xl shadow-sm border border-slate-200/80 dark:border-slate-800">
+                <h2 id="form-titulo" class="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-2.5">Adicionar Novo Produto</h2>
                 
                 <form id="form-compra" class="space-y-2.5" onsubmit="salvarItemCompra(event)">
                     <input type="hidden" id="edit-compra-id">
                     
-                    <div class="grid grid-cols-12 gap-1.5 items-end">
+                    <div class="grid grid-cols-12 gap-2 items-end">
                         <div class="col-span-6">
-                            <label class="block text-[10px] font-semibold text-gray-500 dark:text-gray-400 uppercase mb-0.5">Produto</label>
-                            <input type="text" id="compra-nome" required placeholder="Ex: Arroz" class="w-full px-2.5 py-2 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-blue-500 dark:text-white">
+                            <label class="block text-[10px] font-semibold text-slate-500 uppercase mb-1">Produto</label>
+                            <input type="text" id="compra-nome" required placeholder="Ex: Arroz, Café..." class="w-full px-3 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs focus:ring-2 focus:ring-blue-500 text-slate-900 dark:text-white">
                         </div>
-                        <div class="col-span-2">
-                            <label class="block text-[10px] font-semibold text-gray-500 dark:text-gray-400 uppercase mb-0.5">Qtd</label>
-                            <input type="number" id="compra-qtd" required min="1" value="1" class="w-full px-1 py-2 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl text-xs text-center focus:outline-none focus:ring-2 focus:ring-blue-500 dark:text-white">
+                        <div class="col-span-3">
+                            <label class="block text-[10px] font-semibold text-slate-500 uppercase mb-1">Qtd</label>
+                            <input type="number" id="compra-qtd" required min="0.1" step="any" value="1" class="w-full px-2 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs text-center focus:ring-2 focus:ring-blue-500 text-slate-900 dark:text-white">
                         </div>
-                        <div class="col-span-4">
-                            <label class="block text-[10px] font-semibold text-gray-500 dark:text-gray-400 uppercase mb-0.5">Preço (R$)</label>
-                            <input type="number" id="compra-preco" required step="0.01" min="0" placeholder="0,00" class="w-full px-2 py-2 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-blue-500 dark:text-white">
+                        <div class="col-span-3">
+                            <label class="block text-[10px] font-semibold text-slate-500 uppercase mb-1">Preço Un (R$)</label>
+                            <input type="number" id="compra-preco" required step="0.01" min="0" placeholder="0,00" class="w-full px-3 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs focus:ring-2 focus:ring-blue-500 text-slate-900 dark:text-white">
                         </div>
                     </div>
 
                     <div class="flex gap-2 pt-1">
-                        <button type="submit" id="btn-submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 rounded-xl transition text-sm shadow-sm">
+                        <button type="submit" id="btn-submit" class="w-full bg-blue-600 hover:bg-blue-700 active:scale-98 text-white font-medium py-2.5 rounded-xl transition text-xs shadow-sm">
                             ➕ Adicionar à Lista
                         </button>
-                        <button type="button" id="btn-cancelar" onclick="cancelarEdicao()" class="hidden bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 text-gray-700 dark:text-gray-200 px-3 py-2 rounded-xl text-sm transition">
+                        <button type="button" id="btn-cancelar" onclick="cancelarEdicao()" class="hidden bg-slate-200 dark:bg-slate-800 hover:bg-slate-300 text-slate-700 dark:text-slate-300 px-4 py-2.5 rounded-xl text-xs transition">
                             Cancelar
                         </button>
                     </div>
                 </form>
-            </div>
+            </section>
 
-            <!-- PAINEL DE RESUMO: TOTAL GASTO E RESTANTE (EM CIMA DA LISTA) -->
-            <div class="bg-gradient-to-r from-gray-900 to-gray-800 dark:from-gray-800 dark:to-gray-950 text-white p-3.5 rounded-2xl shadow-md flex justify-between items-center px-4">
-                <div>
-                    <span class="block text-[10px] font-semibold uppercase tracking-wider text-gray-400">Total Gasto no Mês</span>
-                    <span id="total-geral" class="text-base sm:text-lg font-black text-white">R$ 0,00</span>
+            <!-- RESUMO EM CARDS (CARRINHO, TOTAL E SOBRA) -->
+            <section class="bg-gradient-to-br from-slate-900 via-slate-800 to-slate-950 text-white p-4 rounded-3xl shadow-lg grid grid-cols-3 gap-2 text-center divide-x divide-slate-800">
+                <div class="px-1">
+                    <span class="block text-[9px] font-semibold uppercase tracking-wider text-slate-400">No Carrinho</span>
+                    <span id="total-carrinho" class="text-xs sm:text-base font-black text-emerald-400 mt-1 block">R$ 0,00</span>
                 </div>
-                <div class="h-8 w-px bg-gray-700/80"></div>
-                <div class="text-right">
-                    <span class="block text-[10px] font-semibold uppercase tracking-wider text-gray-400">Sobra / Restante</span>
-                    <span id="saldo-restante-final" class="text-base sm:text-lg font-black text-emerald-400">R$ 0,00</span>
+                <div class="px-1">
+                    <span class="block text-[9px] font-semibold uppercase tracking-wider text-slate-400">Total Previsto</span>
+                    <span id="total-geral" class="text-xs sm:text-base font-black text-white mt-1 block">R$ 0,00</span>
                 </div>
-            </div>
+                <div class="px-1">
+                    <span class="block text-[9px] font-semibold uppercase tracking-wider text-slate-400">Restante</span>
+                    <span id="saldo-restante-final" class="text-xs sm:text-base font-black text-emerald-400 mt-1 block">R$ 0,00</span>
+                </div>
+            </section>
 
-            <!-- TABELA DE ITENS -->
-            <div class="bg-white dark:bg-gray-800 p-4 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 space-y-3">
+            <!-- TABELA / LISTA DE PRODUTOS -->
+            <section class="bg-white dark:bg-slate-900 p-4 rounded-3xl shadow-sm border border-slate-200/80 dark:border-slate-800 space-y-3">
                 <div class="flex justify-between items-center">
-                    <h3 id="status-progresso" class="text-sm font-semibold text-gray-900 dark:text-white">Itens na Lista (0)</h3>
-                    <div class="flex gap-2">
-                        <button onclick="limparListaCompras()" class="text-xs text-red-500 hover:underline">Limpar Mês</button>
-                    </div>
+                    <h3 id="status-progresso" class="text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wide">Itens na Lista (0)</h3>
+                    <button onclick="solicitarLimparLista()" class="text-xs text-rose-500 hover:text-rose-600 font-medium">Limpar Mês</button>
                 </div>
 
-                <div class="overflow-x-auto">
-                    <table class="w-full text-left border-collapse">
-                        <thead>
-                            <tr class="border-b border-gray-100 dark:border-gray-700 text-[10px] font-semibold text-gray-400 uppercase">
-                                <th class="py-2 px-2">Item / Detalhes</th>
-                                <th class="py-2 px-2 text-center w-24">Ações</th>
-                            </tr>
-                        </thead>
-                        <tbody id="tabela-compras" class="divide-y divide-gray-50 dark:divide-gray-700 text-sm">
-                            <tr>
-                                <td colspan="2" class="py-6 text-center text-gray-400 text-xs">Nenhum item neste mês. Use o microfone abaixo para adicionar!</td>
-                            </tr>
-                        </tbody>
-                    </table>
+                <div id="container-itens" class="divide-y divide-slate-100 dark:divide-slate-800">
+                    <!-- Itens inseridos via script -->
                 </div>
+            </section>
+
+        </main>
+    </div>
+
+    <!-- MODAL DE ORÇAMENTO (SUBSTITUI PROMPT) -->
+    <div id="modal-orcamento" class="fixed inset-0 z-50 bg-slate-950/70 backdrop-blur-sm hidden flex items-center justify-center p-4">
+        <div class="bg-white dark:bg-slate-900 p-6 rounded-3xl shadow-2xl max-w-xs w-full space-y-4 border border-slate-200 dark:border-slate-800">
+            <h3 id="modal-orcamento-titulo" class="text-base font-bold text-slate-900 dark:text-white">Ajustar Orçamento</h3>
+            <p id="modal-orcamento-desc" class="text-xs text-slate-500">Defina o valor para este mês:</p>
+            
+            <input type="number" step="0.01" min="0" id="input-orcamento-valor" class="w-full px-3 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-sm focus:ring-2 focus:ring-blue-500 text-slate-900 dark:text-white font-bold">
+            
+            <div class="flex gap-2">
+                <button onclick="fecharModalOrcamento()" class="flex-1 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 py-2.5 rounded-xl text-xs font-semibold">Cancelar</button>
+                <button onclick="confirmarModalOrcamento()" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white py-2.5 rounded-xl text-xs font-semibold">Salvar</button>
             </div>
-
         </div>
     </div>
 
-    <!-- MODAL DE RELATÓRIO ANUAL -->
-    <div id="modal-relatorio" class="fixed inset-0 z-50 bg-gray-900/80 backdrop-blur-sm hidden flex items-center justify-center p-4">
-        <div class="bg-white dark:bg-gray-800 p-6 rounded-3xl shadow-2xl max-w-lg w-full space-y-4 border border-gray-100 dark:border-gray-700 max-h-[90vh] overflow-y-auto">
-            <div class="flex justify-between items-center border-b pb-3 dark:border-gray-700">
-                <h3 id="titulo-modal-ano" class="text-lg font-bold text-gray-900 dark:text-white">📊 Relatório Mês a Mês</h3>
-                <button onclick="fecharRelatorioAnual()" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 text-lg font-bold">✕</button>
+    <!-- MODAL DE CONFIRMAÇÃO (SUBSTITUI CONFIRM) -->
+    <div id="modal-confirmacao" class="fixed inset-0 z-50 bg-slate-950/70 backdrop-blur-sm hidden flex items-center justify-center p-4">
+        <div class="bg-white dark:bg-slate-900 p-6 rounded-3xl shadow-2xl max-w-xs w-full space-y-4 text-center border border-slate-200 dark:border-slate-800">
+            <div class="text-3xl">⚠️</div>
+            <h3 id="modal-confirma-titulo" class="text-base font-bold text-slate-900 dark:text-white">Confirmação</h3>
+            <p id="modal-confirma-msg" class="text-xs text-slate-500">Tem certeza que deseja prosseguir?</p>
+            
+            <div class="flex gap-2 pt-2">
+                <button onclick="fecharModalConfirma()" class="flex-1 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 py-2.5 rounded-xl text-xs font-semibold">Não</button>
+                <button id="btn-confirma-acao" class="flex-1 bg-rose-600 hover:bg-rose-700 text-white py-2.5 rounded-xl text-xs font-semibold">Sim, Excluir</button>
             </div>
-            <div id="conteudo-relatorio-meses" class="space-y-2 text-sm">
-                <!-- Preenchido via JS -->
+        </div>
+    </div>
+
+    <!-- MODAL RELATÓRIO ANUAL -->
+    <div id="modal-relatorio" class="fixed inset-0 z-50 bg-slate-950/70 backdrop-blur-sm hidden flex items-center justify-center p-4">
+        <div class="bg-white dark:bg-slate-900 p-6 rounded-3xl shadow-2xl max-w-md w-full space-y-4 border border-slate-200 dark:border-slate-800 max-h-[85vh] flex flex-col">
+            <div class="flex justify-between items-center border-b pb-3 dark:border-slate-800">
+                <h3 id="titulo-modal-ano" class="text-base font-bold text-slate-900 dark:text-white">📊 Relatório Mês a Mês</h3>
+                <button onclick="fecharRelatorioAnual()" class="text-slate-400 hover:text-slate-600 text-lg font-bold">✕</button>
             </div>
-            <div class="border-t pt-3 flex justify-between items-center font-bold text-base dark:border-gray-700 text-gray-900 dark:text-white">
-                <span>Total Acumulado do Ano:</span>
+            
+            <div id="conteudo-relatorio-meses" class="space-y-2 text-sm overflow-y-auto flex-1 pr-1"></div>
+            
+            <div class="border-t pt-3 flex justify-between items-center font-bold text-sm dark:border-slate-800">
+                <span>Total Acumulado:</span>
                 <span id="modal-total-ano" class="text-amber-600 dark:text-amber-400">R$ 0,00</span>
             </div>
-            <button onclick="fecharRelatorioAnual()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2.5 rounded-xl transition text-sm">
-                Fechar Relatório
+            
+            <button onclick="fecharRelatorioAnual()" class="w-full bg-blue-600 hover:bg-blue-700 text-white py-2.5 rounded-xl text-xs font-semibold">
+                Fechar
             </button>
         </div>
     </div>
 
-    <!-- BARRA INFERIOR COM BOTÕES UTILITÁRIOS E MICROFONE -->
-    <div class="fixed bottom-0 left-0 right-0 z-40 bg-white/90 dark:bg-gray-900/90 backdrop-blur-md border-t border-gray-200 dark:border-gray-800 px-4 py-2.5 flex justify-between items-center max-w-4xl mx-auto rounded-t-2xl shadow-lg">
-        <div class="flex items-center gap-2">
-            <button onclick="alternarDarkMode()" class="px-3 py-1.5 rounded-xl bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300 text-xs font-medium transition flex items-center gap-1" title="Modo Escuro">
-                🌙/☀️ Tema
+    <!-- BARRA INFERIOR FIXA -->
+    <nav class="fixed bottom-0 left-0 right-0 z-40 bg-white/90 dark:bg-slate-900/90 backdrop-blur-md border-t border-slate-200/80 dark:border-slate-800/80 px-4 py-2 flex justify-between items-center max-w-3xl mx-auto rounded-t-3xl shadow-xl">
+        <div class="flex items-center gap-1.5 overflow-x-auto">
+            <button onclick="alternarDarkMode()" class="px-2.5 py-1.5 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 text-xs font-medium" title="Tema">
+                🌙/☀️
             </button>
-            <button onclick="instalarApp()" class="px-3 py-1.5 rounded-xl bg-blue-50 dark:bg-blue-950/50 text-blue-600 dark:text-blue-300 text-xs font-medium transition flex items-center gap-1" title="Instalar App no Celular">
-                📱 Instalar App
+            <button onclick="instalarApp()" class="px-2.5 py-1.5 rounded-xl bg-blue-50 dark:bg-blue-950/50 text-blue-600 dark:text-blue-300 text-xs font-medium" title="Instalar">
+                📱 App
             </button>
-            <button onclick="partilharWhatsApp()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-1.5 rounded-xl text-xs font-medium transition flex items-center gap-1 shadow-sm">
-                📱 WhatsApp
+            <button onclick="partilharWhatsApp()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-2.5 py-1.5 rounded-xl text-xs font-medium shadow-sm flex items-center gap-1">
+                💬 WhatsApp
             </button>
-            <button onclick="bloquearNovamente()" class="px-3 py-1.5 rounded-xl bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300 text-xs font-medium transition flex items-center gap-1 md:hidden" title="Bloquear Celular">
-                🔒 Bloquear
+            <button onclick="bloquearApp()" class="px-2.5 py-1.5 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 text-xs font-medium" title="Bloquear">
+                🔒 Sair
             </button>
         </div>
-        <!-- MICROFONE FLUTUANTE NA BARRA -->
-        <button onclick="ouvirVoz()" id="btn-voz-flutuante" class="bg-red-600 hover:bg-red-700 text-white w-12 h-12 rounded-full shadow-lg flex items-center justify-center text-xl transition transform hover:scale-105 active:scale-95" title="Falar e Adicionar Automaticamente">
+
+        <!-- Botão de Voz -->
+        <button onclick="ouvirVoz()" id="btn-voz-flutuante" class="bg-rose-600 hover:bg-rose-700 text-white w-12 h-12 rounded-2xl shadow-lg flex items-center justify-center text-xl transition active:scale-90 ml-2 shrink-0" title="Falar e Adicionar">
             🎤
         </button>
-    </div>
+    </nav>
 
-    <!-- LÓGICA COM SUPABASE & BIO-LOCK EXCLUSIVO -->
+    <!-- SCRIPTS -->
     <script>
         const SUPABASE_URL = 'https://jmeepzdvmmjngxwvayqb.supabase.co';
         const SUPABASE_ANON_KEY = 'sb_publishable_54ORrLbP7naW7n-KlKCdUA_hZnpjguH';
         const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-        let deferredPrompt = null;
-        let dadosGlobaisNuvem = {};
-
-        window.addEventListener('beforeinstallprompt', (e) => {
-            e.preventDefault();
-            deferredPrompt = e;
-        });
-
-        function instalarApp() {
-            if (deferredPrompt) {
-                deferredPrompt.prompt();
-                deferredPrompt.userChoice.then((choiceResult) => {
-                    deferredPrompt = null;
-                });
-            } else {
-                alert("📱 Para instalar no celular:\n\n• No Android (Chrome): Toque nos 3 pontinhos e selecione 'Adicionar à tela inicial'.\n• No iPhone (Safari): Toque no botão de Compartilhar e escolha 'Adicionar à Tela de Início'.");
-            }
-        }
-
-        async function sincronizarComNuvem() {
-            try {
-                let { data, error } = await supabaseClient
-                    .from('app_dados_compras')
-                    .select('conteudo')
-                    .eq('id', '1')
-                    .single();
-
-                if (data && data.conteudo) {
-                    dadosGlobaisNuvem = data.conteudo;
-                    if (dadosGlobaisNuvem.historico_compras) {
-                        localStorage.setItem('historico_compras_mensal', JSON.stringify(dadosGlobaisNuvem.historico_compras));
-                    }
-                    if (dadosGlobaisNuvem.historico_ticket) {
-                        localStorage.setItem('historico_ticket_mensal', JSON.stringify(dadosGlobaisNuvem.historico_ticket));
-                    }
-                    if (dadosGlobaisNuvem.historico_dinheiro) {
-                        localStorage.setItem('historico_dinheiro_mensal', JSON.stringify(dadosGlobaisNuvem.historico_dinheiro));
-                    }
-                } else {
-                    await salvarNaNuvem();
-                }
-            } catch(e) {
-                console.error("Erro ao sincronizar com nuvem:", e);
-            }
-        }
-
-        async function salvarNaNuvem() {
-            let comprasLocal = JSON.parse(localStorage.getItem('historico_compras_mensal') || '{}');
-            let ticketLocal = JSON.parse(localStorage.getItem('historico_ticket_mensal') || '{}');
-            let dinheiroLocal = JSON.parse(localStorage.getItem('historico_dinheiro_mensal') || '{}');
-
-            dadosGlobaisNuvem = {
-                historico_compras: comprasLocal,
-                historico_ticket: ticketLocal,
-                historico_dinheiro: dinheiroLocal
-            };
-
-            try {
-                await supabaseClient
-                    .from('app_dados_compras')
-                    .upsert({ id: '1', conteudo: dadosGlobaisNuvem });
-            } catch (err) {
-                console.error("Erro ao gravar na nuvem:", err);
-            }
-        }
-
-        async function sincronizarComNuvemManual() {
-            await sincronizarComNuvem();
-            renderizarTabelaCompras();
-            alert("✅ Sincronizado com sucesso com a nuvem!");
-        }
-
-        const mesesArray = ['Janeiro', 'Fevereiro', 'Marco', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'];
+        const PIN_PADRAO = '1234'; // Altere conforme desejar
+        const mesesArray = ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'];
         const dataHoje = new Date();
         const mesRealAtual = mesesArray[dataHoje.getMonth()];
         const anoRealAtual = String(dataHoje.getFullYear());
@@ -333,125 +303,165 @@
         let anoSelecionado = localStorage.getItem('ultimo_ano') || anoRealAtual;
         let chaveMesAno = `${mesSelecionado}_${anoSelecionado}`;
 
-        // --- SISTEMA DE VERIFICAÇÃO BIOMÉTRICA EXCLUSIVA ---
-        function ehDispositivoMovel() {
-            return window.innerWidth < 768;
+        let deferredPrompt = null;
+        let orcamentoModalTipo = null;
+        let acaoConfirmacaoPendente = null;
+
+        // --- INICIALIZAÇÃO ---
+        window.addEventListener('DOMContentLoaded', () => {
+            if (localStorage.getItem('dark_mode') === 'true') {
+                document.documentElement.classList.add('dark');
+            }
+            inicializarSeletorAnos();
+
+            if (sessionStorage.getItem('autenticado_site') === 'true') {
+                liberarAcesso();
+            } else {
+                bloquearApp();
+                // Tenta biometria automática em celulares compatíveis
+                if (window.innerWidth < 768 && window.PublicKeyCredential) {
+                    setTimeout(entrarComBiometria, 400);
+                }
+            }
+        });
+
+        function inicializarSeletorAnos() {
+            const selectAno = document.getElementById('filtro-ano');
+            const anoAtual = new Date().getFullYear();
+            selectAno.innerHTML = '';
+            for (let a = anoAtual - 1; a <= anoAtual + 2; a++) {
+                const opt = document.createElement('option');
+                opt.value = String(a);
+                opt.textContent = String(a);
+                if (String(a) === anoSelecionado) opt.selected = true;
+                selectAno.appendChild(opt);
+            }
         }
 
-        function bloquearNovamente() {
-            if (!ehDispositivoMovel()) return; // Computador nunca bloqueia
+        // --- SISTEMA DE AUTENTICAÇÃO ---
+        function bloquearApp() {
             sessionStorage.removeItem('autenticado_site');
             document.getElementById('conteudo-site').classList.add('hidden');
-            const telaLogin = document.getElementById('tela-login');
-            telaLogin.classList.remove('hidden');
-            document.getElementById('erro-senha').classList.add('hidden');
+            document.getElementById('tela-login').classList.remove('hidden');
+            document.getElementById('erro-login').classList.add('hidden');
         }
 
         async function liberarAcesso() {
+            sessionStorage.setItem('autenticado_site', 'true');
             await sincronizarComNuvem();
             document.getElementById('tela-login').classList.add('hidden');
             document.getElementById('conteudo-site').classList.remove('hidden');
             
-            document.getElementById('saudacao-usuario').textContent = `Bem-vinda, Mariana!`;
             document.getElementById('filtro-mes-ano').value = mesSelecionado;
             document.getElementById('filtro-ano').value = anoSelecionado;
-
             renderizarTabelaCompras();
         }
 
+        function entrarComPin() {
+            const pinDigitado = document.getElementById('input-pin').value;
+            const erroEl = document.getElementById('erro-login');
+            if (pinDigitado === PIN_PADRAO) {
+                document.getElementById('input-pin').value = '';
+                liberarAcesso();
+            } else {
+                erroEl.textContent = "PIN incorreto. Tente novamente.";
+                erroEl.classList.remove('hidden');
+            }
+        }
+
         async function entrarComBiometria() {
-            const erroEl = document.getElementById('erro-senha');
+            const erroEl = document.getElementById('erro-login');
             erroEl.classList.add('hidden');
 
             if (!window.PublicKeyCredential) {
-                erroEl.innerText = "Biometria indisponível neste navegador.";
+                erroEl.textContent = "Biometria indisponível neste navegador. Use o PIN.";
                 erroEl.classList.remove('hidden');
                 return;
             }
+
             try {
                 const available = await PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable();
-                if (!available) { 
-                    erroEl.innerText = "Nenhuma biometria ativa configurada no aparelho.";
+                if (!available) {
+                    erroEl.textContent = "Nenhum leitor biométrico detectado. Use o PIN.";
                     erroEl.classList.remove('hidden');
-                    return; 
+                    return;
                 }
 
                 const challenge = new Uint8Array(32); window.crypto.getRandomValues(challenge);
                 const userId = new Uint8Array(16); window.crypto.getRandomValues(userId);
 
                 const createCredentialOptions = {
-                    challenge: challenge, rp: { name: "Lista de Compras", id: window.location.hostname },
-                    user: { id: userId, name: "mariana@compras.local", displayName: "Mariana" },
+                    challenge, rp: { name: "Lista de Compras", id: window.location.hostname },
+                    user: { id: userId, name: "usuario@compras.local", displayName: "Usuário" },
                     pubKeyCredParams: [{ alg: -7, type: "public-key" }, { alg: -257, type: "public-key" }],
-                    authenticatorSelection: { authenticatorAttachment: "platform", userVerification: "required", residentKey: "preferred" },
+                    authenticatorSelection: { authenticatorAttachment: "platform", userVerification: "required" },
                     timeout: 60000
                 };
 
-                let cred; const credentialIdStr = localStorage.getItem('biometria_cred_id');
-                if (credentialIdStr) {
+                let cred;
+                const credId = localStorage.getItem('biometria_cred_id');
+                if (credId) {
                     try {
-                        const rawId = Uint8Array.from(atob(credentialIdStr), c => c.charCodeAt(0));
-                        cred = await navigator.credentials.get({ challenge, allowCredentials: [{ id: rawId, type: "public-key" }], userVerification: "required", timeout: 60000 });
-                    } catch (err) {
+                        const rawId = Uint8Array.from(atob(credId), c => c.charCodeAt(0));
+                        cred = await navigator.credentials.get({ challenge, allowCredentials: [{ id: rawId, type: "public-key" }], userVerification: "required" });
+                    } catch (e) {
                         cred = await navigator.credentials.create({ publicKey: createCredentialOptions });
-                        localStorage.setItem('biometria_cred_id', btoa(String.fromCharCode.apply(null, new Uint8Array(cred.rawId))));
+                        localStorage.setItem('biometria_cred_id', btoa(String.fromCharCode(...new Uint8Array(cred.rawId))));
                     }
                 } else {
                     cred = await navigator.credentials.create({ publicKey: createCredentialOptions });
-                    localStorage.setItem('biometria_cred_id', btoa(String.fromCharCode.apply(null, new Uint8Array(cred.rawId))));
+                    localStorage.setItem('biometria_cred_id', btoa(String.fromCharCode(...new Uint8Array(cred.rawId))));
                 }
 
-                if (cred) {
-                    sessionStorage.setItem('autenticado_site', 'true');
-                    liberarAcesso();
-                }
-            } catch (error) {
-                if (error.name !== "NotAllowedError") {
-                    erroEl.innerText = "Falha biométrica. Tente novamente.";
+                if (cred) liberarAcesso();
+            } catch (err) {
+                if (err.name !== "NotAllowedError") {
+                    erroEl.textContent = "Falha na leitura biométrica. Use o PIN.";
                     erroEl.classList.remove('hidden');
                 }
             }
         }
 
-        // Auto-Lock ao minimizar ou apagar o ecrã no telemóvel
-        document.addEventListener('visibilitychange', () => {
-            if (document.hidden) {
-                bloquearNovamente();
-            } else if (ehDispositivoMovel() && sessionStorage.getItem('autenticado_site') !== 'true') {
-                setTimeout(entrarComBiometria, 300);
+        // --- SINCRONIZAÇÃO COM SUPABASE ---
+        async function sincronizarComNuvem() {
+            try {
+                let { data } = await supabaseClient
+                    .from('app_dados_compras')
+                    .select('conteudo')
+                    .eq('id', '1')
+                    .single();
+
+                if (data && data.conteudo) {
+                    if (data.conteudo.historico_compras) localStorage.setItem('historico_compras_mensal', JSON.stringify(data.conteudo.historico_compras));
+                    if (data.conteudo.historico_ticket) localStorage.setItem('historico_ticket_mensal', JSON.stringify(data.conteudo.historico_ticket));
+                    if (data.conteudo.historico_dinheiro) localStorage.setItem('historico_dinheiro_mensal', JSON.stringify(data.conteudo.historico_dinheiro));
+                } else {
+                    await salvarNaNuvem();
+                }
+            } catch (e) {
+                console.warn("Offline ou erro de nuvem:", e);
             }
-        });
-
-        window.addEventListener('blur', () => {
-            bloquearNovamente();
-        });
-
-        window.addEventListener('DOMContentLoaded', async () => {
-            if (localStorage.getItem('dark_mode') === 'true') {
-                document.documentElement.classList.add('dark');
-            }
-
-            // No computador: entra direto
-            if (!ehDispositivoMovel()) {
-                sessionStorage.setItem('autenticado_site', 'true');
-                await liberarAcesso();
-                return;
-            }
-
-            // No celular: verifica sessão ou dispara biometria
-            if (sessionStorage.getItem('autenticado_site') === 'true') {
-                await liberarAcesso();
-            } else {
-                bloquearNovamente();
-                setTimeout(entrarComBiometria, 400);
-            }
-        });
-
-        function alternarDarkMode() {
-            document.documentElement.classList.toggle('dark');
-            localStorage.setItem('dark_mode', document.documentElement.classList.contains('dark'));
         }
 
+        async function salvarNaNuvem() {
+            const payload = {
+                historico_compras: JSON.parse(localStorage.getItem('historico_compras_mensal') || '{}'),
+                historico_ticket: JSON.parse(localStorage.getItem('historico_ticket_mensal') || '{}'),
+                historico_dinheiro: JSON.parse(localStorage.getItem('historico_dinheiro_mensal') || '{}')
+            };
+            try {
+                await supabaseClient.from('app_dados_compras').upsert({ id: '1', conteudo: payload });
+            } catch (err) {
+                console.error("Erro ao gravar:", err);
+            }
+        }
+
+        async function sincronizarComNuvemManual() {
+            await sincronizarComNuvem();
+            renderizarTabelaCompras();
+        }
+
+        // --- NAVEGAÇÃO DE PERÍODO ---
         function mudarMesReferencia() {
             mesSelecionado = document.getElementById('filtro-mes-ano').value;
             anoSelecionado = document.getElementById('filtro-ano').value;
@@ -464,163 +474,71 @@
             cancelarEdicao();
         }
 
-        function formatarValorInput(str) {
-            if (!str) return 0;
-            let limpo = String(str).trim().replace(/\s/g, '').replace('R$', '').replace('r$', '');
-            if (limpo.includes(',')) {
-                limpo = limpo.replace(/\./g, '').replace(',', '.');
-            } else if (limpo.split('.').length > 2) {
-                limpo = limpo.replace(/\./g, (match, offset, string) => {
-                    return offset === string.lastIndexOf('.') ? '.' : '';
-                });
-            }
-            return parseFloat(limpo) || 0;
-        }
-
-        function ouvirVoz() {
-            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-            if (!SpeechRecognition) { alert("Reconhecimento de voz não suportado."); return; }
-
-            const recognition = new SpeechRecognition();
-            recognition.lang = 'pt-BR';
-            const btnFloat = document.getElementById('btn-voz-flutuante');
-
-            recognition.onstart = () => { if (btnFloat) btnFloat.classList.add('animate-pulse', 'bg-amber-500'); };
-            recognition.onresult = (event) => { processarFalaEAdicionar(event.results[0][0].transcript); };
-            recognition.onerror = recognition.onend = () => { resetarBotaoVoz(); };
-            recognition.start();
-        }
-
-        function resetarBotaoVoz() {
-            const btnFloat = document.getElementById('btn-voz-flutuante');
-            if (btnFloat) btnFloat.classList.remove('animate-pulse', 'bg-amber-500');
-        }
-
-        async function processarFalaEAdicionar(texto) {
-            let limpo = texto.toLowerCase().replace(/quantidade/g, '').replace(/reais/g, '').replace(/real/g, '').replace(/por/g, '');
-            const mapaNums = { 'um': '1', 'uma': '1', 'dois': '2', 'duas': '2', 'três': '3', 'tres': '3', 'quatro': '4', 'cinco': '5', 'seis': '6', 'sete': '7', 'oito': '8', 'nove': '9', 'dez': '10' };
-            let palavras = limpo.split(/\s+/);
-            let tokensProcessados = palavras.map(p => mapaNums[p] !== undefined ? mapaNums[p] : p);
-            let textoProcessado = tokensProcessados.join(' ').replace(/(\d+),(\d+)/g, '$1.$2');
-
-            let partes = textoProcessado.split(/\s+/);
-            let nomeArr = []; let numerosEncontrados = [];
-
-            partes.forEach(parte => {
-                let num = parseFloat(parte);
-                if (!isNaN(num) && parte.match(/^\d+(\.\d+)?$/)) { numerosEncontrados.push(num); }
-                else { if (numerosEncontrados.length === 0) nomeArr.push(parte); }
-            });
-
-            let nomeProduto = nomeArr.join(' ');
-            let qtd = 1; let preco = 0;
-
-            if (numerosEncontrados.length === 1) {
-                let n = numerosEncontrados[0];
-                if (String(n).includes('.') || n > 15) { preco = n; qtd = 1; } else { qtd = n; preco = 0; }
-            } else if (numerosEncontrados.length >= 2) {
-                qtd = numerosEncontrados[0]; preco = numerosEncontrados[1];
-            }
-
-            if (!nomeProduto) nomeProduto = texto;
-            nomeProduto = nomeProduto.charAt(0).toUpperCase() + nomeProduto.slice(1);
-
-            let lista = obterListaDoMes();
-            lista.push({ id: Date.now() + Math.random(), nome: nomeProduto, qtd: qtd > 0 ? qtd : 1, preco: preco > 0 ? preco : 0 });
-
-            guardarListaDoMes(lista);
-            await salvarNaNuvem();
-            renderizarTabelaCompras();
-            document.getElementById('tabela-compras').scrollIntoView({ behavior: 'smooth' });
-        }
-
-        function obterTicketDoMes() {
-            let cache = JSON.parse(localStorage.getItem('historico_ticket_mensal') || '{}');
-            return cache[chaveMesAno] !== undefined ? cache[chaveMesAno] : null;
-        }
-        async function guardarTicketDoMes(val) {
-            let cache = JSON.parse(localStorage.getItem('historico_ticket_mensal') || '{}');
-            cache[chaveMesAno] = val;
-            localStorage.setItem('historico_ticket_mensal', JSON.stringify(cache));
-            await salvarNaNuvem();
-        }
-        async function alterarTicket() {
-            let atual = obterTicketDoMes() || 0;
-            let val = prompt("Digite o valor do cartão ALELO para " + mesSelecionado + " de " + anoSelecionado + " (R$):", atual);
-            if (val !== null) {
-                await guardarTicketDoMes(formatarValorInput(val));
-                renderizarTabelaCompras();
-            }
-        }
-
-        function obterDinheiroDoMes() {
-            let cache = JSON.parse(localStorage.getItem('historico_dinheiro_mensal') || '{}');
-            return cache[chaveMesAno] !== undefined ? cache[chaveMesAno] : null;
-        }
-        async function guardarDinheiroDoMes(val) {
-            let cache = JSON.parse(localStorage.getItem('historico_dinheiro_mensal') || '{}');
-            cache[chaveMesAno] = val;
-            localStorage.setItem('historico_dinheiro_mensal', JSON.stringify(cache));
-            await salvarNaNuvem();
-        }
-        async function alterarDinheiro() {
-            let atual = obterDinheiroDoMes() || 0;
-            let val = prompt("Digite o valor em DINHEIRO (Espécie) para " + mesSelecionado + " de " + anoSelecionado + " (R$):", atual);
-            if (val !== null) {
-                await guardarDinheiroDoMes(formatarValorInput(val));
-                renderizarTabelaCompras();
-            }
-        }
-
+        // --- GETTERS E SETTERS ---
         function obterListaDoMes() {
-            let cacheGeral = JSON.parse(localStorage.getItem('historico_compras_mensal') || '{}');
-            return cacheGeral[chaveMesAno] || [];
+            const cache = JSON.parse(localStorage.getItem('historico_compras_mensal') || '{}');
+            return cache[chaveMesAno] || [];
         }
 
         function guardarListaDoMes(lista) {
-            let cacheGeral = JSON.parse(localStorage.getItem('historico_compras_mensal') || '{}');
-            cacheGeral[chaveMesAno] = lista;
-            localStorage.setItem('historico_compras_mensal', JSON.stringify(cacheGeral));
+            const cache = JSON.parse(localStorage.getItem('historico_compras_mensal') || '{}');
+            cache[chaveMesAno] = lista;
+            localStorage.setItem('historico_compras_mensal', JSON.stringify(cache));
         }
 
-        function calcularTotalAno() {
-            let cacheGeral = JSON.parse(localStorage.getItem('historico_compras_mensal') || '{}');
-            let totalAno = 0;
-            mesesArray.forEach(m => {
-                let chave = `${m}_${anoSelecionado}`;
-                let listaMes = cacheGeral[chave] || [];
-                listaMes.forEach(i => { totalAno += (i.qtd * i.preco); });
-            });
-            return totalAno;
+        function obterOrcamento(tipo) {
+            const chave = tipo === 'alelo' ? 'historico_ticket_mensal' : 'historico_dinheiro_mensal';
+            const cache = JSON.parse(localStorage.getItem(chave) || '{}');
+            return cache[chaveMesAno] || 0;
         }
 
-        function abrirRelatorioAnual() {
-            document.getElementById('titulo-modal-ano').textContent = `📊 Relatório Mês a Mês (${anoSelecionado})`;
-            let cacheGeral = JSON.parse(localStorage.getItem('historico_compras_mensal') || '{}');
-            let container = document.getElementById('conteudo-relatorio-meses');
-            let html = ''; let totalAcumulado = 0;
-
-            mesesArray.forEach(m => {
-                let chave = `${m}_${anoSelecionado}`;
-                let lista = cacheGeral[chave] || [];
-                let totalMes = lista.reduce((soma, i) => soma + (i.qtd * i.preco), 0);
-                totalAcumulado += totalMes;
-
-                html += `
-                    <div class="flex justify-between items-center py-2 px-3 bg-gray-50 dark:bg-gray-700/50 rounded-xl">
-                        <span class="font-medium text-gray-800 dark:text-gray-200">${m}</span>
-                        <span class="font-bold text-gray-900 dark:text-white">R$ ${totalMes.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
-                    </div>
-                `;
-            });
-
-            container.innerHTML = html;
-            document.getElementById('modal-total-ano').textContent = `R$ ${totalAcumulado.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
-            document.getElementById('modal-relatorio').classList.remove('hidden');
+        async function guardarOrcamento(tipo, valor) {
+            const chave = tipo === 'alelo' ? 'historico_ticket_mensal' : 'historico_dinheiro_mensal';
+            const cache = JSON.parse(localStorage.getItem(chave) || '{}');
+            cache[chaveMesAno] = valor;
+            localStorage.setItem(chave, JSON.stringify(cache));
+            await salvarNaNuvem();
         }
 
-        function fecharRelatorioAnual() { document.getElementById('modal-relatorio').classList.add('hidden'); }
+        // --- MODAIS DE ORÇAMENTO ---
+        function abrirModalOrcamento(tipo) {
+            orcamentoModalTipo = tipo;
+            const titulo = tipo === 'alelo' ? '💳 Orçamento Cartão Alelo' : '💵 Orçamento em Espécie';
+            document.getElementById('modal-orcamento-titulo').textContent = titulo;
+            document.getElementById('input-orcamento-valor').value = obterOrcamento(tipo) || '';
+            document.getElementById('modal-orcamento').classList.remove('hidden');
+        }
 
+        function fecharModalOrcamento() {
+            document.getElementById('modal-orcamento').classList.add('hidden');
+        }
+
+        async function confirmarModalOrcamento() {
+            const val = parseFloat(document.getElementById('input-orcamento-valor').value) || 0;
+            await guardarOrcamento(orcamentoModalTipo, val);
+            fecharModalOrcamento();
+            renderizarTabelaCompras();
+        }
+
+        // --- MODAIS DE CONFIRMAÇÃO ---
+        function abrirModalConfirma(titulo, msg, callback) {
+            document.getElementById('modal-confirma-titulo').textContent = titulo;
+            document.getElementById('modal-confirma-msg').textContent = msg;
+            acaoConfirmacaoPendente = callback;
+            document.getElementById('modal-confirmacao').classList.remove('hidden');
+        }
+
+        function fecharModalConfirma() {
+            document.getElementById('modal-confirmacao').classList.add('hidden');
+            acaoConfirmacaoPendente = null;
+        }
+
+        document.getElementById('btn-confirma-acao').onclick = () => {
+            if (acaoConfirmacaoPendente) acaoConfirmacaoPendente();
+            fecharModalConfirma();
+        };
+
+        // --- CRUD DE ITENS ---
         async function salvarItemCompra(e) {
             e.preventDefault();
             const editId = document.getElementById('edit-compra-id').value;
@@ -633,7 +551,7 @@
                 const item = lista.find(i => i.id == editId);
                 if (item) { item.nome = nome; item.qtd = qtd; item.preco = preco; }
             } else {
-                lista.push({ id: Date.now(), nome, qtd, preco });
+                lista.push({ id: Date.now(), nome, qtd, preco, comprado: false });
             }
 
             guardarListaDoMes(lista);
@@ -643,7 +561,7 @@
         }
 
         function prepararEdicao(id) {
-            let lista = obterListaDoMes();
+            const lista = obterListaDoMes();
             const item = lista.find(i => i.id === id);
             if (!item) return;
 
@@ -667,98 +585,208 @@
             document.getElementById('btn-cancelar').classList.add('hidden');
         }
 
-        async function apagarItemCompra(id) {
-            if (confirm('Deseja excluir este item?')) {
-                let lista = obterListaDoMes();
-                lista = lista.filter(i => i.id !== id);
+        async function alternarComprado(id) {
+            let lista = obterListaDoMes();
+            const item = lista.find(i => i.id === id);
+            if (item) {
+                item.comprado = !item.comprado;
                 guardarListaDoMes(lista);
                 await salvarNaNuvem();
                 renderizarTabelaCompras();
             }
         }
 
-        async function limparListaCompras() {
-            if (confirm(`Deseja limpar todos os itens de ${mesSelecionado} de ${anoSelecionado}?`)) {
+        function solicitarExclusao(id) {
+            abrirModalConfirma("Excluir Item", "Deseja remover este item da lista?", async () => {
+                let lista = obterListaDoMes().filter(i => i.id !== id);
+                guardarListaDoMes(lista);
+                await salvarNaNuvem();
+                renderizarTabelaCompras();
+            });
+        }
+
+        function solicitarLimparLista() {
+            abrirModalConfirma("Limpar Lista", `Deseja apagar todos os itens de ${mesSelecionado}/${anoSelecionado}?`, async () => {
                 guardarListaDoMes([]);
                 await salvarNaNuvem();
                 renderizarTabelaCompras();
                 cancelarEdicao();
-            }
-        }
-
-        function partilharWhatsApp() {
-            let lista = obterListaDoMes();
-            if (lista.length === 0) { alert('A lista deste mês está vazia.'); return; }
-            let ticketTotal = obterTicketDoMes() || 0;
-            let dinheiroVal = obterDinheiroDoMes() || 0;
-            let orcamentoTotal = ticketTotal + dinheiroVal;
-            let totalGeral = 0;
-
-            let texto = `🛒 *Lista de Compras (${mesSelecionado} / ${anoSelecionado})*%0A%0A`;
-            lista.forEach(i => {
-                let sub = i.qtd * i.preco; totalGeral += sub;
-                texto += `- ${i.nome} (${i.qtd}x) = R$ ${sub.toFixed(2)}%0A`;
             });
-            texto += `%0A💰 *Total do Mês:* R$ ${totalGeral.toFixed(2)}`;
-            texto += `%0A💳 *Alelo:* R$ ${ticketTotal.toFixed(2)}`;
-            texto += `%0A💵 *Dinheiro:* R$ ${dinheiroVal.toFixed(2)}`;
-            texto += `%0A∑ *Orçamento Total:* R$ ${orcamentoTotal.toFixed(2)}`;
-            texto += `%0A✨ *Saldo Restante:* R$ ${(orcamentoTotal - totalGeral).toFixed(2)}`;
-            window.open(`https://api.whatsapp.com/send?text=${texto}`, '_blank');
         }
 
+        // --- RENDERIZAÇÃO DA TABELA ---
         function renderizarTabelaCompras() {
-            let lista = obterListaDoMes();
-            const tbody = document.getElementById('tabela-compras');
-            document.getElementById('status-progresso').textContent = `Itens na Lista (${lista.length})`;
+            const lista = obterListaDoMes();
+            const container = document.getElementById('container-itens');
+            
+            const totalItens = lista.length;
+            const compradosCount = lista.filter(i => i.comprado).length;
+            document.getElementById('status-progresso').textContent = `Itens: ${compradosCount}/${totalItens} no carrinho`;
 
             let totalGeral = 0;
-            lista.forEach(i => { totalGeral += (i.qtd * i.preco); });
+            let totalCarrinho = 0;
 
-            document.getElementById('total-geral').textContent = `R$ ${totalGeral.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+            lista.forEach(i => {
+                const sub = i.qtd * i.preco;
+                totalGeral += sub;
+                if (i.comprado) totalCarrinho += sub;
+            });
 
-            let ticketTotal = obterTicketDoMes() || 0;
-            let dinheiroVal = obterDinheiroDoMes() || 0;
-            let orcamentoTotal = ticketTotal + dinheiroVal;
-            let restante = orcamentoTotal - totalGeral;
+            const alelo = obterOrcamento('alelo');
+            const dinheiro = obterOrcamento('dinheiro');
+            const orcamentoTotal = alelo + dinheiro;
+            const restante = orcamentoTotal - totalGeral;
 
-            document.getElementById('saldo-ticket').textContent = `R$ ${ticketTotal.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
-            document.getElementById('saldo-dinheiro').textContent = `R$ ${dinheiroVal.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
-            document.getElementById('orcamento-total-combinado').textContent = `R$ ${orcamentoTotal.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
-
-            let elRestante = document.getElementById('saldo-restante-final');
-            elRestante.textContent = `R$ ${restante.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+            document.getElementById('saldo-ticket').textContent = `R$ ${alelo.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`;
+            document.getElementById('saldo-dinheiro').textContent = `R$ ${dinheiro.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`;
+            document.getElementById('orcamento-total-combinado').textContent = `R$ ${orcamentoTotal.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`;
             
-            elRestante.className = restante < 0 
-                ? "text-base sm:text-lg font-black text-rose-500" 
-                : "text-base sm:text-lg font-black text-emerald-400";
+            document.getElementById('total-carrinho').textContent = `R$ ${totalCarrinho.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`;
+            document.getElementById('total-geral').textContent = `R$ ${totalGeral.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`;
+            
+            const elRestante = document.getElementById('saldo-restante-final');
+            elRestante.textContent = `R$ ${restante.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`;
+            elRestante.className = restante < 0 ? "text-xs sm:text-base font-black text-rose-400 mt-1 block" : "text-xs sm:text-base font-black text-emerald-400 mt-1 block";
 
             if (lista.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="2" class="py-6 text-center text-gray-400 text-xs">Nenhum item neste mês. Use o microfone abaixo para adicionar!</td></tr>`;
+                container.innerHTML = `<div class="py-8 text-center text-slate-400 text-xs">Nenhum item cadastrado neste mês. Toque no microfone para falar!</div>`;
                 return;
             }
 
-            tbody.innerHTML = lista.map(i => {
-                const totalItem = i.qtd * i.preco;
+            container.innerHTML = lista.map(i => {
+                const sub = i.qtd * i.preco;
                 return `
-                    <tr class="hover:bg-gray-50/50 dark:hover:bg-gray-700/50 transition">
-                        <td class="py-2.5 px-2">
-                            <div class="flex items-center justify-between">
-                                <span class="text-xs font-semibold text-gray-900 dark:text-white">${i.nome}</span>
-                                <span class="text-[11px] bg-blue-50 dark:bg-blue-950/50 text-blue-600 dark:text-blue-400 px-1.5 py-0.5 rounded font-bold">${i.qtd}x</span>
+                    <div class="py-3 flex items-center justify-between gap-3 ${i.comprado ? 'opacity-50' : ''}">
+                        <div class="flex items-center gap-3 min-w-0">
+                            <input type="checkbox" onchange="alternarComprado(${i.id})" ${i.comprado ? 'checked' : ''} class="w-4 h-4 rounded text-blue-600 focus:ring-0 cursor-pointer">
+                            <div class="min-w-0">
+                                <p class="text-xs font-semibold text-slate-900 dark:text-white truncate ${i.comprado ? 'line-through' : ''}">${i.nome}</p>
+                                <p class="text-[11px] text-slate-400">
+                                    ${i.qtd}x R$ ${i.preco.toFixed(2)} = <span class="font-bold text-slate-700 dark:text-slate-300">R$ ${sub.toFixed(2)}</span>
+                                </p>
                             </div>
-                            <div class="text-[11px] text-gray-500 dark:text-gray-400 mt-1 flex justify-between">
-                                <span>R$ ${i.preco.toFixed(2)} un</span>
-                                <span class="font-bold text-gray-800 dark:text-gray-200">Total: R$ ${totalItem.toFixed(2)}</span>
-                            </div>
-                        </td>
-                        <td class="py-2.5 px-2 text-center whitespace-nowrap w-24">
-                            <button onclick="prepararEdicao(${i.id})" class="text-blue-600 dark:text-blue-400 hover:underline text-[11px] mr-2">Editar</button>
-                            <button onclick="apagarItemCompra(${i.id})" class="text-gray-400 hover:text-red-600 dark:hover:text-red-400 text-[11px]">Excluir</button>
-                        </td>
-                    </tr>
+                        </div>
+                        <div class="flex items-center gap-2 shrink-0 text-xs">
+                            <button onclick="prepararEdicao(${i.id})" class="text-blue-500 hover:underline">Editar</button>
+                            <button onclick="solicitarExclusao(${i.id})" class="text-slate-400 hover:text-rose-500">✕</button>
+                        </div>
+                    </div>
                 `;
             }).join('');
+        }
+
+        // --- RELATÓRIO ANUAL ---
+        function abrirRelatorioAnual() {
+            document.getElementById('titulo-modal-ano').textContent = `📊 Relatório Anual (${anoSelecionado})`;
+            const cache = JSON.parse(localStorage.getItem('historico_compras_mensal') || '{}');
+            const container = document.getElementById('conteudo-relatorio-meses');
+            let html = '';
+            let acumulado = 0;
+
+            mesesArray.forEach(m => {
+                const chave = `${m}_${anoSelecionado}`;
+                const lista = cache[chave] || [];
+                const total = lista.reduce((soma, i) => soma + (i.qtd * i.preco), 0);
+                acumulado += total;
+
+                html += `
+                    <div class="flex justify-between items-center py-2 px-3 bg-slate-50 dark:bg-slate-800/50 rounded-xl">
+                        <span class="font-medium text-slate-700 dark:text-slate-300">${m}</span>
+                        <span class="font-bold text-slate-900 dark:text-white">R$ ${total.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>
+                    </div>
+                `;
+            });
+
+            container.innerHTML = html;
+            document.getElementById('modal-total-ano').textContent = `R$ ${acumulado.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`;
+            document.getElementById('modal-relatorio').classList.remove('hidden');
+        }
+
+        function fecharRelatorioAnual() {
+            document.getElementById('modal-relatorio').classList.add('hidden');
+        }
+
+        // --- COMPARTILHAR WHATSAPP ---
+        function partilharWhatsApp() {
+            const lista = obterListaDoMes();
+            if (lista.length === 0) return alert('Sua lista está vazia.');
+
+            const alelo = obterOrcamento('alelo');
+            const dinheiro = obterOrcamento('dinheiro');
+            const orcamentoTotal = alelo + dinheiro;
+            const totalGeral = lista.reduce((acc, i) => acc + (i.qtd * i.preco), 0);
+
+            let linhas = lista.map(i => `${i.comprado ? '✅' : '▫️'} ${i.nome} (${i.qtd}x) - R$ ${(i.qtd * i.preco).toFixed(2)}`).join('\n');
+            let texto = `🛒 *Lista de Compras (${mesSelecionado}/${anoSelecionado})*\n\n${linhas}\n\n` +
+                        `💰 *Total Geral:* R$ ${totalGeral.toFixed(2)}\n` +
+                        `💳 *Alelo:* R$ ${alelo.toFixed(2)} | 💵 *Espécie:* R$ ${dinheiro.toFixed(2)}\n` +
+                        `✨ *Saldo Restante:* R$ ${(orcamentoTotal - totalGeral).toFixed(2)}`;
+
+            window.open(`https://wa.me/?text=${encodeURIComponent(texto)}`, '_blank');
+        }
+
+        // --- ENTRADA DE VOZ ---
+        function ouvirVoz() {
+            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+            if (!SpeechRecognition) return alert("Reconhecimento de voz não suportado neste navegador.");
+
+            const recognition = new SpeechRecognition();
+            recognition.lang = 'pt-BR';
+            const btn = document.getElementById('btn-voz-flutuante');
+
+            recognition.onstart = () => btn.classList.add('animate-pulse', 'bg-amber-500');
+            recognition.onresult = (e) => processarFala(e.results[0][0].transcript);
+            recognition.onerror = recognition.onend = () => btn.classList.remove('animate-pulse', 'bg-amber-500');
+            recognition.start();
+        }
+
+        async function processarFala(texto) {
+            let limpo = texto.toLowerCase()
+                .replace(/quantidade/g, '').replace(/reais/g, '').replace(/real/g, '').replace(/por/g, '');
+            
+            const mapa = { 'um': '1', 'uma': '1', 'dois': '2', 'duas': '2', 'três': '3', 'quatro': '4', 'cinco': '5' };
+            let palavras = limpo.split(/\s+/).map(p => mapa[p] || p);
+            let textoTratado = palavras.join(' ').replace(/(\d+),(\d+)/g, '$1.$2');
+
+            let tokens = textoTratado.split(/\s+/);
+            let nomeArr = [], nums = [];
+
+            tokens.forEach(tok => {
+                let n = parseFloat(tok);
+                if (!isNaN(n) && tok.match(/^\d+(\.\d+)?$/)) nums.push(n);
+                else if (nums.length === 0) nomeArr.push(tok);
+            });
+
+            let nome = nomeArr.join(' ') || texto;
+            nome = nome.charAt(0).toUpperCase() + nome.slice(1);
+            let qtd = nums.length >= 2 ? nums[0] : 1;
+            let preco = nums.length >= 2 ? nums[1] : (nums.length === 1 ? nums[0] : 0);
+
+            let lista = obterListaDoMes();
+            lista.push({ id: Date.now(), nome, qtd: qtd > 0 ? qtd : 1, preco, comprado: false });
+            guardarListaDoMes(lista);
+            await salvarNaNuvem();
+            renderizarTabelaCompras();
+        }
+
+        // --- TEMA E INSTALAÇÃO ---
+        function alternarDarkMode() {
+            document.documentElement.classList.toggle('dark');
+            localStorage.setItem('dark_mode', document.documentElement.classList.contains('dark'));
+        }
+
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+        });
+
+        function instalarApp() {
+            if (deferredPrompt) {
+                deferredPrompt.prompt();
+                deferredPrompt = null;
+            } else {
+                alert("Para instalar no celular:\n• Android: Toque nos três pontos do navegador e selecione 'Adicionar à tela inicial'.\n• iPhone: Toque no botão Compartilhar e selecione 'Adicionar à Tela de Início'.");
+            }
         }
     </script>
 </body>
