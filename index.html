@@ -19,8 +19,8 @@
     <!-- Supabase JS Client -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
-    <!-- Leitor de Código de Barras (HTML5-QRCode) -->
-    <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
+    <!-- Leitor ZXing de Alta Precisão (Compatível com Android e iPhone) -->
+    <script src="https://unpkg.com/@zxing/library@latest"></script>
 
     <!-- Manifesto Dinâmico PWA -->
     <link id="pwa-manifest" rel="manifest" href="data:application/manifest+json;charset=utf-8,{
@@ -35,7 +35,7 @@
 </head>
 <body class="bg-slate-50 dark:bg-slate-950 min-h-screen text-slate-800 dark:text-slate-100 transition-colors duration-200 pb-36 select-none antialiased">
 
-    <!-- AVISO TOAST FLUTUANTE (MENSAGENS NA MESMA TELA) -->
+    <!-- AVISO TOAST FLUTUANTE -->
     <div id="toast-aviso" class="fixed top-4 left-1/2 -translate-x-1/2 z-50 bg-slate-900 text-white px-4 py-2.5 rounded-2xl shadow-xl text-xs font-medium flex items-center gap-2 transition-all duration-300 opacity-0 pointer-events-none -translate-y-4 max-w-xs text-center border border-slate-700">
         <span id="toast-icone">ℹ️</span>
         <span id="toast-texto">Mensagem</span>
@@ -154,7 +154,7 @@
             <section class="bg-white dark:bg-slate-900 p-4 rounded-3xl shadow-sm border border-slate-200/80 dark:border-slate-800">
                 <div class="flex justify-between items-center mb-2.5">
                     <h2 id="form-titulo" class="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Adicionar Produto</h2>
-                    <!-- BOTÃO BIPAR NA MESMA TELA -->
+                    <!-- BOTÃO BIPAR CÓDIGO -->
                     <button type="button" onclick="iniciarLeitorCodigoBarras()" class="bg-blue-50 dark:bg-blue-950/50 hover:bg-blue-100 text-blue-600 dark:text-blue-400 px-3 py-1.5 rounded-xl text-xs font-bold transition flex items-center gap-1.5 border border-blue-200 dark:border-blue-800 active:scale-95">
                         <span>📷</span> Bipar Código
                     </button>
@@ -232,7 +232,7 @@
         </main>
     </div>
 
-    <!-- MODAL DO SCANNER DE CÓDIGO DE BARRAS -->
+    <!-- MODAL DO SCANNER COM VÍDEO DIRETO E NATIVO -->
     <div id="modal-scanner" class="fixed inset-0 z-50 bg-slate-950/95 backdrop-blur-md hidden flex items-center justify-center p-4">
         <div class="bg-white dark:bg-slate-900 rounded-3xl shadow-2xl max-w-sm w-full overflow-hidden border border-slate-200 dark:border-slate-800 flex flex-col">
             <div class="p-4 border-b border-slate-100 dark:border-slate-800 flex justify-between items-center">
@@ -240,20 +240,21 @@
                     <span class="text-base">📷</span>
                     <h3 class="text-sm font-bold text-slate-900 dark:text-white">Leitor de Código de Barras</h3>
                 </div>
-                <button onclick="fecharLeitorCodigoBarras()" class="text-slate-400 hover:text-slate-600 text-lg font-bold">✕</button>
+                <button onclick="fecharLeitorCodigoBarras()" class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 text-lg font-bold">✕</button>
             </div>
             
             <div class="p-4 space-y-3">
-                <p class="text-[11px] text-slate-500 dark:text-slate-400 text-center">Posicione a linha vermelha sobre o código de barras:</p>
+                <p class="text-[11px] text-slate-500 dark:text-slate-400 text-center">Aponte a câmera para o código:</p>
                 
-                <!-- Área da Câmera -->
-                <div class="relative w-full rounded-2xl overflow-hidden bg-black aspect-[4/3] flex items-center justify-center border border-slate-700">
-                    <div id="scanner-camera-view" class="w-full h-full"></div>
-                    <!-- Linha guia vermelha -->
-                    <div class="absolute inset-x-4 top-1/2 -translate-y-1/2 h-0.5 bg-rose-500 shadow-[0_0_8px_#f43f5e] pointer-events-none"></div>
+                <!-- ÁREA DE VÍDEO REAL DIRETA (SEM CAIXA PRETA) -->
+                <div class="relative w-full rounded-2xl overflow-hidden bg-slate-950 aspect-[4/3] flex items-center justify-center border border-slate-700 shadow-inner">
+                    <video id="video-camera-stream" autoplay playsinline muted class="w-full h-full object-cover"></video>
+                    <!-- Linha vermelha de mira laser -->
+                    <div class="absolute inset-x-4 top-1/2 -translate-y-1/2 h-0.5 bg-rose-500 shadow-[0_0_10px_#f43f5e] pointer-events-none"></div>
+                    <div class="absolute inset-4 border border-white/20 rounded-xl pointer-events-none"></div>
                 </div>
 
-                <!-- Campo manual dentro do modal caso a câmera não foque -->
+                <!-- Campo manual caso o código esteja rasurado -->
                 <div class="pt-2 border-t border-slate-100 dark:border-slate-800 text-center">
                     <p class="text-[10px] text-slate-400 mb-1">Embalagem amassada? Digite o código:</p>
                     <div class="flex gap-1.5">
@@ -267,7 +268,7 @@
 
             <div class="p-3 bg-slate-50 dark:bg-slate-800/50 border-t border-slate-100 dark:border-slate-800">
                 <button onclick="fecharLeitorCodigoBarras()" class="w-full bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-200 py-2 rounded-xl text-xs font-semibold">
-                    Fechar
+                    Fechar Câmera
                 </button>
             </div>
         </div>
@@ -362,7 +363,12 @@
         let deferredPrompt = null;
         let orcamentoModalTipo = null;
         let acaoConfirmacaoPendente = null;
-        let html5QrCodeScanner = null;
+
+        // Variáveis da Câmera Nativa
+        let streamCameraNativa = null;
+        let loopEscaneamentoAtivo = false;
+        let detectorNativo = null;
+        let zxingCodeReader = null;
 
         // --- SISTEMA DE TOAST (AVISOS NA MESMA TELA) ---
         function mostrarToast(mensagem, icone = 'ℹ️', duracao = 3000) {
@@ -514,38 +520,71 @@
             }
         }
 
-        // --- SCANNER DE CÓDIGO DE BARRAS & AUTO-PREENCHIMENTO ---
+        // --- CÂMERA REAL E SCANNER DE ALTA VELOCIDADE ---
         async function iniciarLeitorCodigoBarras() {
             document.getElementById('modal-scanner').classList.remove('hidden');
             document.getElementById('input-ean-manual').value = '';
 
+            const video = document.getElementById('video-camera-stream');
+
             try {
-                html5QrCodeScanner = new Html5Qrcode("scanner-camera-view", {
-                    experimentalFeatures: { useBarCodeDetectorIfSupported: true }
+                // Inicia o stream da câmera traseira de forma direta
+                streamCameraNativa = await navigator.mediaDevices.getUserMedia({
+                    video: {
+                        facingMode: { ideal: "environment" },
+                        width: { ideal: 1280 },
+                        height: { ideal: 720 }
+                    },
+                    audio: false
                 });
 
-                const cameraConfig = {
-                    facingMode: { ideal: "environment" },
-                    width: { min: 1280, ideal: 1920 },
-                    height: { min: 720, ideal: 1080 }
-                };
+                video.srcObject = streamCameraNativa;
+                await video.play();
 
-                const config = {
-                    fps: 15,
-                    qrbox: (viewWidth, viewHeight) => ({ width: Math.floor(viewWidth * 0.85), height: Math.floor(viewHeight * 0.45) }),
-                    aspectRatio: 1.333333,
-                    formatsToSupport: [
-                        Html5QrcodeSupportedFormats.EAN_13,
-                        Html5QrcodeSupportedFormats.EAN_8,
-                        Html5QrcodeSupportedFormats.UPC_A,
-                        Html5QrcodeSupportedFormats.UPC_E,
-                        Html5QrcodeSupportedFormats.CODE_128
-                    ]
-                };
+                loopEscaneamentoAtivo = true;
 
-                await html5QrCodeScanner.start(cameraConfig, config, onCodigoBarrasDetectado);
+                // 1. Tenta usar o leitor nativo acelerado do Android (Google Lens / Chrome)
+                if ('BarcodeDetector' in window) {
+                    try {
+                        detectorNativo = new BarcodeDetector({
+                            formats: ['ean_13', 'ean_8', 'upc_a', 'upc_e', 'code_128', 'qr_code']
+                        });
+                        iniciarLoopDetectorNativo(video);
+                        return;
+                    } catch(e) {
+                        detectorNativo = null;
+                    }
+                }
+
+                // 2. Fallback para ZXing caso o celular não tenha BarcodeDetector
+                if (window.ZXing) {
+                    zxingCodeReader = new ZXing.BrowserMultiFormatReader();
+                    zxingCodeReader.decodeFromVideoElement(video, (result, err) => {
+                        if (result && loopEscaneamentoAtivo) {
+                            loopEscaneamentoAtivo = false;
+                            onCodigoBarrasDetectado(result.getText());
+                        }
+                    });
+                }
             } catch (err) {
-                mostrarToast("Câmera indisponível. Digite o número abaixo.", "⚠️");
+                console.error("Erro na câmera:", err);
+                mostrarToast("Não foi possível acessar a câmera. Digite o código abaixo.", "⚠️", 4000);
+            }
+        }
+
+        async function iniciarLoopDetectorNativo(video) {
+            while (loopEscaneamentoAtivo) {
+                if (video.readyState >= 2) {
+                    try {
+                        const barcodes = await detectorNativo.detect(video);
+                        if (barcodes.length > 0 && loopEscaneamentoAtivo) {
+                            loopEscaneamentoAtivo = false;
+                            onCodigoBarrasDetectado(barcodes[0].rawValue);
+                            break;
+                        }
+                    } catch (err) {}
+                }
+                await new Promise(r => setTimeout(r, 120)); // analisa 8 frames por segundo
             }
         }
 
@@ -559,17 +598,17 @@
             tocarBipeLeitor();
             await fecharLeitorCodigoBarras();
 
-            mostrarToast(`Buscando código ${codigo}...`, "⏳", 4000);
+            mostrarToast(`Código lido: ${codigo}. Buscando...`, "⏳", 3000);
 
             let nomeEncontrado = null;
 
-            // 1. Catálogo local (produtos que você já salvou)
+            // 1. Consulta no catálogo de produtos já salvos pelo usuário
             const catalogo = JSON.parse(localStorage.getItem('catalogo_codigos_barras') || '{}');
             if (catalogo[codigo]) {
                 nomeEncontrado = catalogo[codigo];
             }
 
-            // 2. Open Food Facts (Alimentos no Brasil)
+            // 2. Consulta Open Food Facts (Brasil)
             if (!nomeEncontrado) {
                 try {
                     const res = await fetch(`https://world.openfoodfacts.org/api/v2/product/${codigo}.json`);
@@ -582,7 +621,7 @@
                 } catch (e) {}
             }
 
-            // 3. Open Beauty Facts (Higiene e Cosméticos)
+            // 3. Consulta Open Beauty Facts (Cosméticos e Higiene)
             if (!nomeEncontrado) {
                 try {
                     const res = await fetch(`https://world.openbeautyfacts.org/api/v0/product/${codigo}.json`);
@@ -595,7 +634,7 @@
                 } catch (e) {}
             }
 
-            // AÇÃO DIRETO NA MESMA TELA
+            // Preenche os campos diretamente na tela
             document.getElementById('compra-ean').value = codigo;
 
             if (nomeEncontrado) {
@@ -603,7 +642,6 @@
                 mostrarToast(`Localizado: ${nomeEncontrado}`, "✅");
                 document.getElementById('compra-preco').focus();
             } else {
-                // Não achou na internet: o usuário só digita o nome UMA vez na mesma tela
                 document.getElementById('compra-nome').value = '';
                 document.getElementById('compra-nome').placeholder = `Código ${codigo} - Digite o nome:`;
                 mostrarToast("Item novo. Digite o nome dele para salvar!", "✏️", 4000);
@@ -612,13 +650,21 @@
         }
 
         async function fecharLeitorCodigoBarras() {
-            if (html5QrCodeScanner) {
-                try {
-                    if (html5QrCodeScanner.isScanning) await html5QrCodeScanner.stop();
-                    html5QrCodeScanner.clear();
-                } catch (e) {}
-                html5QrCodeScanner = null;
+            loopEscaneamentoAtivo = false;
+            
+            if (zxingCodeReader) {
+                try { zxingCodeReader.reset(); } catch(e) {}
+                zxingCodeReader = null;
             }
+
+            if (streamCameraNativa) {
+                streamCameraNativa.getTracks().forEach(track => track.stop());
+                streamCameraNativa = null;
+            }
+
+            const video = document.getElementById('video-camera-stream');
+            if (video) video.srcObject = null;
+
             document.getElementById('modal-scanner').classList.add('hidden');
         }
 
@@ -758,7 +804,6 @@
             const qtd = parseFloat(document.getElementById('compra-qtd').value) || 1;
             const preco = parseFloat(document.getElementById('compra-preco').value) || 0;
 
-            // Memoriza o produto para que nunca mais precise digitar
             if (ean && nome) {
                 const catalogo = JSON.parse(localStorage.getItem('catalogo_codigos_barras') || '{}');
                 catalogo[ean] = nome;
@@ -777,7 +822,7 @@
             await salvarNaNuvem();
             renderizarTabelaCompras();
             cancelarEdicao();
-            mostrarToast("Item adicionado à lista!", "🛒");
+            mostrarToast("Item adicionado!", "🛒");
         }
 
         function prepararEdicao(id) {
@@ -1004,7 +1049,7 @@
             let nome = nomeArr.join(' ') || texto;
             nome = nome.charAt(0).toUpperCase() + nome.slice(1);
             let qtd = nums.length >= 2 ? nums[0] : 1;
-            let preco = nums.length >= 2 ? nums[1] : (nums.length === 1 ? nums[0] : 0);
+            let preco = nums.length >= 2 ? nums : (nums.length === 1 ? nums[0] : 0);
 
             let lista = obterListaDoMes();
             lista.push({ id: Date.now(), nome, qtd: qtd > 0 ? qtd : 1, preco, ean: null, comprado: false });
