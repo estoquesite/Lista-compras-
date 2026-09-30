@@ -7,7 +7,7 @@
     
     <!-- Ícone e PWA -->
     <link rel="icon" href="https://cdn-icons-png.flaticon.com/512/1170/1170576.png" type="image/png">
-    <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/1170/1170576.png">
+    <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/1170576.png">
     <meta name="theme-color" content="#2563eb">
 
     <!-- Tailwind CSS -->
@@ -19,7 +19,7 @@
     <!-- Supabase JS Client -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
-    <!-- Leitor ZXing de Alta Precisão (Android e iPhone) -->
+    <!-- Leitor ZXing de Alta Precisão -->
     <script src="https://unpkg.com/@zxing/library@latest"></script>
 
     <!-- Manifesto Dinâmico PWA -->
@@ -33,7 +33,6 @@
         %22icons%22:[{%22src%22:%22https://cdn-icons-png.flaticon.com/512/1170/1170576.png%22,%22sizes%22:%22512x512%22,%22type%22:%22image/png%22}]
     }">
 
-    <!-- REFINO VISUAL V2 — somente CSS; lógica/JavaScript/IDs preservados -->
     <style>
         :root {
             --ui-radius: 1.15rem;
@@ -44,14 +43,12 @@
         html { scroll-behavior: smooth; }
         body { letter-spacing: -0.005em; }
 
-        /* Cabeçalho mais leve e sofisticado */
         header.sticky {
             box-shadow: 0 1px 0 rgba(15,23,42,.04), 0 8px 24px rgba(15,23,42,.035) !important;
         }
         header.sticky > div { padding-top: .7rem !important; padding-bottom: .7rem !important; }
         header h1 { letter-spacing: -.025em; }
 
-        /* Botões superiores */
         header button {
             transition: transform .18s ease, background-color .18s ease, box-shadow .18s ease, opacity .18s ease !important;
         }
@@ -60,13 +57,11 @@
             box-shadow: 0 5px 14px rgba(217,119,6,.16) !important;
         }
 
-        /* Seletor de período */
         header .bg-blue-50\/80 {
             box-shadow: inset 0 1px 0 rgba(255,255,255,.55), 0 3px 12px rgba(37,99,235,.035);
         }
         header select { min-height: 30px; }
 
-        /* Cards de orçamento do topo */
         header .grid.grid-cols-3 > div {
             min-height: 54px;
             padding: .55rem .7rem !important;
@@ -76,13 +71,11 @@
         header .grid.grid-cols-3 > div:active { transform: scale(.985); }
         header .grid.grid-cols-3 > div p:last-child { letter-spacing: -.02em; }
 
-        /* Cartões principais */
         main > section:not(#card-painel-orcamento) {
             box-shadow: var(--ui-shadow) !important;
             border-color: var(--ui-border) !important;
         }
 
-        /* Formulário */
         #form-compra input:not([type="hidden"]) {
             transition: border-color .18s ease, box-shadow .18s ease, background-color .18s ease;
         }
@@ -95,7 +88,6 @@
             font-weight: 650 !important;
         }
 
-        /* Painel de resumo: compacto, sem alterar os dados */
         #card-painel-orcamento {
             padding: .8rem 1rem !important;
             min-height: 70px;
@@ -106,7 +98,6 @@
         #card-painel-orcamento span:first-child { opacity: .78; }
         #card-painel-orcamento span:last-child { letter-spacing: -.025em; }
 
-        /* Área da lista */
         #container-itens > div {
             min-height: 54px;
             padding-top: .65rem !important;
@@ -126,13 +117,11 @@
         }
         #container-itens button { transition: opacity .18s ease, color .18s ease; }
 
-        /* Filtros */
         #btn-filtro-todos, #btn-filtro-pendentes, #btn-filtro-comprados {
             transition: background-color .18s ease, color .18s ease, box-shadow .18s ease !important;
         }
         #campo-busca-itens { min-height: 34px; }
 
-        /* Barra inferior mais limpa */
         nav.fixed.bottom-0 {
             padding-top: .55rem !important;
             padding-bottom: .55rem !important;
@@ -146,7 +135,6 @@
         nav button { transition: transform .18s ease, box-shadow .18s ease, background-color .18s ease !important; }
         nav button:active { transform: scale(.94); }
 
-        /* Modais: mesma linguagem visual */
         #modal-scanner > div,
         #modal-config-ia > div,
         #modal-orcamento > div,
@@ -159,13 +147,11 @@
         #modal-orcamento > div,
         #modal-confirmacao > div { padding: 1.35rem !important; }
 
-        /* Toast */
         #toast-aviso {
             box-shadow: 0 10px 30px rgba(15,23,42,.18) !important;
             backdrop-filter: blur(10px);
         }
 
-        /* Toque mobile */
         @media (max-width: 640px) {
             main { padding-left: .75rem !important; padding-right: .75rem !important; }
             header.sticky > div { padding-left: .8rem !important; padding-right: .8rem !important; }
@@ -174,17 +160,15 @@
             nav.fixed.bottom-0 { padding-left: .7rem !important; padding-right: .7rem !important; }
         }
 
-        /* Acessibilidade sem mudar o comportamento */
         button:focus-visible, input:focus-visible, select:focus-visible {
             outline: 2px solid rgba(59,130,246,.55);
             outline-offset: 2px;
         }
     </style>
-
 </head>
 <body class="bg-slate-50 dark:bg-slate-950 min-h-screen text-slate-800 dark:text-slate-100 transition-colors duration-200 pb-36 select-none antialiased">
 
-    <!-- AVISO TOAST FLUTUANTE (MENSAGENS NA TELA) -->
+    <!-- AVISO TOAST FLUTUANTE -->
     <div id="toast-aviso" class="fixed top-4 left-1/2 -translate-x-1/2 z-50 bg-slate-900 text-white px-4 py-2.5 rounded-2xl shadow-xl text-xs font-medium flex items-center gap-2 transition-all duration-300 opacity-0 pointer-events-none -translate-y-4 max-w-xs text-center border border-slate-700">
         <span id="toast-icone">ℹ️</span>
         <span id="toast-texto">Mensagem</span>
@@ -235,7 +219,11 @@
                         <h1 class="text-base sm:text-lg font-bold text-slate-900 dark:text-white flex items-center gap-1.5">
                             <span>🛒</span> Lista de Compras
                         </h1>
-                        <p id="saudacao-usuario" class="text-[11px] text-slate-500 dark:text-slate-400">Pronta para o mercado</p>
+                        <div class="flex items-center gap-2 mt-0.5">
+                            <span id="badge-status-rede" class="inline-flex items-center gap-1 text-[10px] font-semibold text-emerald-600 dark:text-emerald-400">
+                                <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span> Online
+                            </span>
+                        </div>
                     </div>
                     <div class="flex gap-2">
                         <button onclick="abrirModalConfigIA()" class="bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 text-slate-700 dark:text-slate-200 p-2 rounded-xl text-xs font-semibold transition" title="Configurar Chave da IA">
@@ -299,10 +287,10 @@
             </div>
         </header>
 
-        <!-- CONTEÚDO PRINCIPAL -->
+        <!-- CORPO PRINCIPAL -->
         <main class="max-w-3xl mx-auto p-4 space-y-4">
             
-            <!-- FORMULÁRIO COM BUSCA + FOTO -->
+            <!-- FORMULÁRIO -->
             <section class="bg-white dark:bg-slate-900 p-4 rounded-3xl shadow-sm border border-slate-200/80 dark:border-slate-800">
                 <div class="flex justify-between items-center mb-2.5">
                     <h2 id="form-titulo" class="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Adicionar Produto</h2>
@@ -313,7 +301,6 @@
                     <input type="hidden" id="edit-compra-id">
                     <input type="hidden" id="compra-ean">
                     
-                    <!-- LINHA 1: PRODUTO COM BOTÃO BUSCA E CÂMERA -->
                     <div>
                         <label class="block text-[10px] font-semibold text-slate-500 uppercase mb-1">Produto ou Código de Barras</label>
                         <div class="flex items-center gap-1.5">
@@ -321,20 +308,17 @@
                                 <input type="text" id="compra-nome" required placeholder="Digite o nome ou código de barras..." class="w-full px-3 py-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs focus:ring-2 focus:ring-blue-500 text-slate-900 dark:text-white" onkeydown="tratarEnterNoCampo(event)">
                             </div>
                             
-                            <!-- BOTÃO BUSCAR NA INTERNET -->
                             <button type="button" onclick="pesquisarProdutoOuCodigo()" class="bg-blue-600 hover:bg-blue-700 active:scale-95 text-white px-3 py-2.5 rounded-xl text-xs font-bold transition flex items-center gap-1 shadow-sm shrink-0" title="Procurar na Internet">
                                 <span>🔍</span>
                                 <span class="hidden sm:inline">Buscar</span>
                             </button>
 
-                            <!-- BOTÃO DE CÂMERA -->
                             <button type="button" onclick="iniciarLeitorCodigoBarras()" class="bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 active:scale-95 text-slate-700 dark:text-slate-300 px-3 py-2.5 rounded-xl text-xs font-bold transition flex items-center gap-1 border border-slate-200 dark:border-slate-700 shrink-0" title="Bipar ou Fotografar">
                                 <span>📷</span>
                             </button>
                         </div>
                     </div>
 
-                    <!-- LINHA 2: QUANTIDADE E PREÇO -->
                     <div class="grid grid-cols-2 gap-2">
                         <div>
                             <label class="block text-[10px] font-semibold text-slate-500 uppercase mb-1">Quantidade</label>
@@ -357,7 +341,7 @@
                 </form>
             </section>
 
-            <!-- RESUMO EM CARDS (CARRINHO, TOTAL E SOBRA) -->
+            <!-- RESUMO EM CARDS -->
             <section id="card-painel-orcamento" class="bg-gradient-to-br from-slate-900 via-slate-800 to-slate-950 text-white p-4 rounded-3xl shadow-lg grid grid-cols-3 gap-2 text-center divide-x divide-slate-800 transition">
                 <div class="px-1">
                     <span class="block text-[9px] font-semibold uppercase tracking-wider text-slate-400">No Carrinho</span>
@@ -373,7 +357,7 @@
                 </div>
             </section>
 
-            <!-- LISTAGEM COM FILTRO E BUSCA -->
+            <!-- LISTAGEM -->
             <section class="bg-white dark:bg-slate-900 p-4 rounded-3xl shadow-sm border border-slate-200/80 dark:border-slate-800 space-y-3">
                 <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-100 dark:border-slate-800 pb-3">
                     <div class="flex items-center gap-2">
@@ -398,7 +382,7 @@
         </main>
     </div>
 
-    <!-- MODAL DA CÂMERA (BIPAR OU FOTOGRAFAR PARA A IA) -->
+    <!-- MODAL DA CÂMERA -->
     <div id="modal-scanner" class="fixed inset-0 z-50 bg-slate-950/95 backdrop-blur-md hidden flex items-center justify-center p-4">
         <div class="bg-white dark:bg-slate-900 rounded-3xl shadow-2xl max-w-sm w-full overflow-hidden border border-slate-200 dark:border-slate-800 flex flex-col">
             <div class="p-4 border-b border-slate-100 dark:border-slate-800 flex justify-between items-center">
@@ -410,15 +394,13 @@
             </div>
             
             <div class="p-4 space-y-3">
-                <p class="text-[11px] text-slate-500 dark:text-slate-400 text-center">Aponte para o código ou tire a foto para a IA identificar:</p>
+                <p class="text-[11px] text-slate-500 dark:text-slate-400 text-center">Aponte para o código ou tire a foto para a IA:</p>
                 
                 <div class="relative w-full rounded-2xl overflow-hidden bg-slate-950 aspect-[4/3] flex items-center justify-center border border-slate-700 shadow-inner">
                     <video id="video-camera-stream" autoplay playsinline muted class="w-full h-full object-cover"></video>
-                    <!-- Linha guia de mira -->
                     <div class="absolute inset-x-4 top-1/2 -translate-y-1/2 h-0.5 bg-rose-500 shadow-[0_0_10px_#f43f5e] pointer-events-none"></div>
                     <div class="absolute inset-4 border border-white/20 rounded-xl pointer-events-none"></div>
 
-                    <!-- BOTÃO FOTOGRAFAR PRODUTO PARA A IA -->
                     <button type="button" onclick="capturarFotoProduto()" class="absolute bottom-3 bg-white/95 hover:bg-white text-slate-900 px-4 py-2 rounded-2xl shadow-xl font-bold text-xs flex items-center gap-1.5 active:scale-95 transition">
                         <span>📸</span> Fotografar Produto
                     </button>
@@ -441,7 +423,7 @@
                 <h3 class="text-base font-bold text-slate-900 dark:text-white">Identificação por IA</h3>
             </div>
             <p class="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">
-                Sua chave gratuita do <strong>Google Gemini API</strong>:
+                Insira sua chave do <strong>Google Gemini API</strong>:
             </p>
             <input type="password" id="input-gemini-key" placeholder="Cole sua Gemini API Key" class="w-full px-3 py-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs text-slate-900 dark:text-white font-mono">
             
@@ -518,14 +500,55 @@
         </div>
     </nav>
 
-    <!-- CANVAS OCULTO PARA FOTOS -->
     <canvas id="canvas-captura" class="hidden"></canvas>
 
     <!-- SCRIPT GERAL -->
     <script>
+        // --- REGISTRO SERVICE WORKER OFFLINE (Auto-gerado via Blob) ---
+        if ('serviceWorker' in navigator) {
+            const swCode = `
+                const CACHE_NAME = 'lista-compras-v1';
+                const ASSETS = [
+                    'https://cdn.tailwindcss.com',
+                    'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2',
+                    'https://unpkg.com/@zxing/library@latest',
+                    'https://cdn-icons-png.flaticon.com/512/1170/1170576.png'
+                ];
+
+                self.addEventListener('install', (e) => {
+                    e.waitUntil(
+                        caches.open(CACHE_NAME).then(cache => cache.addAll(ASSETS)).catch(() => {})
+                    );
+                    self.skipWaiting();
+                });
+
+                self.addEventListener('activate', (e) => {
+                    e.waitUntil(self.clients.claim());
+                });
+
+                self.addEventListener('fetch', (e) => {
+                    if (e.request.method !== 'GET') return;
+                    e.respondWith(
+                        caches.match(e.request).then(cached => {
+                            const networkFetch = fetch(e.request).then(res => {
+                                if (res && res.status === 200 && res.type !== 'opaque') {
+                                    const copy = res.clone();
+                                    caches.open(CACHE_NAME).then(c => c.put(e.request, copy));
+                                }
+                                return res;
+                            }).catch(() => cached);
+                            return cached || networkFetch;
+                        })
+                    );
+                });
+            `;
+            const swBlob = new Blob([swCode], { type: 'application/javascript' });
+            navigator.serviceWorker.register(URL.createObjectURL(swBlob)).catch(() => {});
+        }
+
         const SUPABASE_URL = 'https://jmeepzdvmmjngxwvayqb.supabase.co';
         const SUPABASE_ANON_KEY = 'sb_publishable_54ORrLbP7naW7n-KlKCdUA_hZnpjguH';
-        const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        const supabaseClient = window.supabase ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
 
         const PIN_PADRAO = '1234';
         const mesesArray = ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'];
@@ -542,13 +565,37 @@
         let orcamentoModalTipo = null;
         let acaoConfirmacaoPendente = null;
 
-        // Câmera e Scanner
         let streamCameraNativa = null;
         let loopEscaneamentoAtivo = false;
         let detectorNativo = null;
         let zxingCodeReader = null;
 
-        // --- SISTEMA DE TOAST ---
+        // Monitor de conectividade
+        function atualizarIndicadorRede() {
+            const badge = document.getElementById('badge-status-rede');
+            if (!badge) return;
+            if (navigator.onLine) {
+                badge.className = "inline-flex items-center gap-1 text-[10px] font-semibold text-emerald-600 dark:text-emerald-400";
+                badge.innerHTML = '<span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span> Online';
+                if (localStorage.getItem('precisa_sync') === 'true') {
+                    salvarNaNuvem();
+                }
+            } else {
+                badge.className = "inline-flex items-center gap-1 text-[10px] font-semibold text-amber-500 dark:text-amber-400";
+                badge.innerHTML = '<span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span> Offline';
+            }
+        }
+
+        window.addEventListener('online', () => {
+            atualizarIndicadorRede();
+            mostrarToast("Conexão restabelecida! Sincronizando...", "🌐");
+            salvarNaNuvem();
+        });
+        window.addEventListener('offline', () => {
+            atualizarIndicadorRede();
+            mostrarToast("Sem internet. Modo Offline ativo!", "📴");
+        });
+
         function mostrarToast(mensagem, icone = 'ℹ️', duracao = 3000) {
             const toast = document.getElementById('toast-aviso');
             document.getElementById('toast-icone').textContent = icone;
@@ -581,12 +628,12 @@
             if ('vibrate' in navigator) navigator.vibrate(80);
         }
 
-        // --- INICIALIZAÇÃO ---
         window.addEventListener('DOMContentLoaded', () => {
             if (localStorage.getItem('dark_mode') === 'true') {
                 document.documentElement.classList.add('dark');
             }
             inicializarSeletorAnos();
+            atualizarIndicadorRede();
 
             if (sessionStorage.getItem('autenticado_site') === 'true') {
                 liberarAcesso();
@@ -611,7 +658,6 @@
             }
         }
 
-        // --- AUTENTICAÇÃO ---
         function bloquearApp() {
             sessionStorage.removeItem('autenticado_site');
             document.getElementById('conteudo-site').classList.add('hidden');
@@ -621,13 +667,16 @@
 
         async function liberarAcesso() {
             sessionStorage.setItem('autenticado_site', 'true');
-            await sincronizarComNuvem();
+            if (navigator.onLine) {
+                await sincronizarComNuvem();
+            }
             document.getElementById('tela-login').classList.add('hidden');
             document.getElementById('conteudo-site').classList.remove('hidden');
             
             document.getElementById('filtro-mes-ano').value = mesSelecionado;
             document.getElementById('filtro-ano').value = anoSelecionado;
             renderizarTabelaCompras();
+            atualizarIndicadorRede();
         }
 
         function entrarComPin() {
@@ -695,7 +744,6 @@
             }
         }
 
-        // --- CONFIGURAÇÃO DA IA (GEMINI API) ---
         function abrirModalConfigIA() {
             document.getElementById('input-gemini-key').value = localStorage.getItem('gemini_api_key') || '';
             document.getElementById('modal-config-ia').classList.remove('hidden');
@@ -712,7 +760,6 @@
             mostrarToast(key ? "IA ativada com sucesso!" : "Chave removida.", "✨");
         }
 
-        // --- CÂMERA & RECONHECIMENTO DE PRODUTOS ---
         async function iniciarLeitorCodigoBarras() {
             document.getElementById('modal-scanner').classList.remove('hidden');
             const video = document.getElementById('video-camera-stream');
@@ -776,14 +823,12 @@
             await buscarPorCodigoDeBarras(codigo);
         }
 
-        // TIRA A FOTO, MANDA PRA IA E DESCARDA NA HORA (ZERO ESPAÇO NO SUPABASE)
         async function capturarFotoProduto() {
             const video = document.getElementById('video-camera-stream');
             if (!video || video.readyState < 2) return;
 
             tocarBipeLeitor();
 
-            // Captura temporariamente na memória
             const canvas = document.getElementById('canvas-captura');
             canvas.width = 400;
             canvas.height = Math.floor(400 * (video.videoHeight / video.videoWidth));
@@ -797,6 +842,10 @@
             const geminiKey = localStorage.getItem('gemini_api_key');
 
             if (geminiKey) {
+                if (!navigator.onLine) {
+                    mostrarToast("IA requer conexão com a internet.", "⚠️", 4000);
+                    return;
+                }
                 mostrarToast("IA analisando a foto...", "✨", 6000);
                 await identificarComGeminiVision(fotoBase64, geminiKey);
             } else {
@@ -805,19 +854,18 @@
             }
         }
 
-        // CHAMADA DA IA APONTANDO PARA O MODELO ATUAL DO GOOGLE: gemini-3.8-flash
+        // CORREÇÃO: Endpoint apontando para gemini-2.5-flash (modelo válido)
         async function identificarComGeminiVision(base64Data, apiKey) {
             const limpaBase64 = base64Data.replace(/^data:image\/[a-z]+;base64,/, '');
             const chaveLimpa = apiKey.trim();
 
             try {
-                // Modelo exigido pelo Google no seu painel: gemini-3.8-flash
-                const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.8-flash:generateContent?key=${chaveLimpa}`;
+                const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${chaveLimpa}`;
                 
                 const payload = {
                     contents: [{
                         parts: [
-                            { text: "Identifique o produto de supermercado ou feira nesta foto. Retorne estritamente um JSON no formato: {\"produto\": \"Nome do produto com marca e tamanho\", \"preco\": null ou numero se houver etiqueta de preco visivel}." },
+                            { text: "Identifique o produto nesta foto. Retorne estritamente um JSON no formato: {\"produto\": \"Nome do produto com marca e tamanho\", \"preco\": null ou numero se houver etiqueta visivel}." },
                             { inlineData: { mimeType: "image/jpeg", data: limpaBase64 } }
                         ]
                     }],
@@ -845,11 +893,10 @@
                         return;
                     }
                 } else if (data.error) {
-                    mostrarToast(`Erro Google: ${data.error.message || 'Verifique a chave'}`, "⚠️", 6000);
+                    mostrarToast(`Erro IA: ${data.error.message || 'Verifique a chave'}`, "⚠️", 6000);
                     return;
                 }
             } catch(e) {
-                console.warn("Falha na chamada da IA:", e);
                 mostrarToast("Erro ao conectar com a IA. Tente novamente.", "⚠️", 4000);
             }
 
@@ -871,7 +918,6 @@
             document.getElementById('modal-scanner').classList.add('hidden');
         }
 
-        // --- BUSCA NA INTERNET (CÓDIGO OU NOME) ---
         function tratarEnterNoCampo(e) {
             if (e.key === 'Enter') {
                 e.preventDefault();
@@ -885,7 +931,7 @@
             if (!termo) return mostrarToast("Digite algo para buscar!", "⚠️");
 
             const ehCodigo = /^\d{8,14}$/.test(termo);
-            mostrarToast(`Buscando "${termo}" na internet...`, "⏳", 3500);
+            mostrarToast(`Buscando "${termo}"...`, "⏳", 3500);
 
             if (ehCodigo) {
                 await buscarPorCodigoDeBarras(termo);
@@ -900,25 +946,13 @@
             const catalogo = JSON.parse(localStorage.getItem('catalogo_codigos_barras') || '{}');
             if (catalogo[codigo]) nomeEncontrado = catalogo[codigo];
 
-            if (!nomeEncontrado) {
+            if (!nomeEncontrado && navigator.onLine) {
                 try {
                     const res = await fetch(`https://world.openfoodfacts.org/api/v2/product/${codigo}.json`);
                     if (res.ok) {
                         const data = await res.json();
                         if (data.status === 1 && data.product) {
                             nomeEncontrado = data.product.product_name_pt || data.product.product_name || data.product.generic_name;
-                        }
-                    }
-                } catch(e) {}
-            }
-
-            if (!nomeEncontrado) {
-                try {
-                    const res = await fetch(`https://world.openbeautyfacts.org/api/v0/product/${codigo}.json`);
-                    if (res.ok) {
-                        const data = await res.json();
-                        if (data.status === 1 && data.product) {
-                            nomeEncontrado = data.product.product_name_pt || data.product.product_name;
                         }
                     }
                 } catch(e) {}
@@ -940,6 +974,12 @@
         }
 
         async function buscarPorNomeDeProduto(nome) {
+            if (!navigator.onLine) {
+                mostrarToast("Busca web requer internet. Use o nome digitado.", "ℹ️");
+                document.getElementById('compra-preco').focus();
+                return;
+            }
+
             try {
                 const url = `https://world.openfoodfacts.org/cgi/search.pl?search_terms=${encodeURIComponent(nome)}&search_simple=1&action=process&json=1&page_size=1`;
                 const res = await fetch(url);
@@ -959,43 +999,53 @@
                 }
             } catch(e) {}
 
-            mostrarToast("Use o nome digitado!", "ℹ️");
+            mostrarToast("Use o nome digitado!", "ℹ️️");
             document.getElementById('compra-preco').focus();
         }
 
-        // --- NUVEM & STORAGE (APENAS TEXTO LEVE) ---
+        // --- NUVEM & OFFLINE-FIRST ---
         async function sincronizarComNuvem() {
+            if (!supabaseClient || !navigator.onLine) return;
             try {
-                let { data } = await supabaseClient
+                let { data, error } = await supabaseClient
                     .from('app_dados_compras')
                     .select('conteudo')
                     .eq('id', '1')
                     .single();
 
-                if (data && data.conteudo) {
+                if (!error && data && data.conteudo) {
                     if (data.conteudo.historico_compras) localStorage.setItem('historico_compras_mensal', JSON.stringify(data.conteudo.historico_compras));
                     if (data.conteudo.historico_ticket) localStorage.setItem('historico_ticket_mensal', JSON.stringify(data.conteudo.historico_ticket));
                     if (data.conteudo.historico_dinheiro) localStorage.setItem('historico_dinheiro_mensal', JSON.stringify(data.conteudo.historico_dinheiro));
                     if (data.conteudo.catalogo_codigos) localStorage.setItem('catalogo_codigos_barras', JSON.stringify(data.conteudo.catalogo_codigos));
-                } else {
+                    localStorage.removeItem('precisa_sync');
+                } else if (!data) {
                     await salvarNaNuvem();
                 }
-            } catch (e) {}
+            } catch (e) {
+                console.warn("Falha de rede Supabase. Mantendo dados locais:", e);
+            }
         }
 
         async function salvarNaNuvem() {
+            localStorage.setItem('precisa_sync', 'true');
+            if (!supabaseClient || !navigator.onLine) return;
+
             const payload = {
                 historico_compras: JSON.parse(localStorage.getItem('historico_compras_mensal') || '{}'),
                 historico_ticket: JSON.parse(localStorage.getItem('historico_ticket_mensal') || '{}'),
                 historico_dinheiro: JSON.parse(localStorage.getItem('historico_dinheiro_mensal') || '{}'),
                 catalogo_codigos: JSON.parse(localStorage.getItem('catalogo_codigos_barras') || '{}')
             };
+
             try {
-                await supabaseClient.from('app_dados_compras').upsert({ id: '1', conteudo: payload });
+                const { error } = await supabaseClient.from('app_dados_compras').upsert({ id: '1', conteudo: payload });
+                if (!error) localStorage.removeItem('precisa_sync');
             } catch (err) {}
         }
 
         async function sincronizarComNuvemManual() {
+            if (!navigator.onLine) return mostrarToast("Você está offline!", "⚠️");
             await sincronizarComNuvem();
             renderizarTabelaCompras();
             mostrarToast("Sincronizado com a nuvem!", "✅");
@@ -1189,7 +1239,6 @@
             });
         }
 
-        // --- RENDERIZAÇÃO DA TABELA ---
         function renderizarTabelaCompras() {
             const listaOriginal = obterListaDoMes();
             const termoBusca = (document.getElementById('campo-busca-itens')?.value || '').toLowerCase().trim();
@@ -1203,7 +1252,7 @@
             let totalCarrinho = 0;
 
             listaOriginal.forEach(i => {
-                const sub = i.qtd * i.preco;
+                const sub = (parseFloat(i.qtd) || 0) * (parseFloat(i.preco) || 0);
                 totalGeral += sub;
                 if (i.comprado) totalCarrinho += sub;
             });
@@ -1246,7 +1295,7 @@
             }
 
             container.innerHTML = listaFiltrada.map(i => {
-                const sub = i.qtd * i.preco;
+                const sub = (parseFloat(i.qtd) || 0) * (parseFloat(i.preco) || 0);
                 return `
                     <div class="py-2.5 flex items-center justify-between gap-2.5 ${i.comprado ? 'opacity-40' : ''}">
                         <div class="flex items-center gap-2.5 min-w-0">
@@ -1258,7 +1307,7 @@
                                     ${i.ean ? '<span class="text-[9px] bg-slate-100 dark:bg-slate-800 text-slate-400 px-1 py-0.2 rounded font-mono">EAN</span>' : ''}
                                 </div>
                                 <p class="text-[11px] text-slate-400">
-                                    ${i.qtd}x R$ ${i.preco.toFixed(2)} = <span class="font-bold text-slate-700 dark:text-slate-300">R$ ${sub.toFixed(2)}</span>
+                                    ${i.qtd}x R$ ${parseFloat(i.preco).toFixed(2)} = <span class="font-bold text-slate-700 dark:text-slate-300">R$ ${sub.toFixed(2)}</span>
                                 </p>
                             </div>
                         </div>
@@ -1271,7 +1320,6 @@
             }).join('');
         }
 
-        // --- RELATÓRIO ANUAL ---
         function abrirRelatorioAnual() {
             document.getElementById('titulo-modal-ano').textContent = `📊 Relatório Anual (${anoSelecionado})`;
             const cache = JSON.parse(localStorage.getItem('historico_compras_mensal') || '{}');
@@ -1282,7 +1330,7 @@
             mesesArray.forEach(m => {
                 const chave = `${m}_${anoSelecionado}`;
                 const lista = cache[chave] || [];
-                const total = lista.reduce((soma, i) => soma + (i.qtd * i.preco), 0);
+                const total = lista.reduce((soma, i) => soma + ((parseFloat(i.qtd) || 0) * (parseFloat(i.preco) || 0)), 0);
                 acumulado += total;
 
                 html += `
@@ -1302,7 +1350,6 @@
             document.getElementById('modal-relatorio').classList.add('hidden');
         }
 
-        // --- COMPARTILHAR WHATSAPP ---
         function partilharWhatsApp() {
             const lista = obterListaDoMes();
             if (lista.length === 0) return mostrarToast('Sua lista está vazia.', '⚠️');
@@ -1310,9 +1357,9 @@
             const alelo = obterOrcamento('alelo');
             const dinheiro = obterOrcamento('dinheiro');
             const orcamentoTotal = alelo + dinheiro;
-            const totalGeral = lista.reduce((acc, i) => acc + (i.qtd * i.preco), 0);
+            const totalGeral = lista.reduce((acc, i) => acc + ((parseFloat(i.qtd) || 0) * (parseFloat(i.preco) || 0)), 0);
 
-            let linhas = lista.map(i => `${i.comprado ? '✅' : '▫️'} ${i.nome} (${i.qtd}x) - R$ ${(i.qtd * i.preco).toFixed(2)}`).join('\n');
+            let linhas = lista.map(i => `${i.comprado ? '✅' : '▫️️'} ${i.nome} (${i.qtd}x) - R$ ${((parseFloat(i.qtd) || 0) * (parseFloat(i.preco) || 0)).toFixed(2)}`).join('\n');
             let texto = `🛒 *Lista de Compras (${mesSelecionado}/${anoSelecionado})*\n\n${linhas}\n\n` +
                         `💰 *Total Geral:* R$ ${totalGeral.toFixed(2)}\n` +
                         `💳 *Alelo:* R$ ${alelo.toFixed(2)} | 💵 *Espécie:* R$ ${dinheiro.toFixed(2)}\n` +
@@ -1321,7 +1368,6 @@
             window.open(`https://wa.me/?text=${encodeURIComponent(texto)}`, '_blank');
         }
 
-        // --- ENTRADA DE VOZ ---
         function ouvirVoz() {
             const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
             if (!SpeechRecognition) return mostrarToast("Reconhecimento de voz indisponível.", "⚠️");
@@ -1336,6 +1382,7 @@
             recognition.start();
         }
 
+        // CORREÇÃO: Tratamento do array de números na voz (evita preco = array)
         async function processarFala(texto) {
             let limpo = texto.toLowerCase().replace(/quantidade/g, '').replace(/reais/g, '').replace(/real/g, '').replace(/por/g, '');
             const mapa = { 'um': '1', 'uma': '1', 'dois': '2', 'duas': '2', 'três': '3', 'quatro': '4', 'cinco': '5' };
@@ -1354,17 +1401,16 @@
             let nome = nomeArr.join(' ') || texto;
             nome = nome.charAt(0).toUpperCase() + nome.slice(1);
             let qtd = nums.length >= 2 ? nums[0] : 1;
-            let preco = nums.length >= 2 ? nums : (nums.length === 1 ? nums[0] : 0);
+            let preco = nums.length >= 2 ? nums[1] : (nums.length === 1 ? nums[0] : 0);
 
             let lista = obterListaDoMes();
             lista.push({ id: Date.now(), nome, qtd: qtd > 0 ? qtd : 1, preco, ean: null, comprado: false });
             guardarListaDoMes(lista);
             await salvarNaNuvem();
             renderizarTabelaCompras();
-            mostrarToast(`Adicionado por voz: ${nome}`, "🎤");
+            mostrarToast(`Adicionado: ${nome} (${qtd}x R$ ${preco.toFixed(2)})`, "🎤");
         }
 
-        // --- TEMA E INSTALAÇÃO PWA ---
         function alternarDarkMode() {
             document.documentElement.classList.toggle('dark');
             localStorage.setItem('dark_mode', document.documentElement.classList.contains('dark'));
@@ -1380,7 +1426,7 @@
                 deferredPrompt.prompt();
                 deferredPrompt = null;
             } else {
-                alert("Para instalar no celular:\n• Android: Toque nos três pontos do navegador e selecione 'Adicionar à tela inicial'.\n• iPhone: Toque no botão Compartilhar e selecione 'Adicionar à Tela de Início'.");
+                alert("Para instalar:\n• Android (Chrome): Toque nos três pontinhos e 'Instalar aplicativo'.\n• iOS (Safari): Toque em Compartilhar e 'Adicionar à Tela de Início'.");
             }
         }
     </script>
