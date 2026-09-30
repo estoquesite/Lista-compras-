@@ -46,81 +46,43 @@
         header.sticky {
             box-shadow: 0 1px 0 rgba(15,23,42,.04), 0 8px 24px rgba(15,23,42,.035) !important;
         }
-        header.sticky > div { padding-top: .7rem !important; padding-bottom: .7rem !important; }
+        header.sticky > div { padding-top: .6rem !important; padding-bottom: .6rem !important; }
         header h1 { letter-spacing: -.025em; }
 
         header button {
             transition: transform .18s ease, background-color .18s ease, box-shadow .18s ease, opacity .18s ease !important;
         }
         header button:active { transform: scale(.96); }
-        header button.bg-amber-600 {
-            box-shadow: 0 5px 14px rgba(217,119,6,.16) !important;
-        }
 
-        header .bg-blue-50\/80 {
-            box-shadow: inset 0 1px 0 rgba(255,255,255,.55), 0 3px 12px rgba(37,99,235,.035);
-        }
-        header select { min-height: 30px; }
-
-        header .grid.grid-cols-3 > div {
-            min-height: 54px;
-            padding: .55rem .7rem !important;
-            box-shadow: 0 3px 12px rgba(15,23,42,.035);
-            transition: transform .18s ease, box-shadow .18s ease;
-        }
-        header .grid.grid-cols-3 > div:active { transform: scale(.985); }
-        header .grid.grid-cols-3 > div p:last-child { letter-spacing: -.02em; }
-
-        main > section:not(#card-painel-orcamento) {
+        #secao-formulario {
             box-shadow: var(--ui-shadow) !important;
             border-color: var(--ui-border) !important;
         }
-
         #form-compra input:not([type="hidden"]) {
             transition: border-color .18s ease, box-shadow .18s ease, background-color .18s ease;
         }
         #form-compra input:not([type="hidden"]):focus {
             box-shadow: 0 0 0 3px rgba(59,130,246,.10) !important;
         }
-        #form-compra > div:first-of-type { margin-bottom: .15rem; }
-        #btn-submit {
-            box-shadow: 0 6px 16px rgba(16,185,129,.13) !important;
-            font-weight: 650 !important;
-        }
 
         #card-painel-orcamento {
-            padding: .8rem 1rem !important;
-            min-height: 70px;
+            padding: .7rem 1rem !important;
+            min-height: 64px;
             box-shadow: 0 10px 28px rgba(15,23,42,.13) !important;
             border: 1px solid rgba(255,255,255,.055);
         }
-        #card-painel-orcamento > div { padding-left: .5rem; padding-right: .5rem; }
-        #card-painel-orcamento span:first-child { opacity: .78; }
-        #card-painel-orcamento span:last-child { letter-spacing: -.025em; }
 
         #container-itens > div {
-            min-height: 54px;
-            padding-top: .65rem !important;
-            padding-bottom: .65rem !important;
+            min-height: 52px;
+            padding-top: .6rem !important;
+            padding-bottom: .6rem !important;
             transition: background-color .18s ease, opacity .18s ease;
-        }
-        #container-itens > div:hover {
-            background: rgba(248,250,252,.72);
-        }
-        .dark #container-itens > div:hover {
-            background: rgba(30,41,59,.32);
         }
         #container-itens input[type="checkbox"] {
             width: 17px !important;
             height: 17px !important;
             accent-color: #e11d48;
         }
-        #container-itens button { transition: opacity .18s ease, color .18s ease; }
-
-        #btn-filtro-todos, #btn-filtro-pendentes, #btn-filtro-comprados {
-            transition: background-color .18s ease, color .18s ease, box-shadow .18s ease !important;
-        }
-        #campo-busca-itens { min-height: 34px; }
 
         nav.fixed.bottom-0 {
             padding-top: .55rem !important;
@@ -132,20 +94,6 @@
             height: 43px !important;
             box-shadow: 0 7px 18px rgba(225,29,72,.20) !important;
         }
-        nav button { transition: transform .18s ease, box-shadow .18s ease, background-color .18s ease !important; }
-        nav button:active { transform: scale(.94); }
-
-        #modal-scanner > div,
-        #modal-config-ia > div,
-        #modal-orcamento > div,
-        #modal-confirmacao > div,
-        #modal-relatorio > div {
-            box-shadow: 0 24px 70px rgba(15,23,42,.22) !important;
-            border-color: rgba(148,163,184,.20) !important;
-        }
-        #modal-config-ia > div,
-        #modal-orcamento > div,
-        #modal-confirmacao > div { padding: 1.35rem !important; }
 
         #toast-aviso {
             box-shadow: 0 10px 30px rgba(15,23,42,.18) !important;
@@ -155,20 +103,13 @@
         @media (max-width: 640px) {
             main { padding-left: .75rem !important; padding-right: .75rem !important; }
             header.sticky > div { padding-left: .8rem !important; padding-right: .8rem !important; }
-            header .grid.grid-cols-3 { gap: .35rem !important; }
-            header .grid.grid-cols-3 > div { padding-left: .55rem !important; padding-right: .55rem !important; }
             nav.fixed.bottom-0 { padding-left: .7rem !important; padding-right: .7rem !important; }
-        }
-
-        button:focus-visible, input:focus-visible, select:focus-visible {
-            outline: 2px solid rgba(59,130,246,.55);
-            outline-offset: 2px;
         }
     </style>
 </head>
 <body class="bg-slate-50 dark:bg-slate-950 min-h-screen text-slate-800 dark:text-slate-100 transition-colors duration-200 pb-36 select-none antialiased">
 
-    <!-- AVISO TOAST FLUTUANTE -->
+    <!-- TOAST DE AVISOS -->
     <div id="toast-aviso" class="fixed top-4 left-1/2 -translate-x-1/2 z-50 bg-slate-900 text-white px-4 py-2.5 rounded-2xl shadow-xl text-xs font-medium flex items-center gap-2 transition-all duration-300 opacity-0 pointer-events-none -translate-y-4 max-w-xs text-center border border-slate-700">
         <span id="toast-icone">ℹ️</span>
         <span id="toast-texto">Mensagem</span>
@@ -182,7 +123,7 @@
             </div>
             <div>
                 <h2 class="text-xl font-bold text-slate-900 dark:text-white">Acesso Seguro</h2>
-                <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">Valide sua biometria ou digite o PIN</p>
+                <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">Valide a biometria ou digite o PIN</p>
             </div>
 
             <button type="button" onclick="entrarComBiometria()" class="w-full bg-emerald-600 hover:bg-emerald-700 active:scale-95 text-white font-semibold py-3 rounded-2xl transition text-sm shadow-md flex items-center justify-center gap-2">
@@ -212,7 +153,7 @@
         
         <!-- CABEÇALHO -->
         <header class="sticky top-0 z-40 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md shadow-sm border-b border-slate-200/80 dark:border-slate-800/80">
-            <div class="max-w-3xl mx-auto p-3.5 space-y-2.5">
+            <div class="max-w-3xl mx-auto p-3.5 space-y-2">
                 
                 <div class="flex justify-between items-center">
                     <div>
@@ -239,7 +180,7 @@
                 </div>
 
                 <!-- Seletor Mês e Ano -->
-                <div class="flex items-center justify-between bg-blue-50/80 dark:bg-blue-950/30 border border-blue-100 dark:border-blue-900/40 p-2 rounded-2xl">
+                <div class="flex items-center justify-between bg-blue-50/80 dark:bg-blue-950/30 border border-blue-100 dark:border-blue-900/40 p-1.5 rounded-2xl">
                     <span class="text-xs font-semibold text-blue-700 dark:text-blue-300 uppercase px-1">📅 Período:</span>
                     <div class="flex gap-1.5">
                         <select id="filtro-mes-ano" onchange="mudarMesReferencia()" class="bg-white dark:bg-slate-900 text-slate-800 dark:text-white px-2.5 py-1 rounded-xl text-xs font-semibold border border-blue-200 dark:border-blue-800 focus:ring-1 focus:ring-blue-500">
@@ -288,87 +229,91 @@
         </header>
 
         <!-- CORPO PRINCIPAL -->
-        <main class="max-w-3xl mx-auto p-4 space-y-4">
+        <main class="max-w-3xl mx-auto p-3.5 space-y-3.5">
             
-            <!-- FORMULÁRIO -->
-            <section class="bg-white dark:bg-slate-900 p-4 rounded-3xl shadow-sm border border-slate-200/80 dark:border-slate-800">
-                <div class="flex justify-between items-center mb-2.5">
+            <!-- FORMULÁRIO COMPACTO -->
+            <section id="secao-formulario" class="bg-white dark:bg-slate-900 p-3.5 rounded-3xl shadow-sm border border-slate-200/80 dark:border-slate-800">
+                <div class="flex justify-between items-center mb-2">
                     <h2 id="form-titulo" class="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Adicionar Produto</h2>
-                    <span class="text-[10px] text-slate-400">Código de barras opcional</span>
+                    <span class="text-[10px] text-slate-400">Sugestões automáticas ativas</span>
                 </div>
                 
-                <form id="form-compra" class="space-y-3" onsubmit="salvarItemCompra(event)">
+                <form id="form-compra" class="space-y-2.5" onsubmit="salvarItemCompra(event)">
                     <input type="hidden" id="edit-compra-id">
                     <input type="hidden" id="compra-ean">
                     
-                    <div>
-                        <label class="block text-[10px] font-semibold text-slate-500 uppercase mb-1">Produto ou Código de Barras</label>
-                        <div class="flex items-center gap-1.5">
-                            <div class="relative flex-1">
-                                <input type="text" id="compra-nome" required placeholder="Digite o nome ou código de barras..." class="w-full px-3 py-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs focus:ring-2 focus:ring-blue-500 text-slate-900 dark:text-white" onkeydown="tratarEnterNoCampo(event)">
-                            </div>
+                    <!-- LINHA 1: NOME COM SUGESTÕES -->
+                    <div class="flex items-center gap-1.5">
+                        <div class="relative flex-1">
+                            <input 
+                                type="text" 
+                                id="compra-nome" 
+                                list="lista-sugestoes" 
+                                autocomplete="off"
+                                required 
+                                placeholder="Digite o produto (ex: biscoito, arroz...)" 
+                                class="w-full px-3 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs focus:ring-2 focus:ring-blue-500 text-slate-900 dark:text-white"
+                                onkeydown="tratarEnterNoCampo(event)"
+                                onfocus="rolarParaCampoAoFocar(this)">
                             
-                            <button type="button" onclick="pesquisarProdutoOuCodigo()" class="bg-blue-600 hover:bg-blue-700 active:scale-95 text-white px-3 py-2.5 rounded-xl text-xs font-bold transition flex items-center gap-1 shadow-sm shrink-0" title="Procurar na Internet">
-                                <span>🔍</span>
-                                <span class="hidden sm:inline">Buscar</span>
-                            </button>
-
-                            <button type="button" onclick="iniciarLeitorCodigoBarras()" class="bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 active:scale-95 text-slate-700 dark:text-slate-300 px-3 py-2.5 rounded-xl text-xs font-bold transition flex items-center gap-1 border border-slate-200 dark:border-slate-700 shrink-0" title="Bipar ou Fotografar">
-                                <span>📷</span>
-                            </button>
+                            <datalist id="lista-sugestoes"></datalist>
                         </div>
+                        
+                        <button type="button" onclick="pesquisarProdutoOuCodigo()" class="bg-blue-600 hover:bg-blue-700 active:scale-95 text-white px-2.5 py-2 rounded-xl text-xs font-bold transition flex items-center gap-1 shrink-0" title="Procurar na Internet">
+                            <span>🔍</span>
+                        </button>
+
+                        <button type="button" onclick="iniciarLeitorCodigoBarras()" class="bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 active:scale-95 text-slate-700 dark:text-slate-300 px-2.5 py-2 rounded-xl text-xs font-bold transition flex items-center gap-1 border border-slate-200 dark:border-slate-700 shrink-0" title="Câmara / Scanner">
+                            <span>📷</span>
+                        </button>
                     </div>
 
-                    <div class="grid grid-cols-2 gap-2">
-                        <div>
-                            <label class="block text-[10px] font-semibold text-slate-500 uppercase mb-1">Quantidade</label>
-                            <input type="number" id="compra-qtd" required min="0.1" step="any" value="1" class="w-full px-3 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs text-center focus:ring-2 focus:ring-blue-500 text-slate-900 dark:text-white">
+                    <!-- LINHA 2: QTD, PREÇO E BOTÃO SALVAR -->
+                    <div class="grid grid-cols-12 gap-1.5 items-center">
+                        <div class="col-span-3">
+                            <input type="number" id="compra-qtd" required min="0.1" step="any" value="1" placeholder="Qtd" class="w-full px-2 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs text-center focus:ring-2 focus:ring-blue-500 text-slate-900 dark:text-white" onfocus="rolarParaCampoAoFocar(this)">
                         </div>
-                        <div>
-                            <label class="block text-[10px] font-semibold text-slate-500 uppercase mb-1">Preço Un (R$)</label>
-                            <input type="number" id="compra-preco" required step="0.01" min="0" placeholder="0,00" class="w-full px-3 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs focus:ring-2 focus:ring-blue-500 text-slate-900 dark:text-white">
+                        <div class="col-span-4">
+                            <input type="number" id="compra-preco" required step="0.01" min="0" placeholder="R$ 0,00" class="w-full px-2 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs focus:ring-2 focus:ring-blue-500 text-slate-900 dark:text-white text-center" onfocus="rolarParaCampoAoFocar(this)">
                         </div>
-                    </div>
-
-                    <div class="flex gap-2 pt-1">
-                        <button type="submit" id="btn-submit" class="w-full bg-emerald-600 hover:bg-emerald-700 active:scale-98 text-white font-medium py-2.5 rounded-xl transition text-xs shadow-sm">
-                            ➕ Adicionar à Lista
-                        </button>
-                        <button type="button" id="btn-cancelar" onclick="cancelarEdicao()" class="hidden bg-slate-200 dark:bg-slate-800 hover:bg-slate-300 text-slate-700 dark:text-slate-300 px-4 py-2.5 rounded-xl text-xs transition">
-                            Cancelar
-                        </button>
+                        <div class="col-span-5 flex gap-1">
+                            <button type="submit" id="btn-submit" class="w-full bg-emerald-600 hover:bg-emerald-700 active:scale-95 text-white font-bold py-2 rounded-xl transition text-xs shadow-sm flex items-center justify-center gap-1">
+                                <span>➕</span> Salvar
+                            </button>
+                            <button type="button" id="btn-cancelar" onclick="cancelarEdicao()" class="hidden bg-slate-200 dark:bg-slate-800 hover:bg-slate-300 text-slate-700 dark:text-slate-300 px-2.5 py-2 rounded-xl text-xs transition">
+                                ✕
+                            </button>
+                        </div>
                     </div>
                 </form>
             </section>
 
-            <!-- RESUMO EM CARDS -->
-            <section id="card-painel-orcamento" class="bg-gradient-to-br from-slate-900 via-slate-800 to-slate-950 text-white p-4 rounded-3xl shadow-lg grid grid-cols-3 gap-2 text-center divide-x divide-slate-800 transition">
+            <!-- RESUMO EM CARDS (RESTANTE DESCONTA DIRETO) -->
+            <section id="card-painel-orcamento" class="bg-gradient-to-br from-slate-900 via-slate-800 to-slate-950 text-white p-3.5 rounded-3xl shadow-lg grid grid-cols-3 gap-2 text-center divide-x divide-slate-800 transition">
                 <div class="px-1">
                     <span class="block text-[9px] font-semibold uppercase tracking-wider text-slate-400">No Carrinho</span>
-                    <span id="total-carrinho" class="text-xs sm:text-base font-black text-emerald-400 mt-1 block">R$ 0,00</span>
+                    <span id="total-carrinho" class="text-xs sm:text-base font-black text-emerald-400 mt-0.5 block">R$ 0,00</span>
                 </div>
                 <div class="px-1">
                     <span class="block text-[9px] font-semibold uppercase tracking-wider text-slate-400">Total Previsto</span>
-                    <span id="total-geral" class="text-xs sm:text-base font-black text-white mt-1 block">R$ 0,00</span>
+                    <span id="total-geral" class="text-xs sm:text-base font-black text-white mt-0.5 block">R$ 0,00</span>
                 </div>
                 <div class="px-1">
                     <span class="block text-[9px] font-semibold uppercase tracking-wider text-slate-400">Restante</span>
-                    <span id="saldo-restante-final" class="text-xs sm:text-base font-black text-emerald-400 mt-1 block">R$ 0,00</span>
+                    <span id="saldo-restante-final" class="text-xs sm:text-base font-black text-emerald-400 mt-0.5 block">R$ 0,00</span>
                 </div>
             </section>
 
-            <!-- LISTAGEM COM EXCLUSÃO EM MASSA -->
-            <section class="bg-white dark:bg-slate-900 p-4 rounded-3xl shadow-sm border border-slate-200/80 dark:border-slate-800 space-y-3">
-                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-100 dark:border-slate-800 pb-3">
+            <!-- LISTAGEM COM IMPORTAÇÃO E EXCLUSÃO EM MASSA -->
+            <section class="bg-white dark:bg-slate-900 p-3.5 rounded-3xl shadow-sm border border-slate-200/80 dark:border-slate-800 space-y-3">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-100 dark:border-slate-800 pb-2.5">
                     <div class="flex items-center gap-2">
-                        <!-- Checkbox Mestre para Selecionar Todos -->
                         <input type="checkbox" id="check-selecionar-todos" onchange="alternarMarcarTodos(this.checked)" class="w-4 h-4 rounded text-rose-600 focus:ring-0 cursor-pointer shrink-0" title="Selecionar todos para apagar">
                         <label for="check-selecionar-todos" id="status-progresso" class="text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wide cursor-pointer">Itens (0)</label>
                         <button onclick="solicitarLimparLista()" class="text-[11px] text-rose-500 hover:underline ml-1">Zerar Mês</button>
                     </div>
                     
                     <div class="flex items-center gap-2">
-                        <!-- Botão de Excluir em Massa -->
                         <button id="btn-apagar-massa" onclick="solicitarExcluirSelecionados()" class="hidden bg-rose-600 hover:bg-rose-700 active:scale-95 text-white px-2.5 py-1 rounded-xl text-xs font-bold transition shadow-sm flex items-center gap-1">
                             <span>🗑️</span>
                             <span id="texto-btn-apagar-massa">Apagar (0)</span>
@@ -386,25 +331,26 @@
                     <input type="text" id="campo-busca-itens" oninput="renderizarTabelaCompras()" placeholder="🔍 Filtrar itens na lista..." class="w-full px-3 py-1.5 bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700/80 rounded-xl text-xs text-slate-800 dark:text-white focus:outline-none focus:ring-1 focus:ring-blue-500">
                 </div>
 
+                <!-- ÁREA DE CARREGAMENTO DOS ITENS E BANNER DE IMPORTAÇÃO -->
                 <div id="container-itens" class="divide-y divide-slate-100 dark:divide-slate-800"></div>
             </section>
 
         </main>
     </div>
 
-    <!-- MODAL DA CÂMERA -->
+    <!-- MODAL DA CÂMARA -->
     <div id="modal-scanner" class="fixed inset-0 z-50 bg-slate-950/95 backdrop-blur-md hidden flex items-center justify-center p-4">
         <div class="bg-white dark:bg-slate-900 rounded-3xl shadow-2xl max-w-sm w-full overflow-hidden border border-slate-200 dark:border-slate-800 flex flex-col">
             <div class="p-4 border-b border-slate-100 dark:border-slate-800 flex justify-between items-center">
                 <div class="flex items-center gap-2">
                     <span class="text-base">📷</span>
-                    <h3 class="text-sm font-bold text-slate-900 dark:text-white">Câmera Inteligente</h3>
+                    <h3 class="text-sm font-bold text-slate-900 dark:text-white">Câmara Inteligente</h3>
                 </div>
                 <button onclick="fecharLeitorCodigoBarras()" class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 text-lg font-bold">✕</button>
             </div>
             
             <div class="p-4 space-y-3">
-                <p class="text-[11px] text-slate-500 dark:text-slate-400 text-center">Aponte para o código ou tire a foto para a IA:</p>
+                <p class="text-[11px] text-slate-500 dark:text-slate-400 text-center">Aponte para o código ou tire foto para a IA:</p>
                 
                 <div class="relative w-full rounded-2xl overflow-hidden bg-slate-950 aspect-[4/3] flex items-center justify-center border border-slate-700 shadow-inner">
                     <video id="video-camera-stream" autoplay playsinline muted class="w-full h-full object-cover"></video>
@@ -419,7 +365,7 @@
 
             <div class="p-3 bg-slate-50 dark:bg-slate-800/50 border-t border-slate-100 dark:border-slate-800">
                 <button onclick="fecharLeitorCodigoBarras()" class="w-full bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-200 py-2 rounded-xl text-xs font-semibold">
-                    Fechar Câmera
+                    Fechar Câmara
                 </button>
             </div>
         </div>
@@ -433,7 +379,7 @@
                 <h3 class="text-base font-bold text-slate-900 dark:text-white">Identificação por IA</h3>
             </div>
             <p class="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">
-                Insira sua chave do <strong>Google Gemini API</strong>:
+                Insira a sua chave da <strong>Google Gemini API</strong>:
             </p>
             <input type="password" id="input-gemini-key" placeholder="Cole sua Gemini API Key" class="w-full px-3 py-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs text-slate-900 dark:text-white font-mono">
             
@@ -462,7 +408,7 @@
         <div class="bg-white dark:bg-slate-900 p-6 rounded-3xl shadow-2xl max-w-xs w-full space-y-4 text-center border border-slate-200 dark:border-slate-800">
             <div class="text-3xl">⚠️</div>
             <h3 id="modal-confirma-titulo" class="text-base font-bold text-slate-900 dark:text-white">Confirmação</h3>
-            <p id="modal-confirma-msg" class="text-xs text-slate-500">Tem certeza que deseja prosseguir?</p>
+            <p id="modal-confirma-msg" class="text-xs text-slate-500">Tem a certeza de que deseja prosseguir?</p>
             <div class="flex gap-2 pt-2">
                 <button onclick="fecharModalConfirma()" class="flex-1 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 py-2.5 rounded-xl text-xs font-semibold">Não</button>
                 <button id="btn-confirma-acao" class="flex-1 bg-rose-600 hover:bg-rose-700 text-white py-2.5 rounded-xl text-xs font-semibold">Sim</button>
@@ -514,10 +460,43 @@
 
     <!-- SCRIPTS GERAIS -->
     <script>
+        const SUGESTOES_PADRAO = [
+            "Arroz", "Arroz Integral", "Feijão Preto", "Feijão Carioca", "Açúcar Refinado", "Açúcar Cristal", 
+            "Café", "Café Solúvel", "Leite Integral", "Leite Desnatado", "Leite Condensado", "Creme de Leite",
+            "Biscoito Recheado", "Biscoito Cream Cracker", "Biscoito Maisena", "Bolacha", "Batata Palha",
+            "Óleo de Soja", "Azeite de Oliva", "Macarrão Espaguete", "Macarrão Parafuso", "Molho de Tomate",
+            "Extrato de Tomate", "Farinha de Trigo", "Farinha de Mandioca", "Ovos", "Manteiga", "Margarina",
+            "Pão Francês", "Pão de Forma", "Queijo Mussarela", "Presunto", "Iogurte", "Achocolatado",
+            "Peito de Frango", "Carne Moída", "Carne Bovina", "Linguiça", "Salsicha", "Bacon",
+            "Cebola", "Alho", "Tomate", "Batata", "Cenoura", "Alface", "Banana", "Maçã", "Laranja", "Limão",
+            "Detergente", "Sabão em Pó", "Sabão Líquido", "Amaciante", "Água Sanitária", "Desinfetante",
+            "Esponja de Prato", "Papel Toalha", "Papel Higiênico", "Sabonete", "Champô", "Condicionador",
+            "Pasta de Dentes", "Escova de Dentes", "Desodorizante"
+        ];
+
+        function atualizarDatalistSugestoes() {
+            const datalist = document.getElementById('lista-sugestoes');
+            if (!datalist) return;
+
+            const catalogo = JSON.parse(localStorage.getItem('catalogo_codigos_barras') || '{}');
+            const produtosHistorico = Object.values(catalogo);
+            
+            const todasSugestoes = Array.from(new Set([...SUGESTOES_PADRAO, ...produtosHistorico]));
+            todasSugestoes.sort();
+
+            datalist.innerHTML = todasSugestoes.map(item => `<option value="${item}">`).join('');
+        }
+
+        function rolarParaCampoAoFocar(elemento) {
+            setTimeout(() => {
+                elemento.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }, 300);
+        }
+
         // --- SERVICE WORKER OFFLINE ---
         if ('serviceWorker' in navigator) {
             const swCode = `
-                const CACHE_NAME = 'lista-compras-v1';
+                const CACHE_NAME = 'lista-compras-v3';
                 const ASSETS = [
                     'https://cdn.tailwindcss.com',
                     'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2',
@@ -569,9 +548,7 @@
         let chaveMesAno = `${mesSelecionado}_${anoSelecionado}`;
         let filtroVisualAtual = 'todos';
 
-        // Set de IDs selecionados para apagar em lote
         let itensSelecionadosParaExcluir = new Set();
-
         let deferredPrompt = null;
         let orcamentoModalTipo = null;
         let acaoConfirmacaoPendente = null;
@@ -598,7 +575,7 @@
 
         window.addEventListener('online', () => {
             atualizarIndicadorRede();
-            mostrarToast("Conectado! Sincronizando...", "🌐");
+            mostrarToast("Conectado! A sincronizar...", "🌐");
             salvarNaNuvem();
         });
         window.addEventListener('offline', () => {
@@ -644,6 +621,7 @@
             }
             inicializarSeletorAnos();
             atualizarIndicadorRede();
+            atualizarDatalistSugestoes();
 
             if (sessionStorage.getItem('autenticado_site') === 'true') {
                 liberarAcesso();
@@ -687,6 +665,7 @@
             document.getElementById('filtro-ano').value = anoSelecionado;
             renderizarTabelaCompras();
             atualizarIndicadorRede();
+            atualizarDatalistSugestoes();
         }
 
         function entrarComPin() {
@@ -805,7 +784,7 @@
                     });
                 }
             } catch (err) {
-                mostrarToast("Não foi possível acessar a câmera.", "⚠️");
+                mostrarToast("Não foi possível aceder à câmara.", "⚠️");
                 fecharLeitorCodigoBarras();
             }
         }
@@ -853,10 +832,10 @@
 
             if (geminiKey) {
                 if (!navigator.onLine) {
-                    mostrarToast("IA requer conexão com a internet.", "⚠️", 4000);
+                    mostrarToast("A IA requer ligação à internet.", "⚠️", 4000);
                     return;
                 }
-                mostrarToast("IA analisando a foto...", "✨", 6000);
+                mostrarToast("IA a analisar a foto...", "✨", 6000);
                 await identificarComGeminiVision(fotoBase64, geminiKey);
             } else {
                 mostrarToast("Cole a chave na engrenagem ⚙️ para a IA ler!", "ℹ️", 4000);
@@ -906,7 +885,7 @@
                     return;
                 }
             } catch(e) {
-                mostrarToast("Erro ao conectar com a IA. Tente novamente.", "⚠️", 4000);
+                mostrarToast("Erro ao conectar à IA. Tente novamente.", "⚠️", 4000);
             }
 
             document.getElementById('compra-nome').focus();
@@ -940,7 +919,7 @@
             if (!termo) return mostrarToast("Digite algo para buscar!", "⚠️");
 
             const ehCodigo = /^\d{8,14}$/.test(termo);
-            mostrarToast(`Buscando "${termo}"...`, "⏳", 3500);
+            mostrarToast(`A procurar "${termo}"...`, "⏳", 3500);
 
             if (ehCodigo) {
                 await buscarPorCodigoDeBarras(termo);
@@ -977,7 +956,7 @@
             } else {
                 document.getElementById('compra-nome').value = '';
                 document.getElementById('compra-nome').placeholder = `Código ${codigo} - Digite o nome:`;
-                mostrarToast("Não achou na base. Digite o nome aqui uma vez!", "✏️", 4000);
+                mostrarToast("Não encontrado na base. Digite o nome aqui uma vez!", "✏️", 4000);
                 document.getElementById('compra-nome').focus();
             }
         }
@@ -1012,7 +991,7 @@
             document.getElementById('compra-preco').focus();
         }
 
-        // --- SINCRONIZAÇÃO EM NUVEM E ARMAZENAMENTO ---
+        // --- NUVEM & ARMAZENAMENTO ---
         async function sincronizarComNuvem() {
             if (!supabaseClient || !navigator.onLine) return;
             try {
@@ -1028,6 +1007,7 @@
                     if (data.conteudo.historico_dinheiro) localStorage.setItem('historico_dinheiro_mensal', JSON.stringify(data.conteudo.historico_dinheiro));
                     if (data.conteudo.catalogo_codigos) localStorage.setItem('catalogo_codigos_barras', JSON.stringify(data.conteudo.catalogo_codigos));
                     localStorage.removeItem('precisa_sync');
+                    atualizarDatalistSugestoes();
                 } else if (!data) {
                     await salvarNaNuvem();
                 }
@@ -1147,6 +1127,61 @@
             renderizarTabelaCompras();
         }
 
+        // --- IMPORTAR ITENS DO MÊS ANTERIOR ---
+        function obterChaveMesAnterior() {
+            const idxAtual = mesesArray.indexOf(mesSelecionado);
+            let mesAnt, anoAnt;
+            if (idxAtual === 0) {
+                mesAnt = mesesArray[11];
+                anoAnt = String(parseInt(anoSelecionado) - 1);
+            } else {
+                mesAnt = mesesArray[idxAtual - 1];
+                anoAnt = anoSelecionado;
+            }
+            return { chave: `${mesAnt}_${anoAnt}`, mesNome: mesAnt, anoNome: anoAnt };
+        }
+
+        function copiarItensDoMesAnterior() {
+            const { chave: chaveAnt, mesNome } = obterChaveMesAnterior();
+            const cache = JSON.parse(localStorage.getItem('historico_compras_mensal') || '{}');
+            const listaAnterior = cache[chaveAnt] || [];
+
+            if (listaAnterior.length === 0) {
+                return mostrarToast(`Nenhum produto encontrado em ${mesNome}.`, "⚠️");
+            }
+
+            abrirModalConfirma(
+                "Copiar Mês Anterior",
+                `Deseja trazer os ${listaAnterior.length} produtos de ${mesNome}? Eles entrarão como pendentes para este mês.`,
+                async () => {
+                    // Clona itens com novos IDs e comprado = false
+                    const novaLista = listaAnterior.map((item, idx) => ({
+                        ...item,
+                        id: Date.now() + idx,
+                        comprado: false
+                    }));
+
+                    guardarListaDoMes(novaLista);
+
+                    // Copia orçamento caso o mês atual ainda esteja zerado
+                    const orcAleloAtual = obterOrcamento('alelo');
+                    const orcDinheiroAtual = obterOrcamento('dinheiro');
+                    if (orcAleloAtual === 0 && orcDinheiroAtual === 0) {
+                        const cacheTicket = JSON.parse(localStorage.getItem('historico_ticket_mensal') || '{}');
+                        const cacheDinheiro = JSON.parse(localStorage.getItem('historico_dinheiro_mensal') || '{}');
+                        if (cacheTicket[chaveAnt]) cacheTicket[chaveMesAno] = cacheTicket[chaveAnt];
+                        if (cacheDinheiro[chaveAnt]) cacheDinheiro[chaveMesAno] = cacheDinheiro[chaveAnt];
+                        localStorage.setItem('historico_ticket_mensal', JSON.stringify(cacheTicket));
+                        localStorage.setItem('historico_dinheiro_mensal', JSON.stringify(cacheDinheiro));
+                    }
+
+                    await salvarNaNuvem();
+                    renderizarTabelaCompras();
+                    mostrarToast(`Lista de ${mesNome} importada com sucesso!`, "📋");
+                }
+            );
+        }
+
         // --- GESTÃO DE SELEÇÃO E EXCLUSÃO EM MASSA ---
         function alternarSelecaoItem(id, marcado) {
             if (marcado) {
@@ -1225,10 +1260,12 @@
             const qtd = parseFloat(document.getElementById('compra-qtd').value) || 1;
             const preco = parseFloat(document.getElementById('compra-preco').value) || 0;
 
-            if (ean && nome) {
+            if (nome) {
                 const catalogo = JSON.parse(localStorage.getItem('catalogo_codigos_barras') || '{}');
-                catalogo[ean] = nome;
+                if (ean) catalogo[ean] = nome;
+                catalogo[nome] = nome;
                 localStorage.setItem('catalogo_codigos_barras', JSON.stringify(catalogo));
+                atualizarDatalistSugestoes();
             }
 
             let lista = obterListaDoMes();
@@ -1255,7 +1292,7 @@
             await salvarNaNuvem();
             renderizarTabelaCompras();
             cancelarEdicao();
-            mostrarToast("Item salvo com sucesso!", "🛒");
+            mostrarToast("Item guardado com sucesso!", "🛒");
         }
 
         function prepararEdicao(id) {
@@ -1270,7 +1307,7 @@
             document.getElementById('compra-preco').value = item.preco;
 
             document.getElementById('form-titulo').textContent = 'Editar Produto';
-            document.getElementById('btn-submit').textContent = 'Atualizar Item';
+            document.getElementById('btn-submit').innerHTML = '<span>💾</span> Salvar';
             document.getElementById('btn-cancelar').classList.remove('hidden');
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
@@ -1280,9 +1317,9 @@
             document.getElementById('edit-compra-id').value = '';
             document.getElementById('compra-ean').value = '';
             document.getElementById('compra-qtd').value = '1';
-            document.getElementById('compra-nome').placeholder = 'Digite o nome ou código de barras...';
+            document.getElementById('compra-nome').placeholder = 'Digite o produto (ex: biscoito, arroz...)';
             document.getElementById('form-titulo').textContent = 'Adicionar Produto';
-            document.getElementById('btn-submit').textContent = '➕ Adicionar à Lista';
+            document.getElementById('btn-submit').innerHTML = '<span>➕</span> Salvar';
             document.getElementById('btn-cancelar').classList.add('hidden');
         }
 
@@ -1320,7 +1357,7 @@
             });
         }
 
-        // --- RENDERIZAÇÃO DA TABELA (DESCONTO IMEDIATO DO TOTAL PREVISTO) ---
+        // --- RENDERIZAÇÃO DA TABELA ---
         function renderizarTabelaCompras() {
             const listaOriginal = obterListaDoMes();
             const termoBusca = (document.getElementById('campo-busca-itens')?.value || '').toLowerCase().trim();
@@ -1343,7 +1380,7 @@
             const dinheiro = obterOrcamento('dinheiro');
             const orcamentoTotal = alelo + dinheiro;
 
-            // DESCONTA IMEDIATAMENTE O VALOR TOTAL PREVISTO
+            // RESTANTE ABATE IMEDIATAMENTE O VALOR PREVISTO
             const restante = orcamentoTotal - totalGeral;
 
             document.getElementById('saldo-ticket').textContent = `R$ ${alelo.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`;
@@ -1358,10 +1395,10 @@
             
             const painel = document.getElementById('card-painel-orcamento');
             if (restante < 0) {
-                elRestante.className = "text-xs sm:text-base font-black text-rose-400 mt-1 block animate-pulse";
+                elRestante.className = "text-xs sm:text-base font-black text-rose-400 mt-0.5 block animate-pulse";
                 painel.classList.add('ring-2', 'ring-rose-500/80');
             } else {
-                elRestante.className = "text-xs sm:text-base font-black text-emerald-400 mt-1 block";
+                elRestante.className = "text-xs sm:text-base font-black text-emerald-400 mt-0.5 block";
                 painel.classList.remove('ring-2', 'ring-rose-500/80');
             }
 
@@ -1375,8 +1412,28 @@
 
             atualizarBotaoApagarMassa();
 
+            // CASO ESTEJA VAZIO: MOSTRA O CARD PARA COPIAR DO MÊS ANTERIOR
             if (listaFiltrada.length === 0) {
-                container.innerHTML = `<div class="py-8 text-center text-slate-400 text-xs">Nenhum item encontrado.</div>`;
+                const { chave: chaveAnt, mesNome } = obterChaveMesAnterior();
+                const cacheHistorico = JSON.parse(localStorage.getItem('historico_compras_mensal') || '{}');
+                const temMesAnterior = (cacheHistorico[chaveAnt] || []).length > 0;
+
+                if (listaOriginal.length === 0 && temMesAnterior) {
+                    container.innerHTML = `
+                        <div class="py-6 px-4 text-center space-y-3 bg-blue-50/50 dark:bg-blue-950/20 rounded-2xl border border-dashed border-blue-200 dark:border-blue-900/60 my-2">
+                            <span class="text-2xl block">📦</span>
+                            <div>
+                                <p class="text-xs font-bold text-slate-800 dark:text-slate-200">Começando o mês de ${mesSelecionado}?</p>
+                                <p class="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">Deseja reaproveitar a sua lista de ${mesNome} sem precisar digitar tudo?</p>
+                            </div>
+                            <button onclick="copiarItensDoMesAnterior()" class="bg-blue-600 hover:bg-blue-700 active:scale-95 text-white font-semibold text-xs px-4 py-2 rounded-xl shadow-sm transition inline-flex items-center gap-1.5">
+                                <span>📋</span> Copiar produtos de ${mesNome}
+                            </button>
+                        </div>
+                    `;
+                } else {
+                    container.innerHTML = `<div class="py-6 text-center text-slate-400 text-xs">Nenhum item encontrado.</div>`;
+                }
                 return;
             }
 
@@ -1385,12 +1442,10 @@
                 const selecionado = itensSelecionadosParaExcluir.has(i.id);
 
                 return `
-                    <div class="py-2.5 flex items-center justify-between gap-2.5 transition-colors ${i.comprado ? 'opacity-40' : ''} ${selecionado ? 'bg-rose-50/70 dark:bg-rose-950/30 rounded-xl px-1.5' : ''}">
+                    <div class="py-2 flex items-center justify-between gap-2.5 transition-colors ${i.comprado ? 'opacity-40' : ''} ${selecionado ? 'bg-rose-50/70 dark:bg-rose-950/30 rounded-xl px-1.5' : ''}">
                         <div class="flex items-center gap-2.5 min-w-0">
-                            <!-- Checkbox de Seleção para Excluir em Lote -->
                             <input type="checkbox" onchange="alternarSelecaoItem(${i.id}, this.checked)" ${selecionado ? 'checked' : ''} class="w-4 h-4 rounded text-rose-600 focus:ring-0 cursor-pointer shrink-0" title="Marcar para apagar">
 
-                            <!-- Botão do Carrinho -->
                             <button type="button" onclick="alternarComprado(${i.id})" class="text-sm shrink-0" title="${i.comprado ? 'Devolver à lista' : 'Colocar no carrinho'}">
                                 ${i.comprado ? '🛒' : '▫️'}
                             </button>
@@ -1446,7 +1501,7 @@
 
         function partilharWhatsApp() {
             const lista = obterListaDoMes();
-            if (lista.length === 0) return mostrarToast('Sua lista está vazia.', '⚠️');
+            if (lista.length === 0) return mostrarToast('A sua lista está vazia.', '⚠️');
 
             const alelo = obterOrcamento('alelo');
             const dinheiro = obterOrcamento('dinheiro');
