@@ -341,7 +341,7 @@
                 </form>
             </section>
 
-            <!-- RESUMO EM CARDS -->
+            <!-- RESUMO EM CARDS (CARRINHO, TOTAL PREVISTO E RESTANTE) -->
             <section id="card-painel-orcamento" class="bg-gradient-to-br from-slate-900 via-slate-800 to-slate-950 text-white p-4 rounded-3xl shadow-lg grid grid-cols-3 gap-2 text-center divide-x divide-slate-800 transition">
                 <div class="px-1">
                     <span class="block text-[9px] font-semibold uppercase tracking-wider text-slate-400">No Carrinho</span>
@@ -357,7 +357,7 @@
                 </div>
             </section>
 
-            <!-- LISTAGEM COM EXCLUSÃO EM MASSA -->
+            <!-- LISTAGEM COM FILTRO, BUSCA E EXCLUSÃO EM MASSA -->
             <section class="bg-white dark:bg-slate-900 p-4 rounded-3xl shadow-sm border border-slate-200/80 dark:border-slate-800 space-y-3">
                 <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-100 dark:border-slate-800 pb-3">
                     <div class="flex items-center gap-2">
@@ -514,7 +514,7 @@
 
     <!-- SCRIPT GERAL -->
     <script>
-        // --- SERVICE WORKER OFFLINE ---
+        // --- REGISTRO SERVICE WORKER OFFLINE ---
         if ('serviceWorker' in navigator) {
             const swCode = `
                 const CACHE_NAME = 'lista-compras-v1';
@@ -569,7 +569,7 @@
         let chaveMesAno = `${mesSelecionado}_${anoSelecionado}`;
         let filtroVisualAtual = 'todos';
 
-        // Conjunto de IDs selecionados para apagar de uma vez
+        // Set de IDs selecionados para apagar em lote
         let itensSelecionadosParaExcluir = new Set();
 
         let deferredPrompt = null;
@@ -859,7 +859,7 @@
                 mostrarToast("IA analisando a foto...", "✨", 6000);
                 await identificarComGeminiVision(fotoBase64, geminiKey);
             } else {
-                mostrarToast("Cole a chave na engrenagem ⚙️ para a IA ler!", "ℹ️️", 4000);
+                mostrarToast("Cole a chave na engrenagem ⚙️ para a IA ler!", "ℹ️", 4000);
                 document.getElementById('compra-nome').focus();
             }
         }
@@ -906,7 +906,7 @@
                     return;
                 }
             } catch(e) {
-                mostrarToast("Erro ao conectar com a IA. Tente novamente.", "⚠️", 4000);
+                mostrarToast("Erro ao conectar com a IA. Tente novamente.", "⚠️️", 4000);
             }
 
             document.getElementById('compra-nome').focus();
@@ -1008,7 +1008,7 @@
                 }
             } catch(e) {}
 
-            mostrarToast("Use o nome digitado!", "ℹ️");
+            mostrarToast("Use o nome digitado!", "ℹ️️");
             document.getElementById('compra-preco').focus();
         }
 
@@ -1320,7 +1320,7 @@
             });
         }
 
-        // --- RENDERIZAÇÃO DA TABELA ---
+        // --- RENDERIZAÇÃO DA TABELA (COM SALDO DESCONTADO DO CARRINHO) ---
         function renderizarTabelaCompras() {
             const listaOriginal = obterListaDoMes();
             const termoBusca = (document.getElementById('campo-busca-itens')?.value || '').toLowerCase().trim();
@@ -1342,7 +1342,9 @@
             const alelo = obterOrcamento('alelo');
             const dinheiro = obterOrcamento('dinheiro');
             const orcamentoTotal = alelo + dinheiro;
-            const restante = orcamentoTotal - totalGeral;
+
+            // DESCONTA APENAS O QUE JÁ ESTÁ NO CARRINHO
+            const restante = orcamentoTotal - totalCarrinho;
 
             document.getElementById('saldo-ticket').textContent = `R$ ${alelo.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`;
             document.getElementById('saldo-dinheiro').textContent = `R$ ${dinheiro.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`;
@@ -1449,13 +1451,21 @@
             const alelo = obterOrcamento('alelo');
             const dinheiro = obterOrcamento('dinheiro');
             const orcamentoTotal = alelo + dinheiro;
-            const totalGeral = lista.reduce((acc, i) => acc + ((parseFloat(i.qtd) || 0) * (parseFloat(i.preco) || 0)), 0);
+            
+            let totalGeral = 0;
+            let totalCarrinho = 0;
+            lista.forEach(i => {
+                const sub = (parseFloat(i.qtd) || 0) * (parseFloat(i.preco) || 0);
+                totalGeral += sub;
+                if (i.comprado) totalCarrinho += sub;
+            });
 
             let linhas = lista.map(i => `${i.comprado ? '✅' : '▫️'} ${i.nome} (${i.qtd}x) - R$ ${((parseFloat(i.qtd) || 0) * (parseFloat(i.preco) || 0)).toFixed(2)}`).join('\n');
             let texto = `🛒 *Lista de Compras (${mesSelecionado}/${anoSelecionado})*\n\n${linhas}\n\n` +
-                        `💰 *Total Geral:* R$ ${totalGeral.toFixed(2)}\n` +
+                        `💰 *Total Previsto:* R$ ${totalGeral.toFixed(2)}\n` +
+                        `🧺 *Total Carrinho:* R$ ${totalCarrinho.toFixed(2)}\n` +
                         `💳 *Alelo:* R$ ${alelo.toFixed(2)} | 💵 *Espécie:* R$ ${dinheiro.toFixed(2)}\n` +
-                        `✨ *Saldo Restante:* R$ ${(orcamentoTotal - totalGeral).toFixed(2)}`;
+                        `✨ *Saldo Restante:* R$ ${(orcamentoTotal - totalCarrinho).toFixed(2)}`;
 
             window.open(`https://wa.me/?text=${encodeURIComponent(texto)}`, '_blank');
         }
