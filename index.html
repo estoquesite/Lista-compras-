@@ -105,6 +105,10 @@ body.kp{padding-bottom:370px}
 .st b small{font-size:.72em;font-weight:700;margin-right:3px;opacity:.75}
 .st b{white-space:nowrap}
 #cnt{background:var(--gold);color:#1d1033;padding:3px 10px;border-radius:10px;font-size:13px;font-weight:800}
+#hit{display:grid;gap:6px}
+.hi{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:9px 12px;border-radius:12px;background:var(--bg);border:1px solid var(--g2);text-align:left}
+.hi .nm{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-weight:700;min-width:0}
+.hi .vl{font-weight:800;white-space:nowrap;font-variant-numeric:tabular-nums}
 @media(prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
 </style>
 </head>
@@ -144,6 +148,7 @@ body.kp{padding-bottom:370px}
   <input type="hidden" id="ean">
   <div class="row"><input id="n" list="sug" required autocomplete="off" enterkeyhint="next" placeholder="Produto (ex.: arroz, café…)" onfocus="kpHide()" onkeydown="if(event.key=='Enter')autoPreco();nx(event,'qt')"><datalist id="sug"></datalist>
    <button type="button" class="ib" onclick="buscar()">🔍</button><button type="button" class="ib" onclick="scan()">📷</button><button type="button" class="ib" id="mic" onclick="voz()">🎤</button></div>
+  <div id="hit" class="hidden"></div>
   <div class="row"><input id="qt" type="text" inputmode="none" readonly value="1" style="width:25%;text-align:center;font-weight:800" onfocus="kpOpen('qt')" onclick="kpOpen('qt')"><input id="p" type="text" inputmode="none" readonly placeholder="R$ 0,00" style="text-align:center;font-weight:800" onfocus="kpOpen('p')" onclick="kpOpen('p')">
    <button class="g" id="bs" style="flex:none">➕ Salvar</button><button type="button" id="bc" class="ib hidden" onclick="reset()">✕</button></div>
  </form>
@@ -269,8 +274,8 @@ function sugest(){const h=Object.values(J(K.k,{}));$('sug').innerHTML=[...new Se
 function lastPrice(n){const all=J(K.c,{});let r=0;Object.values(all).forEach(l=>l.forEach(i=>{if(i.nome.toLowerCase()==n.toLowerCase()&&i.preco)r=i.preco}));return r}
 function autoPreco(){const n=$('n').value.trim();if(n&&!$('p').value&&!edit){const p=lastPrice(n);if(p){$('p').value=String(p).replace('.',',');toast('Último preço pago: '+brl(p),'💡')}}}
 function save(e){e.preventDefault();const n=$('n').value.trim(),qtd=num($('qt').value)||1,p=num($('p').value)||0,ean=$('ean').value;if(!n)return;const c=J(K.k,{});if(ean)c[ean]=n;c[n]=n;S(K.k,c);const l=L();if(edit){const i=l.find(x=>x.id==edit);i&&Object.assign(i,{nome:n,qtd,preco:p,ean:ean||i.ean||null})}else l.push({id:Date.now(),nome:n,qtd,preco:p,ean:ean||null,comprado:AC()});SL(l);reset();render();sugest();toast(edit||!AC()?'Item guardado':'Item no carrinho','🛒');$('n').focus()}
-function reset(){$('f').reset();edit=null;$('ean').value='';$('qt').value=1;$('n').placeholder='Produto (ex.: arroz, café…)';$('ft').textContent='Adicionar produto';$('bs').textContent='➕ Salvar';$('bc').classList.add('hidden')}
-function ed(id){const i=L().find(x=>x.id==id);if(!i)return;edit=id;$('ean').value=i.ean||'';$('n').value=i.nome;$('qt').value=String(i.qtd).replace('.',',');$('p').value=i.preco?String(i.preco).replace('.',','):'';$('ft').textContent='Editar produto';$('bs').textContent='💾 Salvar';$('bc').classList.remove('hidden');scrollTo({top:0,behavior:'smooth'})}
+function reset(){$('f').reset();edit=null;$('ean').value='';$('qt').value=1;$('n').placeholder='Produto (ex.: arroz, café…)';$('ft').textContent='Adicionar produto';$('bs').textContent='➕ Salvar';$('bc').classList.add('hidden');hits()}
+function ed(id){const i=L().find(x=>x.id==id);if(!i)return;edit=id;$('ean').value=i.ean||'';$('n').value=i.nome;$('qt').value=String(i.qtd).replace('.',',');$('p').value=i.preco?String(i.preco).replace('.',','):'';$('ft').textContent='Editar produto';$('bs').textContent='💾 Salvar';$('bc').classList.remove('hidden');kpSee()}
 function tg(id){const l=L(),i=l.find(x=>x.id==id);if(i){i.comprado=!i.comprado;beep();SL(l);render()}}
 function qty(id,d){const l=L(),i=l.find(x=>x.id==id);if(i){i.qtd=Math.max(.1,Math.round((+i.qtd+d)*100)/100);SL(l);render()}}
 function rm(id){const old=L(),i=old.find(x=>x.id==id);SL(old.filter(x=>x.id!=id));sel.delete(id);render();toast('Item removido','🗑️','Desfazer',()=>{SL(old);render()})}
@@ -311,7 +316,7 @@ function baixarCsv(){const r=['Mes;Ano;Produto;Qtd;Preco;Subtotal;Comprado'];Obj
 function importar(f){if(!f)return;const r=new FileReader();r.onload=()=>{try{const o=JSON.parse(r.result),c=J(K.c,{});let n=0;for(const[k,v]of Object.entries(o.historico_compras||{})){const cur=c[k]||[];v.forEach(i=>{if(!cur.some(x=>x.nome.toLowerCase()==String(i.nome).toLowerCase())){cur.push({...i,id:Date.now()+Math.floor(Math.random()*1e6)});n++}});c[k]=cur}S(K.c,c);[['historico_ticket',K.a],['historico_dinheiro',K.d]].forEach(([s,t])=>{const cur=J(t,{});for(const[k,v]of Object.entries(o[s]||{}))if(!cur[k])cur[k]=v;S(t,cur)});S(K.k,{...(o.catalogo_codigos||{}),...J(K.k,{})});push();closeM();render();sugest();toast(n+' item(ns) juntado(s)','✅')}catch{toast('Arquivo inválido','⚠️')}};r.readAsText(f)}
 
 /* ---------- Ajustes ---------- */
-function cfg(){const fq_=J(FILA,[]).length;openM(`<h3>⚙️ Ajustes</h3><label class="row" style="font-size:13px"><input type="checkbox" id="ac" ${AC()?'checked':''}> Item novo já entra no carrinho</label><p class="mut">Chave Google Gemini (identificar produto por foto — precisa de internet)</p><input id="gk" type="password" placeholder="Gemini API Key" value="${esc(localStorage.gemini_api_key||'')}">${fq_?`<p class="mut">📥 ${fq_} foto(s) aguardando internet</p>`:''}<button class="ib" style="width:100%;height:auto;padding:9px" onclick="testarIA()">🧪 Testar chave da IA</button><p class="mut">Novo PIN (4–6 dígitos, opcional)</p><input id="np" type="password" inputmode="numeric" maxlength="6" placeholder="PIN atual: ${localStorage.pin_app?'personalizado':'1234'}"><div class="row"><button class="ib" style="flex:1" onclick="closeM()">Fechar</button><button class="g" style="flex:1" onclick="localStorage.gemini_api_key=$('gk').value.trim();localStorage.auto_carrinho=$('ac').checked?'1':'0';const p=$('np').value;if(/^\\d{4,6}$/.test(p))localStorage.pin_app=p;closeM();toast('Ajustes salvos','✨');processaFila()">Salvar</button></div>`)}
+function cfg(){const fq_=J(FILA,[]).length;openM(`<h3>⚙️ Ajustes</h3><label class="row" style="font-size:13px"><input type="checkbox" id="ac" ${AC()?'checked':''}> Item novo já entra no carrinho</label><label class="row" style="font-size:13px"><input type="checkbox" id="af" ${AF()?'checked':''}> Pular campos e salvar sozinho</label><p class="mut">Chave Google Gemini (identificar produto por foto — precisa de internet)</p><input id="gk" type="password" placeholder="Gemini API Key" value="${esc(localStorage.gemini_api_key||'')}">${fq_?`<p class="mut">📥 ${fq_} foto(s) aguardando internet</p>`:''}<button class="ib" style="width:100%;height:auto;padding:9px" onclick="testarIA()">🧪 Testar chave da IA</button><p class="mut">Novo PIN (4–6 dígitos, opcional)</p><input id="np" type="password" inputmode="numeric" maxlength="6" placeholder="PIN atual: ${localStorage.pin_app?'personalizado':'1234'}"><div class="row"><button class="ib" style="flex:1" onclick="closeM()">Fechar</button><button class="g" style="flex:1" onclick="localStorage.gemini_api_key=$('gk').value.trim();localStorage.auto_carrinho=$('ac').checked?'1':'0';localStorage.auto_fluxo=$('af').checked?'1':'0';const p=$('np').value;if(/^\\d{4,6}$/.test(p))localStorage.pin_app=p;closeM();toast('Ajustes salvos','✨');processaFila()">Salvar</button></div>`)}
 
 /* ---------- Busca, scanner e IA ---------- */
 async function buscar(){const t=$('n').value.trim();if(!t)return toast('Digite algo para buscar','⚠️');toast('Procurando…','⏳');/^\d{8,14}$/.test(t)?await porCodigo(t):await porNome(t)}
@@ -377,20 +382,25 @@ function dragInit(){document.querySelectorAll('.hdl').forEach(h=>h.addEventListe
  h.addEventListener('pointermove',mv);h.addEventListener('pointerup',up);h.addEventListener('pointercancel',up)}))}
 
 /* ---------- Teclado numérico interno ---------- */
-let kf=null,fresh=true;
+let kf=null,fresh=true,kt,nt;
+const AF=()=>localStorage.auto_fluxo!='0';
+const nomes=()=>[...new Set([...SUG,...Object.values(J(K.k,{}))])].map(x=>x.toLowerCase());
+function hits(){const v=$('n').value.trim().toLowerCase(),h=$('hit');if(!v||edit){h.classList.add('hidden');h.innerHTML='';return}const r=L().filter(i=>i.nome.toLowerCase().includes(v)).slice(0,4);h.classList.toggle('hidden',!r.length);h.innerHTML=r.map(i=>`<button type="button" class="hi" onclick="hit(${i.id})"><span class="nm">${esc(i.nome)}${i.comprado?' ✓':''}</span><span class="vl">${+i.qtd} × ${brl(i.preco)}</span></button>`).join('')}
+function hit(id){ed(id);hits();kpOpen('p')}
+$('n').addEventListener('input',e=>{hits();clearTimeout(nt);if(!AF()||edit||(e.inputType||'').startsWith('delete'))return;const v=$('n').value.trim().toLowerCase();if(!v)return;nt=setTimeout(()=>{if($('n').value.trim().toLowerCase()!=v||document.activeElement!==$('n'))return;const ns=nomes();if(ns.includes(v)&&!ns.some(x=>x!=v&&x.startsWith(v))&&!L().some(i=>i.nome.toLowerCase()==v)){autoPreco();nx({key:'Enter',preventDefault(){}},'qt')}},450)});
 const setHH=()=>{const h=document.querySelector('header');h&&h.offsetHeight&&document.documentElement.style.setProperty('--hh',h.offsetHeight+'px')};addEventListener('resize',setHH);
 const num=v=>+String(v).replace(',','.')||0;
 const hb=n=>'<small>R$</small>'+(+n||0).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});
 function kpShow(){$('kl').textContent=($('n').value||'Produto')+' · '+(kf=='qt'?'Quantidade':'Valor (R$)');$('kv').textContent=$(kf).value||'0';$('kgo').textContent=kf=='qt'?'Próximo ➜':'✔ Salvar'}
 function kpOpen(id){if(kf==id&&$('kp').classList.contains('on'))return;kf=id;fresh=true;$('kp').classList.add('on');document.body.classList.add('kp');document.querySelectorAll('.fl').forEach(e=>e.classList.add('off'));kpShow();kpSee()}
 function kpSee(){const h=document.querySelector('.hero'),f=$('sf');if(!h||!f)return;const top=(parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--hh'))||52)+h.offsetHeight+8,r=f.getBoundingClientRect();if(r.top<top||r.bottom>innerHeight-($('kp').offsetHeight||300))scrollBy({top:r.top-top,behavior:'smooth'})}
-function kpHide(){kf=null;$('kp').classList.remove('on');document.body.classList.remove('kp');const a=document.activeElement;a&&/^(qt|p)$/.test(a.id)&&a.blur();wake()}
+function kpHide(){clearTimeout(kt);kf=null;$('kp').classList.remove('on');document.body.classList.remove('kp');const a=document.activeElement;a&&/^(qt|p)$/.test(a.id)&&a.blur();wake()}
 function kp(k){const el=$(kf);if(!el)return;let v=fresh?'':el.value;fresh=false;
  if(k=='b')v=v.slice(0,-1);
  else if(k==','){if(!v.includes(','))v=(v||'0')+','}
  else{if(v.includes(',')&&v.split(',')[1].length>=2)return;v=v=='0'?k:v+k}
- el.value=v;kpShow();navigator.vibrate&&navigator.vibrate(15)}
-function kpNext(){if(kf=='qt'){if(!$('qt').value)$('qt').value='1';kf=null;kpOpen('p');$('p').focus()}else{if(!$('n').value.trim()){kpHide();$('n').focus();return toast('Digite o nome do produto','✏️')}kpHide();$('bs').click()}}
+ el.value=v;kpShow();clearTimeout(kt);if(AF()&&k!='b'){if(kf=='qt'&&v)kt=setTimeout(()=>{kf=='qt'&&kpNext()},1300);if(kf=='p'&&/,\d\d$/.test(v))kt=setTimeout(()=>{kf=='p'&&kpNext()},700)};navigator.vibrate&&navigator.vibrate(15)}
+function kpNext(){clearTimeout(kt);if(kf=='qt'){if(!$('qt').value)$('qt').value='1';kf=null;kpOpen('p');$('p').focus()}else{if(!$('n').value.trim()){kpHide();$('n').focus();return toast('Digite o nome do produto','✏️')}kpHide();$('bs').click()}}
 
 applyOrder();dragInit();navigator.storage&&navigator.storage.persist&&navigator.storage.persist();applyF();addEventListener('resize',()=>{clearTimeout(rt);rt=setTimeout(()=>bgAnim(J('fundo',{}).anim),300)});
 sessionStorage.auth?enter():(innerWidth<768&&window.PublicKeyCredential&&setTimeout(bio,400));
