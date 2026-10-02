@@ -231,7 +231,7 @@ const PIN=()=>localStorage.pin_app||'1234';
 function err(m){$('err').textContent=m}
 function pinGo(){$('pin').value==PIN()?($('pin').value='',enter()):err('PIN incorreto.')}
 async function enter(){sessionStorage.auth='1';await down();$('login').classList.add('hidden');$('app').classList.remove('hidden');setHH();$('fm').value=mes;$('fa').value=ano;render();sugest();net();wake()}
-function lock(){sessionStorage.removeItem('auth');$('app').classList.add('hidden');$('login').classList.remove('hidden')}
+function lock(){stopMic(0);sessionStorage.removeItem('auth');$('app').classList.add('hidden');$('login').classList.remove('hidden')}
 async function bio(){try{if(!window.PublicKeyCredential||!await PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable())return err('Biometria indisponível. Use o PIN.');const ch=crypto.getRandomValues(new Uint8Array(32));let c;if(localStorage.bio){try{c=await navigator.credentials.get({publicKey:{challenge:ch,allowCredentials:[{id:Uint8Array.from(atob(localStorage.bio),x=>x.charCodeAt(0)),type:'public-key'}],userVerification:'required'}})}catch{}}
 if(!c){c=await navigator.credentials.create({publicKey:{challenge:ch,rp:{name:'Compras'},user:{id:crypto.getRandomValues(new Uint8Array(16)),name:'user',displayName:'Usuário'},pubKeyCredParams:[{alg:-7,type:'public-key'},{alg:-257,type:'public-key'}],authenticatorSelection:{authenticatorAttachment:'platform',userVerification:'required'}}});localStorage.bio=btoa(String.fromCharCode(...new Uint8Array(c.rawId)))}c&&enter()}catch(e){e.name!='NotAllowedError'&&err('Falha biométrica. Use o PIN.')}}
 
@@ -358,20 +358,47 @@ async function processaFila(){const f=J(FILA,[]);if(fq||!f.length||!localStorage
 /* ---------- Voz e WhatsApp ---------- */
 let rec;
 const vozManual=m=>{openM(`<h3>🎤 Adicionar por voz</h3><p class="mut" style="font-size:12px">${m} Toque no campo e use o microfone do teclado do celular, ou digite. Exemplo: arroz 2 12,50</p><input id="vt" placeholder="arroz 2 12,50" onkeydown="if(event.key=='Enter'){falar(this.value);closeM()}"><button class="g" onclick="falar($('vt').value);closeM()">Adicionar</button>`);setTimeout(()=>$('vt').focus(),150)};
-function voz(){if(rec){rec.stop();return}const R=window.SpeechRecognition||window.webkitSpeechRecognition;if(!R)return vozManual('Este navegador não tem reconhecimento de voz.');
- const r=rec=new R();r.lang='pt-BR';r.interimResults=false;r.continuous=MODO()=='casa';r.maxAlternatives=1;let ok=0;
- r.onstart=()=>{$('mic').style.filter='brightness(1.3)';toast(MODO()=='casa'?'Ouvindo… diga os itens e as quantidades. Toque no 🎤 para parar':'Ouvindo… diga: arroz 2 12,50','🎤')};
- r.onresult=e=>{ok=1;for(let i=e.resultIndex;i<e.results.length;i++)e.results[i].isFinal&&falar(e.results[i][0].transcript)};
- r.onerror=e=>{const m={'not-allowed':'O microfone está bloqueado ou não funciona com o arquivo aberto direto do aparelho.','service-not-allowed':'O reconhecimento de voz não funciona com o arquivo aberto direto do aparelho.','network':'A voz precisa de internet.','audio-capture':'Nenhum microfone encontrado.'}[e.error];ok=1;m?vozManual(m):toast('Não ouvi nada. Tente de novo.','🎤')};
- r.onend=()=>{rec=null;$('mic').style.filter='';ok||toast('Não captei a voz. Tente de novo.','🎤')};
- try{r.start()}catch{rec=null;vozManual('Não consegui ligar o microfone.')}}
+let micOn=false;
+function stopMic(m){micOn=false;try{rec&&rec.stop()}catch{}rec=null;const b=$('mic');b&&(b.style.filter='');m!==0&&toast('Microfone desligado','🎤')}
+function voz(){if(micOn)return stopMic();const R=window.SpeechRecognition||window.webkitSpeechRecognition;if(!R)return vozManual('Este navegador não tem reconhecimento de voz.');micOn=true;ouvir(R);toast(MODO()=='casa'?'Microfone aberto: fale os itens e as quantidades. Toque no 🎤 ou diga "pronto" para desligar':'Microfone aberto: diga o produto e ele aparece. Toque no 🎤 ou diga "pronto" para desligar','🎤')}
+function ouvir(R){const r=rec=new R();r.lang='pt-BR';r.interimResults=false;r.continuous=true;r.maxAlternatives=1;
+ r.onstart=()=>{$('mic').style.filter='brightness(1.4) drop-shadow(0 0 8px #d9c2ff)'};
+ r.onresult=e=>{for(let i=e.resultIndex;i<e.results.length;i++)e.results[i].isFinal&&falar(e.results[i][0].transcript)};
+ r.onerror=e=>{const m={'not-allowed':'O microfone está bloqueado ou não funciona com o arquivo aberto direto do aparelho.','service-not-allowed':'O reconhecimento de voz não funciona com o arquivo aberto direto do aparelho.','network':'A voz precisa de internet.','audio-capture':'Nenhum microfone encontrado.'}[e.error];if(m){micOn=false;vozManual(m)}};
+ r.onend=()=>{rec=null;micOn?setTimeout(()=>micOn&&ouvir(R),250):$('mic').style.filter=''};
+ try{r.start()}catch{rec=null;micOn=false;vozManual('Não consegui ligar o microfone.')}}
 const canon=n=>{const lo=n.toLowerCase(),c=[lo,lo.replace(/s$/,''),lo.replace(/es$/,'')],f=[...SUG,...Object.values(J(K.k,{}))].find(b=>c.includes(b.toLowerCase()));return f||n[0].toUpperCase()+n.slice(1)};
-function falar(t){if(!t||!t.trim())return;const mp={um:1,uma:1,dois:2,duas:2,três:3,tres:3,quatro:4,cinco:5,seis:6,sete:7,oito:8,nove:9,dez:10,onze:11,doze:12},isn=x=>/^\d+(\.\d+)?$/.test(String(x)),l=L(),add=[];
- t.toLowerCase().split(/[,;]| e (?=\S)/).forEach((seg,k)=>{seg=seg.trim();if(!seg)return;const hasR=/reais|real|r\$/.test(seg),tk=seg.replace(/r\$|quantidade|reais|real|\bpor\b/g,' ').replace(/(\d+),(\d+)/g,'$1.$2').split(/\s+/).filter(Boolean).map(w=>mp[w]||w),nums=tk.filter(isn).map(Number),nome=tk.filter(x=>!isn(x)).join(' ');if(!nome)return;
-  let q=1,pr=0,qs=false;if(nums.length>=2){q=nums[0];pr=nums[1];qs=true}else if(nums.length==1){const v=nums[0];if(hasR||!Number.isInteger(v))pr=v;else if(isn(tk[0])||MODO()=='casa'){q=v;qs=true}else pr=v}
-  const nm=canon(nome),ex=l.find(i=>i.nome.toLowerCase()==nm.toLowerCase());
-  if(ex){qs&&(ex.qtd=q);pr&&(ex.preco=pr)}else l.push({id:Date.now()+k,nome:nm,qtd:q,preco:pr||lastPrice(nm),ean:null,comprado:MODO()=='mercado'&&AC()});add.push(nm+(q>1?' ×'+q:''))});
- if(!add.length)return;SL(l);render();toast('Adicionado: '+add.join(', '),'🎤')}
+const STOPR=/n[aã]o quero mais( falar)?|parar|para de ouvir|chega|terminei|pronto|desligar|encerrar|fim da lista/g;
+const W=x=>new Set(x.split(' '));
+const LEAD=W('eu a o as os preciso precisa precisamos precisar quero queria querer falta faltando faltou faltam acabou acabaram comprar compra vou vamos tenho tem que com esse esses essa essas pra para mais também tô to estou está estamos de do da dos das e então aí ai só ainda adiciona adicionar coloca colocar bota botar põe anota anotar pegar leva levar lá aqui tipo gente'),
+ TRAIL=W('né mais também tá ta ok favor aí ai então pra para de e do da'),
+ FILL=W('ah ahn ahh é hum hm hmm né tipo enfim então aí ai bom olha tá ta ok ó ué ei tchau'),
+ BL=W('não nao nada falar falando microfone obrigado obrigada alô teste testando deixa esquece esqueça errei cancelar'),
+ NUM={um:1,uma:1,dois:2,duas:2,três:3,tres:3,quatro:4,cinco:5,seis:6,sete:7,oito:8,nove:9,dez:10,onze:11,doze:12,quinze:15,vinte:20},
+ isn=x=>/^\d+(\.\d+)?$/.test(String(x));
+function limpa(seg){let tk=seg.toLowerCase().replace(/(^|\s)com\s+ess[ea]s?(?=\s|$)/g,' ').replace(/(\d+),(\d+)/g,'$1.$2').replace(/r\$/g,' real ').split(/\s+/).filter(Boolean);
+ const hasR=tk.some(x=>x=='real'||x=='reais');
+ tk=tk.filter(x=>!['real','reais','quantidade','por'].includes(x)&&!FILL.has(x));
+ while(tk.length&&LEAD.has(tk[0]))tk.shift();
+ while(tk.length&&TRAIL.has(tk[tk.length-1]))tk.pop();
+ tk=tk.map(w=>NUM.hasOwnProperty(w)?NUM[w]:w);
+ tk=tk.filter((x,i)=>!(x=='de'&&i&&isn(tk[i-1])));
+ if(tk.some(x=>BL.has(x)))return null;
+ const nums=tk.filter(isn).map(Number),nome=tk.filter(x=>!isn(x)).join(' ');
+ if(!nome||nome.split(' ').length>5)return null;
+ return{nome,nums,hasR,lead:isn(tk[0])}}
+function buscaVoz(nm){kpHide();reset();$('n').value=nm;const low=nm.toLowerCase(),pend=L().filter(i=>!i.comprado&&i.nome.toLowerCase().includes(low)),ex=pend.find(i=>i.nome.toLowerCase()==low)||(pend.length==1?pend[0]:null);if(ex)return hit(ex.id);hits();if(!L().some(i=>i.nome.toLowerCase().includes(low))){autoPreco();nx({key:'Enter',preventDefault(){}},'qt')}else toast('Toque no item para dar o valor','👆')}
+function falar(t){if(!t||!t.trim())return;let x=t.toLowerCase();const parar=x.search(STOPR)>=0;x=x.replace(STOPR,' ');const l=L(),add=[];let busca=null;
+ x.split(/;|\.(?!\d)|,(?!\d)| e (?=\S)/).forEach((seg,k)=>{const o=limpa(seg);if(!o)return;const{nome,nums,hasR}=o;let q=1,pr=0,qs=false;
+  if(nums.length>=2){q=nums[0];pr=nums[1];qs=true}else if(nums.length==1){const v=nums[0];if(hasR||!Number.isInteger(v))pr=v;else if(o.lead||MODO()=='casa'){q=v;qs=true}else pr=v}
+  const nm=canon(nome);
+  if(MODO()=='mercado'&&!pr){busca=nm;return}
+  const ex=l.find(i=>i.nome.toLowerCase()==nm.toLowerCase());
+  if(ex){qs&&(ex.qtd=q);pr&&(ex.preco=pr);MODO()=='mercado'&&AC()&&pr&&(ex.comprado=true)}else l.push({id:Date.now()+k,nome:nm,qtd:q,preco:pr||lastPrice(nm),ean:null,comprado:MODO()=='mercado'&&AC()});
+  add.push(nm+(q>1?' ×'+q:''))});
+ if(add.length){SL(l);render();toast('Adicionado: '+add.join(', '),'🎤')}
+ if(busca)buscaVoz(busca);
+ if(parar)stopMic()}
 function zap(){const l=L();if(!l.length)return toast('Lista vazia','⚠️');const o=B('a')+B('d');let g=0,c=0;l.forEach(i=>{g+=i.qtd*i.preco;i.comprado&&(c+=i.qtd*i.preco)});window.open('https://wa.me/?text='+encodeURIComponent(`🛒 *Lista de Compras (${mes}/${ano})*\n\n`+l.map(i=>`${i.comprado?'✅':'▫️'} ${i.nome} (${i.qtd}x) - ${brl(i.qtd*i.preco)}`).join('\n')+`\n\n💰 *Previsto:* ${brl(g)}\n🧺 *Carrinho:* ${brl(c)}\n✨ *Restante:* ${brl(o-g)}`),'_blank')}
 
 /* ---------- Painel flutuante: some quando para ---------- */
