@@ -79,6 +79,9 @@ html::after{content:'';position:fixed;inset:7px;border-radius:22px;pointer-event
 .sw button{width:34px;height:34px;border-radius:50%;border:2px solid var(--bd)}
 .chips button{padding:6px 10px;border-radius:10px;border:1px solid var(--bd);font-size:12px}
 .sw .on{box-shadow:0 0 0 3px var(--g2)}.chips .on{background:var(--gold);color:#1d1033;font-weight:700}
+.card{position:relative}
+.hdl{position:absolute;top:0;left:50%;transform:translateX(-50%);width:64px;height:16px;font-size:20px;line-height:12px;touch-action:none;cursor:grab;opacity:.55;z-index:2}
+.card.drag{z-index:50;box-shadow:0 14px 40px rgba(0,0,0,.45);outline:2px solid var(--g2)}
 @media(prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
 </head>
@@ -97,25 +100,14 @@ html::after{content:'';position:fixed;inset:7px;border-radius:22px;pointer-event
 <div id="app" class="w hidden">
 <header>
  <div class="row sp">
-  <div><h1>Lista de Compras</h1><span id="net" class="mut">● Online</span></div>
-  <div class="row">
-   <button class="ib" title="Nuvem" onclick="syncManual()">☁️</button>
-   <button class="ib" title="Relatório" onclick="relat()">📊</button>
-   <button class="ib" title="Backup / Juntar" onclick="backup()">💾</button>
-   <button class="ib" title="Ajustes" onclick="cfg()">⚙️</button>
-  </div>
+  <div><h1 style="font-size:16px">Lista de Compras</h1><span id="net" class="mut">● Online</span></div>
+  <div class="row" style="gap:4px"><select id="fm" onchange="per()" style="width:auto;padding:5px 8px;font-size:12px"></select><select id="fa" onchange="per()" style="width:auto;padding:5px 8px;font-size:12px"></select></div>
  </div>
- <div class="row" style="margin-top:8px"><select id="fm" onchange="per()"></select><select id="fa" onchange="per()" style="width:100px"></select></div>
 </header>
 
-<div class="st" style="margin-top:6px">
- <div onclick="orc('a')"><span class="mut">💳 Alelo ✏️</span><b id="sa"></b></div>
- <div onclick="orc('d')"><span class="mut">💵 Espécie ✏️</span><b id="sd"></b></div>
- <div><span class="mut">∑ Orçado</span><b id="so"></b></div>
-</div>
-
-<section class="card hero">
- <div class="st" style="gap:0">
+<div id="blocks">
+<section class="card hero" data-b="hero"><button class="hdl" aria-label="Mover bloco">⋯</button>
+ <div class="st" style="gap:0;margin-top:4px">
   <div style="background:none;border:0"><span class="mut">No carrinho</span><b id="tc"></b></div>
   <div style="background:none;border:0"><span class="mut">Previsto</span><b id="tg"></b></div>
   <div style="background:none;border:0"><span class="mut">Restante</span><b id="tr"></b></div>
@@ -123,8 +115,8 @@ html::after{content:'';position:fixed;inset:7px;border-radius:22px;pointer-event
  <div class="bar" id="bar"><i></i></div>
 </section>
 
-<section class="card" id="sf">
- <div class="mut" id="ft" style="margin-bottom:8px">Adicionar produto</div>
+<section class="card" id="sf" data-b="form"><button class="hdl" aria-label="Mover bloco">⋯</button>
+ <div class="mut" id="ft" style="margin:4px 0 8px">Adicionar produto</div>
  <form id="f" onsubmit="save(event)" style="display:grid;gap:8px">
   <input type="hidden" id="ean">
   <div class="row"><input id="n" list="sug" required autocomplete="off" enterkeyhint="next" placeholder="Produto (ex.: arroz, café…)" onkeydown="if(event.key=='Enter')autoPreco();nx(event,'qt')"><datalist id="sug"></datalist>
@@ -134,8 +126,8 @@ html::after{content:'';position:fixed;inset:7px;border-radius:22px;pointer-event
  </form>
 </section>
 
-<section class="card">
- <div class="row sp" style="flex-wrap:wrap">
+<section class="card" data-b="list"><button class="hdl" aria-label="Mover bloco">⋯</button>
+ <div class="row sp" style="flex-wrap:wrap;margin-top:6px">
   <label class="row"><input type="checkbox" id="all" onchange="selAll(this.checked)"><b id="prog" style="font-size:12px"></b></label>
   <div class="row"><button id="del" class="g hidden" style="padding:5px 10px;font-size:12px;background:var(--bad);color:#fff" onclick="delSel()"></button>
    <div class="tabs" id="tabs"><button class="on" data-f="todos">Todos</button><button data-f="pend">Pendentes</button><button data-f="ok">Carrinho</button></div></div>
@@ -144,6 +136,15 @@ html::after{content:'';position:fixed;inset:7px;border-radius:22px;pointer-event
  <div id="list"></div>
  <button class="mut" style="margin-top:10px;color:var(--bad)" onclick="zerar()">Zerar este mês</button>
 </section>
+
+<section class="card" data-b="orc"><button class="hdl" aria-label="Mover bloco">⋯</button>
+ <div class="st" style="margin-top:6px">
+  <div onclick="orc('a')"><span class="mut">💳 Alelo ✏️</span><b id="sa"></b></div>
+  <div onclick="orc('d')"><span class="mut">💵 Espécie ✏️</span><b id="sd"></b></div>
+  <div><span class="mut">∑ Orçado</span><b id="so"></b></div>
+ </div>
+</section>
+</div>
 </div>
 
 <div id="mo" class="mo hidden" onclick="if(event.target==this)closeM()"><div class="box" id="mb"></div></div>
@@ -154,7 +155,7 @@ html::after{content:'';position:fixed;inset:7px;border-radius:22px;pointer-event
  <button class="ib" onclick="scan()">📷</button>
  <button id="mic" class="ib" onclick="voz()">🎤</button>
  <button class="ib" onclick="zap()">💬</button>
- <button class="ib" onclick="lock()">🔒</button>
+ <button class="ib" onclick="menuM()">⋯</button>
 </nav>
 <canvas id="cv" class="hidden"></canvas>
 
@@ -282,7 +283,7 @@ function baixarCsv(){const r=['Mes;Ano;Produto;Qtd;Preco;Subtotal;Comprado'];Obj
 function importar(f){if(!f)return;const r=new FileReader();r.onload=()=>{try{const o=JSON.parse(r.result),c=J(K.c,{});let n=0;for(const[k,v]of Object.entries(o.historico_compras||{})){const cur=c[k]||[];v.forEach(i=>{if(!cur.some(x=>x.nome.toLowerCase()==String(i.nome).toLowerCase())){cur.push({...i,id:Date.now()+Math.floor(Math.random()*1e6)});n++}});c[k]=cur}S(K.c,c);[['historico_ticket',K.a],['historico_dinheiro',K.d]].forEach(([s,t])=>{const cur=J(t,{});for(const[k,v]of Object.entries(o[s]||{}))if(!cur[k])cur[k]=v;S(t,cur)});S(K.k,{...(o.catalogo_codigos||{}),...J(K.k,{})});push();closeM();render();sugest();toast(n+' item(ns) juntado(s)','✅')}catch{toast('Arquivo inválido','⚠️')}};r.readAsText(f)}
 
 /* ---------- Ajustes ---------- */
-function cfg(){const fq_=J(FILA,[]).length;openM(`<h3>⚙️ Ajustes</h3><label class="row" style="font-size:13px"><input type="checkbox" id="ac" ${AC()?'checked':''}> Item novo já entra no carrinho</label><p class="mut">Chave Google Gemini (identificar produto por foto — precisa de internet)</p><input id="gk" type="password" placeholder="Gemini API Key" value="${esc(localStorage.gemini_api_key||'')}">${fq_?`<p class="mut">📥 ${fq_} foto(s) aguardando internet</p>`:''}<p class="mut">Novo PIN (4–6 dígitos, opcional)</p><input id="np" type="password" inputmode="numeric" maxlength="6" placeholder="PIN atual: ${localStorage.pin_app?'personalizado':'1234'}"><div class="row"><button class="ib" style="flex:1" onclick="closeM()">Fechar</button><button class="g" style="flex:1" onclick="localStorage.gemini_api_key=$('gk').value.trim();localStorage.auto_carrinho=$('ac').checked?'1':'0';const p=$('np').value;if(/^\\d{4,6}$/.test(p))localStorage.pin_app=p;closeM();toast('Ajustes salvos','✨');processaFila()">Salvar</button></div>`)}
+function cfg(){const fq_=J(FILA,[]).length;openM(`<h3>⚙️ Ajustes</h3><label class="row" style="font-size:13px"><input type="checkbox" id="ac" ${AC()?'checked':''}> Item novo já entra no carrinho</label><p class="mut">Chave Google Gemini (identificar produto por foto — precisa de internet)</p><input id="gk" type="password" placeholder="Gemini API Key" value="${esc(localStorage.gemini_api_key||'')}">${fq_?`<p class="mut">📥 ${fq_} foto(s) aguardando internet</p>`:''}<button class="ib" style="width:100%;height:auto;padding:9px" onclick="testarIA()">🧪 Testar chave da IA</button><p class="mut">Novo PIN (4–6 dígitos, opcional)</p><input id="np" type="password" inputmode="numeric" maxlength="6" placeholder="PIN atual: ${localStorage.pin_app?'personalizado':'1234'}"><div class="row"><button class="ib" style="flex:1" onclick="closeM()">Fechar</button><button class="g" style="flex:1" onclick="localStorage.gemini_api_key=$('gk').value.trim();localStorage.auto_carrinho=$('ac').checked?'1':'0';const p=$('np').value;if(/^\\d{4,6}$/.test(p))localStorage.pin_app=p;closeM();toast('Ajustes salvos','✨');processaFila()">Salvar</button></div>`)}
 
 /* ---------- Busca, scanner e IA ---------- */
 async function buscar(){const t=$('n').value.trim();if(!t)return toast('Digite algo para buscar','⚠️');toast('Procurando…','⏳');/^\d{8,14}$/.test(t)?await porCodigo(t):await porNome(t)}
@@ -299,19 +300,23 @@ async function scan(){openM(`<h3>📷 Câmera</h3><video id="vd" autoplay playsi
 function stopCam(){run=false;try{zx&&zx.reset()}catch{}zx=null;stream&&stream.getTracks().forEach(t=>t.stop());stream=null;closeM()}
 async function lido(c){beep();stopCam();$('n').value=c;await porCodigo(c)}
 
-/* IA de foto: tenta dois modelos, aceita resposta com texto extra e mostra o erro real */
-async function iaFoto(b){const k=localStorage.gemini_api_key;let ult='';
- for(const m of ['gemini-2.5-flash','gemini-2.0-flash']){try{
-  const r=await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${m}:generateContent?key=${encodeURIComponent(k)}`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({contents:[{parts:[{text:'Identifique o produto de supermercado na foto. Responda somente JSON: {"produto":"nome com marca e tamanho","preco":null ou número se houver etiqueta de preço visível}.'},{inlineData:{mimeType:'image/jpeg',data:b}}]}]})}),d=await r.json();
-  if(d.error){ult=d.error.message;continue}
-  const t=((d.candidates&&d.candidates[0]&&d.candidates[0].content&&d.candidates[0].content.parts)||[]).map(x=>x.text||'').join(''),j=t.match(/\{[\s\S]*\}/);
-  if(j)return JSON.parse(j[0]);ult='A IA não devolveu resposta'}catch(e){ult=e.message}}
- throw new Error(ult||'falha')}
+/* IA de foto: tenta vários modelos e mostra o erro real na tela */
+const MODELOS=['gemini-2.5-flash','gemini-2.0-flash','gemini-flash-latest'];
+const errM=t=>openM(`<h3>⚠️ Erro da IA</h3><p class="mut" style="font-size:12px;word-break:break-word;white-space:pre-wrap">${esc(t)}</p><button class="g" onclick="closeM()">OK</button>`);
+async function gem(parts){const k=(localStorage.gemini_api_key||'').trim(),er=[];
+ for(const m of MODELOS){try{
+  const r=await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${m}:generateContent?key=${encodeURIComponent(k)}`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({contents:[{parts}]})}),d=await r.json();
+  if(d.error){er.push(m+': '+d.error.message);continue}
+  const t=((d.candidates&&d.candidates[0]&&d.candidates[0].content&&d.candidates[0].content.parts)||[]).map(x=>x.text||'').join('');
+  if(t)return t;er.push(m+': resposta vazia'+(d.promptFeedback?' ('+JSON.stringify(d.promptFeedback)+')':''))}catch(e){er.push(m+': '+e.message+' (sem conexão com o Google?)')}}
+ throw new Error(er.join('\n'))}
+async function iaFoto(b){const t=await gem([{text:'Identifique o produto de supermercado na foto. Responda somente JSON: {"produto":"nome com marca e tamanho","preco":null ou número se houver etiqueta de preço visível}.'},{inlineData:{mimeType:'image/jpeg',data:b}}]),j=t.match(/\{[\s\S]*\}/);if(!j)throw new Error('Resposta inesperada da IA: '+t.slice(0,150));return JSON.parse(j[0])}
+async function testarIA(){const k=$('gk').value.trim();if(!k)return toast('Cole a chave primeiro','ℹ️');localStorage.gemini_api_key=k;if(!navigator.onLine)return errM('Sem internet no aparelho.');toast('Testando a chave…','⏳');try{await gem([{text:'Responda só: ok'}]);toast('Chave funcionando!','✅')}catch(e){errM(e.message)}}
 async function foto(){const v=$('vd');if(!v||v.readyState<2)return;beep();const c=$('cv'),w=Math.min(1024,v.videoWidth);c.width=w;c.height=Math.floor(w*v.videoHeight/v.videoWidth);c.getContext('2d').drawImage(v,0,0,c.width,c.height);const b=c.toDataURL('image/jpeg',.8).split(',')[1];stopCam();
  if(!localStorage.gemini_api_key)return toast('Cole a chave Gemini em ⚙️ para a IA ler a foto','ℹ️');
  if(!navigator.onLine){const f=J(FILA,[]);f.push({b,mes,ano});try{S(FILA,f);toast('Sem internet: foto guardada. A IA identifica quando voltar','📥')}catch{toast('Sem espaço para guardar a foto','⚠️')}return}
  toast('IA analisando a foto…','✨');
- try{const p=await iaFoto(b);if(p.produto){$('n').value=p.produto;p.preco&&($('p').value=p.preco);beep();toast('IA: '+p.produto,'✨');autoPreco();$('qt').focus();$('qt').select()}else toast('A IA não reconheceu o produto','ℹ️')}catch(e){toast('Erro IA: '+e.message,'⚠️')}}
+ try{const p=await iaFoto(b);if(p.produto){$('n').value=p.produto;p.preco&&($('p').value=p.preco);beep();toast('IA: '+p.produto,'✨');autoPreco();$('qt').focus();$('qt').select()}else toast('A IA não reconheceu o produto','ℹ️')}catch(e){errM(e.message)}}
 async function processaFila(){const f=J(FILA,[]);if(fq||!f.length||!localStorage.gemini_api_key||!navigator.onLine)return;fq=1;const resto=[];let n=0;
  for(const x of f){try{const p=await iaFoto(x.b);if(p.produto){const c=J(K.c,{}),k=x.mes+'_'+x.ano,l=c[k]||[];l.push({id:Date.now()+n,nome:p.produto,qtd:1,preco:+p.preco||lastPrice(p.produto),ean:null,comprado:AC()});c[k]=l;S(K.c,c);n++}}catch{resto.push(x)}}
  S(FILA,resto);fq=0;if(n){push();render();toast(n+' foto(s) identificada(s) e adicionada(s)','✨')}}
@@ -333,7 +338,17 @@ function zap(){const l=L();if(!l.length)return toast('Lista vazia','⚠️');con
 function wake(){document.querySelectorAll('.fl').forEach(e=>e.classList.remove('off'));clearTimeout(ot);ot=setTimeout(()=>{if(/INPUT|SELECT/.test(document.activeElement.tagName)||!$('mo').classList.contains('hidden'))return wake();document.querySelectorAll('.fl').forEach(e=>e.classList.add('off'))},3000)}
 ['pointerdown','pointermove','scroll','touchstart','keydown'].forEach(e=>addEventListener(e,()=>sessionStorage.auth&&wake(),{passive:true}));
 
-navigator.storage&&navigator.storage.persist&&navigator.storage.persist();applyF();addEventListener('resize',()=>{clearTimeout(rt);rt=setTimeout(()=>bgAnim(J('fundo',{}).anim),300)});
+/* ---------- Menu e blocos móveis ---------- */
+function menuM(){openM(`<h3>Menu</h3><div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">${[['☁️ Nuvem','syncManual()'],['📊 Relatório','relat()'],['💾 Backup / Juntar','backup()'],['⚙️ Ajustes','cfg()'],['↕️ Restaurar posições','ordemPadrao()'],['🔒 Bloquear','lock()']].map(([t,f])=>`<button class="ib" style="width:100%;height:auto;padding:12px" onclick="closeM();${f}">${t}</button>`).join('')}</div>`)}
+const ORD=['hero','form','list','orc'];
+function applyOrder(){const box=$('blocks');J('ordem',ORD).forEach(b=>{const e=box.querySelector(`[data-b="${b}"]`);e&&box.appendChild(e)})}
+function ordemPadrao(){S('ordem',ORD);applyOrder();toast('Posições restauradas','↕️')}
+function dragInit(){document.querySelectorAll('.hdl').forEach(h=>h.addEventListener('pointerdown',e=>{e.preventDefault();const c=h.closest('.card'),y0=e.clientY;h.setPointerCapture(e.pointerId);c.classList.add('drag');
+ const mv=ev=>{c.style.transform=`translateY(${ev.clientY-y0}px)`},
+ up=()=>{h.removeEventListener('pointermove',mv);h.removeEventListener('pointerup',up);h.removeEventListener('pointercancel',up);const r=c.getBoundingClientRect(),cy=r.top+r.height/2;c.style.transform='';c.classList.remove('drag');const box=$('blocks');let ref=null;for(const x of [...box.children].filter(x=>x!=c)){const q=x.getBoundingClientRect();if(cy<q.top+q.height/2){ref=x;break}}box.insertBefore(c,ref);S('ordem',[...box.children].map(x=>x.dataset.b))};
+ h.addEventListener('pointermove',mv);h.addEventListener('pointerup',up);h.addEventListener('pointercancel',up)}))}
+
+applyOrder();dragInit();navigator.storage&&navigator.storage.persist&&navigator.storage.persist();applyF();addEventListener('resize',()=>{clearTimeout(rt);rt=setTimeout(()=>bgAnim(J('fundo',{}).anim),300)});
 sessionStorage.auth?enter():(innerWidth<768&&window.PublicKeyCredential&&setTimeout(bio,400));
 </script>
 </body>
