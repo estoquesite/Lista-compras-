@@ -82,10 +82,9 @@ html::after{content:'';position:fixed;inset:7px;border-radius:22px;pointer-event
 .card{position:relative}
 .hdl{position:absolute;top:0;left:50%;transform:translateX(-50%);width:64px;height:16px;font-size:20px;line-height:12px;touch-action:none;cursor:grab;opacity:.55;z-index:2}
 .card.drag{z-index:50;box-shadow:0 14px 40px rgba(0,0,0,.45);outline:2px solid var(--g2)}
-.hero .mut{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.6px}
-.hero #tr{font-size:clamp(30px,10vw,42px);letter-spacing:-.5px;line-height:1.1;white-space:nowrap}
-.hero #tc,.hero #tg{font-size:clamp(18px,6vw,26px);white-space:nowrap}
-.hero b small{font-size:.5em;font-weight:700;margin-right:4px;opacity:.75}
+.hero .mut{font-size:12px}
+.hero .st b{font-size:clamp(14px,4.3vw,17px);white-space:nowrap}
+.hero b small{font-size:.7em;font-weight:700;margin-right:4px;opacity:.75}
 .it b{font-variant-numeric:tabular-nums}
 #sf{scroll-margin-top:70px}
 body.kp{padding-bottom:370px}
@@ -99,7 +98,10 @@ body.kp{padding-bottom:370px}
 #kp .kg button:active{transform:scale(.94)}
 #kp .kg .go{grid-column:4;grid-row:2/5;background:var(--gold);color:#1d1033;font-size:17px}
 #kp .kg .z{grid-column:1/3}
-@media(prefers-reduced-motion:reduce){*{transition:none!important}}
+.pul{animation:pul 1.8s ease-in-out infinite}
+#n,#qt,#p{animation:pul 1.8s ease-in-out infinite}
+@keyframes pul{0%,100%{border-color:var(--g2);box-shadow:0 0 0 0 rgba(157,107,224,.65),0 0 8px rgba(157,107,224,.35)}50%{border-color:#d9c2ff;box-shadow:0 0 0 6px rgba(157,107,224,0),0 0 18px rgba(190,150,245,.7)}}
+@media(prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
 </style>
 </head>
 <body>
@@ -124,10 +126,10 @@ body.kp{padding-bottom:370px}
 
 <div id="blocks">
 <section class="card hero" data-b="hero"><button class="hdl" aria-label="Mover bloco">⋯</button>
-  <div style="text-align:center;margin-top:6px"><span class="mut">Restante</span><b id="tr"></b></div>
- <div class="st" style="grid-template-columns:1fr 1fr;gap:0;margin-top:10px;text-align:center">
+  <div class="st" style="gap:0;margin-top:4px">
   <div style="background:none;border:0"><span class="mut">No carrinho</span><b id="tc"></b></div>
   <div style="background:none;border:0"><span class="mut">Previsto</span><b id="tg"></b></div>
+  <div style="background:none;border:0"><span class="mut">Restante</span><b id="tr"></b></div>
  </div>
  <div class="bar" id="bar"><i></i></div>
 </section>
