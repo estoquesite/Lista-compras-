@@ -28,8 +28,8 @@ h1{font:800 22px Inter,system-ui,sans-serif;margin:0;background:var(--gold);-web
 .mut{color:var(--mut);font-size:12px;font-weight:600}
 header{position:sticky;top:0;z-index:30;padding:10px 0;backdrop-filter:blur(14px);background:color-mix(in srgb,var(--bg) 82%,transparent)}
 .st{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
-.st>div{background:color-mix(in srgb,var(--card) 90%,transparent);border:1px solid var(--bd);border-radius:16px;padding:9px 10px}
-.st b{display:block;font:800 15px Inter,system-ui,sans-serif;font-variant-numeric:lining-nums tabular-nums;margin-top:3px}
+.st>div{background:color-mix(in srgb,var(--card) 90%,transparent);border:1px solid var(--bd);border-radius:16px;padding:8px 6px}
+.st b{display:block;font:800 clamp(12px,3.7vw,15px) Inter,system-ui,sans-serif;font-variant-numeric:lining-nums tabular-nums;margin-top:3px}
 .hero{background:var(--gold);border:0;color:#1d1033;text-align:center;box-shadow:0 10px 30px rgba(157,107,224,.4)}
 .hero b{color:#1d1033}.hero .mut{color:#4a2f7a}.hero .bad{color:#b3261e}.hero .bar{background:rgba(29,16,51,.2)}.hero .bar i{background:#1d1033}.hero .bar.over i{background:#b3261e}
 .bar{height:6px;border-radius:9px;background:rgba(157,107,224,.2);overflow:hidden;margin-top:12px}
@@ -52,7 +52,7 @@ input[type=checkbox]{width:17px;height:17px;padding:0;accent-color:var(--g2);fle
 .fl.off{transform:translate(-50%,160%);opacity:0;pointer-events:none}
 #dock{bottom:max(14px,env(safe-area-inset-bottom));display:flex;align-items:center;gap:6px;padding:8px 10px;border-radius:26px;background:color-mix(in srgb,var(--card) 80%,transparent);backdrop-filter:blur(18px);border:1px solid var(--bd);box-shadow:0 14px 40px rgba(0,0,0,.35),0 0 0 1px rgba(157,107,224,.15)}
 #dock .ib{border:0;background:transparent;font-size:18px}
-#mic{width:54px;height:54px;border-radius:50%;font-size:22px;margin:-22px 2px 0;background:var(--gold);box-shadow:0 8px 24px rgba(157,107,224,.55)}
+#dock #mic{width:54px;height:54px;border-radius:50%;font-size:22px;margin:-22px 2px 0;background:var(--gold);box-shadow:0 8px 24px rgba(157,107,224,.55)}
 #pill{bottom:92px;padding:8px 16px;border-radius:20px;background:var(--gold);color:#1d1033;border:0;font-weight:700;font-size:12px;white-space:nowrap;box-shadow:0 8px 24px rgba(0,0,0,.4)}
 #toast{position:fixed;top:14px;left:50%;transform:translate(-50%,-90px);z-index:90;background:var(--card);color:var(--tx);border:1px solid var(--g2);padding:10px 14px;border-radius:16px;font-size:12px;display:flex;gap:10px;align-items:center;transition:transform .35s;max-width:92vw}
 #toast.on{transform:translate(-50%,0)}
@@ -101,6 +101,10 @@ body.kp{padding-bottom:370px}
 .pul{animation:pul 1.8s ease-in-out infinite}
 #n,#qt,#p{animation:pul 1.8s ease-in-out infinite}
 @keyframes pul{0%,100%{border-color:var(--g2);box-shadow:0 0 0 0 rgba(157,107,224,.65),0 0 8px rgba(157,107,224,.35)}50%{border-color:#d9c2ff;box-shadow:0 0 0 6px rgba(157,107,224,0),0 0 18px rgba(190,150,245,.7)}}
+.hero{position:sticky;top:var(--hh,52px);z-index:20}
+.st b small{font-size:.72em;font-weight:700;margin-right:3px;opacity:.75}
+.st b{white-space:nowrap}
+#cnt{background:var(--gold);color:#1d1033;padding:3px 10px;border-radius:10px;font-size:13px;font-weight:800}
 @media(prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
 </style>
 </head>
@@ -135,11 +139,11 @@ body.kp{padding-bottom:370px}
 </section>
 
 <section class="card" id="sf" data-b="form"><button class="hdl" aria-label="Mover bloco">⋯</button>
- <div class="mut" id="ft" style="margin:4px 0 8px">Adicionar produto</div>
+ <div class="row sp" style="margin:4px 0 8px"><span class="mut" id="ft">Adicionar produto</span><b id="cnt">🛒 0 de 0</b></div>
  <form id="f" onsubmit="save(event)" style="display:grid;gap:8px">
   <input type="hidden" id="ean">
   <div class="row"><input id="n" list="sug" required autocomplete="off" enterkeyhint="next" placeholder="Produto (ex.: arroz, café…)" onfocus="kpHide()" onkeydown="if(event.key=='Enter')autoPreco();nx(event,'qt')"><datalist id="sug"></datalist>
-   <button type="button" class="ib" onclick="buscar()">🔍</button><button type="button" class="ib" onclick="scan()">📷</button></div>
+   <button type="button" class="ib" onclick="buscar()">🔍</button><button type="button" class="ib" onclick="scan()">📷</button><button type="button" class="ib" id="mic" onclick="voz()">🎤</button></div>
   <div class="row"><input id="qt" type="text" inputmode="none" readonly value="1" style="width:25%;text-align:center;font-weight:800" onfocus="kpOpen('qt')" onclick="kpOpen('qt')"><input id="p" type="text" inputmode="none" readonly placeholder="R$ 0,00" style="text-align:center;font-weight:800" onfocus="kpOpen('p')" onclick="kpOpen('p')">
    <button class="g" id="bs" style="flex:none">➕ Salvar</button><button type="button" id="bc" class="ib hidden" onclick="reset()">✕</button></div>
  </form>
@@ -172,8 +176,7 @@ body.kp{padding-bottom:370px}
 <nav id="dock" class="fl">
  <button class="ib" onclick="fundoM()">🎨</button>
  <button class="ib" onclick="scan()">📷</button>
- <button id="mic" class="ib" onclick="voz()">🎤</button>
- <button class="ib" onclick="zap()">💬</button>
+  <button class="ib" onclick="zap()">💬</button>
  <button class="ib" onclick="menuM()">⋯</button>
 </nav>
 <canvas id="cv" class="hidden"></canvas>
@@ -221,7 +224,7 @@ addEventListener('online',net);addEventListener('offline',net);
 const PIN=()=>localStorage.pin_app||'1234';
 function err(m){$('err').textContent=m}
 function pinGo(){$('pin').value==PIN()?($('pin').value='',enter()):err('PIN incorreto.')}
-async function enter(){sessionStorage.auth='1';await down();$('login').classList.add('hidden');$('app').classList.remove('hidden');$('fm').value=mes;$('fa').value=ano;render();sugest();net();wake()}
+async function enter(){sessionStorage.auth='1';await down();$('login').classList.add('hidden');$('app').classList.remove('hidden');setHH();$('fm').value=mes;$('fa').value=ano;render();sugest();net();wake()}
 function lock(){sessionStorage.removeItem('auth');$('app').classList.add('hidden');$('login').classList.remove('hidden')}
 async function bio(){try{if(!window.PublicKeyCredential||!await PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable())return err('Biometria indisponível. Use o PIN.');const ch=crypto.getRandomValues(new Uint8Array(32));let c;if(localStorage.bio){try{c=await navigator.credentials.get({publicKey:{challenge:ch,allowCredentials:[{id:Uint8Array.from(atob(localStorage.bio),x=>x.charCodeAt(0)),type:'public-key'}],userVerification:'required'}})}catch{}}
 if(!c){c=await navigator.credentials.create({publicKey:{challenge:ch,rp:{name:'Compras'},user:{id:crypto.getRandomValues(new Uint8Array(16)),name:'user',displayName:'Usuário'},pubKeyCredParams:[{alg:-7,type:'public-key'},{alg:-257,type:'public-key'}],authenticatorSelection:{authenticatorAttachment:'platform',userVerification:'required'}}});localStorage.bio=btoa(String.fromCharCode(...new Uint8Array(c.rawId)))}c&&enter()}catch(e){e.name!='NotAllowedError'&&err('Falha biométrica. Use o PIN.')}}
@@ -284,10 +287,10 @@ function copiar(){const[m,a]=prevMes(),k=m+'_'+a,all=J(K.c,{}),ant=all[k]||[];as
 function render(){
  const l=L();let tg_=0,tc=0;l.forEach(i=>{const s=i.qtd*i.preco;tg_+=s;i.comprado&&(tc+=s)});
  const a=B('a'),d=B('d'),o=a+d,r=o-tg_;
- $('sa').textContent=brl(a);$('sd').textContent=brl(d);$('so').textContent=brl(o);$('tc').innerHTML=hb(tc);$('tg').innerHTML=hb(tg_);$('tr').innerHTML=hb(r);
+ $('sa').innerHTML=hb(a);$('sd').innerHTML=hb(d);$('so').innerHTML=hb(o);$('tc').innerHTML=hb(tc);$('tg').innerHTML=hb(tg_);$('tr').innerHTML=hb(r);
  $('tr').className=r<0?'bad':'';$('bar').classList.toggle('over',r<0);$('bar').firstChild.style.width=(o?Math.min(100,tg_/o*100):tg_?100:0)+'%';
  $('pill').textContent=`🧺 ${brl(tc)}  ·  Restante ${brl(r)}`;
- $('prog').textContent=`${l.filter(i=>i.comprado).length}/${l.length} no carrinho`;
+ $('cnt').textContent=`🛒 ${l.filter(i=>i.comprado).length} de ${l.length}`;$('prog').textContent=`${l.filter(i=>i.comprado).length}/${l.length} no carrinho`;
  $('del').classList.toggle('hidden',!sel.size);$('del').textContent=`🗑️ Apagar (${sel.size})`;$('all').checked=l.length>0&&sel.size>=l.length;
  const v=vis();
  if(!v.length){const[m]=prevMes(),tem=(J(K.c,{})[prevMes().join('_')]||[]).length;$('list').innerHTML=!l.length&&tem?`<div style="text-align:center;padding:22px 8px;border:1px dashed var(--g2);border-radius:16px;margin-top:12px"><p>Começando ${mes}? Reaproveite a lista de ${m}.</p><button class="g" onclick="copiar()">📋 Copiar de ${m}</button></div>`:'<p class="mut" style="text-align:center;padding:22px">Nenhum item. Adicione o primeiro acima.</p>';return}
@@ -375,10 +378,12 @@ function dragInit(){document.querySelectorAll('.hdl').forEach(h=>h.addEventListe
 
 /* ---------- Teclado numérico interno ---------- */
 let kf=null,fresh=true;
+const setHH=()=>{const h=document.querySelector('header');h&&h.offsetHeight&&document.documentElement.style.setProperty('--hh',h.offsetHeight+'px')};addEventListener('resize',setHH);
 const num=v=>+String(v).replace(',','.')||0;
 const hb=n=>'<small>R$</small>'+(+n||0).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});
 function kpShow(){$('kl').textContent=($('n').value||'Produto')+' · '+(kf=='qt'?'Quantidade':'Valor (R$)');$('kv').textContent=$(kf).value||'0';$('kgo').textContent=kf=='qt'?'Próximo ➜':'✔ Salvar'}
-function kpOpen(id){if(kf==id&&$('kp').classList.contains('on'))return;kf=id;fresh=true;$('kp').classList.add('on');document.body.classList.add('kp');document.querySelectorAll('.fl').forEach(e=>e.classList.add('off'));kpShow();$('sf').scrollIntoView({block:'start',behavior:'smooth'})}
+function kpOpen(id){if(kf==id&&$('kp').classList.contains('on'))return;kf=id;fresh=true;$('kp').classList.add('on');document.body.classList.add('kp');document.querySelectorAll('.fl').forEach(e=>e.classList.add('off'));kpShow();kpSee()}
+function kpSee(){const h=document.querySelector('.hero'),f=$('sf');if(!h||!f)return;const top=(parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--hh'))||52)+h.offsetHeight+8,r=f.getBoundingClientRect();if(r.top<top||r.bottom>innerHeight-($('kp').offsetHeight||300))scrollBy({top:r.top-top,behavior:'smooth'})}
 function kpHide(){kf=null;$('kp').classList.remove('on');document.body.classList.remove('kp');const a=document.activeElement;a&&/^(qt|p)$/.test(a.id)&&a.blur();wake()}
 function kp(k){const el=$(kf);if(!el)return;let v=fresh?'':el.value;fresh=false;
  if(k=='b')v=v.slice(0,-1);
