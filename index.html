@@ -109,6 +109,7 @@ body.kp{padding-bottom:370px}
 .hi{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:9px 12px;border-radius:12px;background:var(--bg);border:1px solid var(--g2);text-align:left}
 .hi .nm{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-weight:700;min-width:0}
 .hi .vl{font-weight:800;white-space:nowrap;font-variant-numeric:tabular-nums}
+.chipm{padding:3px 10px;border-radius:10px;border:1px solid var(--g2);font-size:13px;font-weight:800;white-space:nowrap}
 @media(prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
 </style>
 </head>
@@ -143,7 +144,7 @@ body.kp{padding-bottom:370px}
 </section>
 
 <section class="card" id="sf" data-b="form"><button class="hdl" aria-label="Mover bloco">⋯</button>
- <div class="row sp" style="margin:4px 0 8px"><span class="mut" id="ft">Adicionar produto</span><b id="cnt">🛒 0 de 0</b></div>
+ <div class="row sp" style="margin:4px 0 8px"><span class="mut" id="ft">Adicionar produto</span><div class="row" style="gap:6px"><button type="button" id="modo" class="chipm" onclick="trocaModo()"></button><b id="cnt">🛒 0 de 0</b></div></div>
  <form id="f" onsubmit="save(event)" style="display:grid;gap:8px">
   <input type="hidden" id="ean">
   <div class="row"><input id="n" list="sug" required autocomplete="off" enterkeyhint="next" placeholder="Produto (ex.: arroz, café…)" onfocus="kpHide()" onkeydown="if(event.key=='Enter')autoPreco();nx(event,'qt')"><datalist id="sug"></datalist>
@@ -273,7 +274,7 @@ $('n').addEventListener('input',e=>{if(e.inputType=='insertReplacementText'){aut
 function sugest(){const h=Object.values(J(K.k,{}));$('sug').innerHTML=[...new Set([...SUG,...h])].sort().map(x=>`<option value="${esc(x)}">`).join('')}
 function lastPrice(n){const all=J(K.c,{});let r=0;Object.values(all).forEach(l=>l.forEach(i=>{if(i.nome.toLowerCase()==n.toLowerCase()&&i.preco)r=i.preco}));return r}
 function autoPreco(){const n=$('n').value.trim();if(n&&!$('p').value&&!edit){const p=lastPrice(n);if(p){$('p').value=String(p).replace('.',',');toast('Último preço pago: '+brl(p),'💡')}}}
-function save(e){e.preventDefault();const n=$('n').value.trim(),qtd=num($('qt').value)||1,p=num($('p').value)||0,ean=$('ean').value;if(!n)return;const c=J(K.k,{});if(ean)c[ean]=n;c[n]=n;S(K.k,c);const l=L();if(edit){const i=l.find(x=>x.id==edit);i&&Object.assign(i,{nome:n,qtd,preco:p,ean:ean||i.ean||null})}else l.push({id:Date.now(),nome:n,qtd,preco:p,ean:ean||null,comprado:AC()});SL(l);reset();render();sugest();toast(edit||!AC()?'Item guardado':'Item no carrinho','🛒');$('n').focus()}
+function save(e){e.preventDefault();const n=$('n').value.trim(),qtd=num($('qt').value)||1,p=num($('p').value)||0,ean=$('ean').value;if(!n)return;const c=J(K.k,{});if(ean)c[ean]=n;c[n]=n;S(K.k,c);const l=L();if(edit){const i=l.find(x=>x.id==edit);i&&(Object.assign(i,{nome:n,qtd,preco:p,ean:ean||i.ean||null}),MODO()=='mercado'&&AC()&&p>0&&!i.comprado&&(i.comprado=true))}else{const ex=MODO()=='casa'&&l.find(x=>x.nome.toLowerCase()==n.toLowerCase());ex?Object.assign(ex,{qtd,preco:p||ex.preco}):l.push({id:Date.now(),nome:n,qtd,preco:p,ean:ean||null,comprado:MODO()=='mercado'&&AC()})}SL(l);reset();render();sugest();toast(MODO()=='casa'?'Adicionado à lista':'Item no carrinho','🛒');$('n').focus()}
 function reset(){$('f').reset();edit=null;$('ean').value='';$('qt').value=1;$('n').placeholder='Produto (ex.: arroz, café…)';$('ft').textContent='Adicionar produto';$('bs').textContent='➕ Salvar';$('bc').classList.add('hidden');hits()}
 function ed(id){const i=L().find(x=>x.id==id);if(!i)return;edit=id;$('ean').value=i.ean||'';$('n').value=i.nome;$('qt').value=String(i.qtd).replace('.',',');$('p').value=i.preco?String(i.preco).replace('.',','):'';$('ft').textContent='Editar produto';$('bs').textContent='💾 Salvar';$('bc').classList.remove('hidden');kpSee()}
 function tg(id){const l=L(),i=l.find(x=>x.id==id);if(i){i.comprado=!i.comprado;beep();SL(l);render()}}
@@ -289,7 +290,7 @@ $('tabs').onclick=e=>{const f=e.target.dataset.f;if(!f)return;flt=f;[...$('tabs'
 function prevMes(){const i=M.indexOf(mes);return i?[M[i-1],ano]:[M[11],''+(ano-1)]}
 function copiar(){const[m,a]=prevMes(),k=m+'_'+a,all=J(K.c,{}),ant=all[k]||[];ask('Copiar mês anterior',`Trazer ${ant.length} produtos de ${m} como pendentes?`,()=>{SL(ant.map((i,x)=>({...i,id:Date.now()+x,comprado:false})));[K.a,K.d].forEach(t=>{const c=J(t,{});if(c[k]&&!c[key()]){c[key()]=c[k];S(t,c)}});push();render();toast('Lista importada','📋')})}
 
-function render(){
+function render(){modoUi();
  const l=L();let tg_=0,tc=0;l.forEach(i=>{const s=i.qtd*i.preco;tg_+=s;i.comprado&&(tc+=s)});
  const a=B('a'),d=B('d'),o=a+d,r=o-tg_;
  $('sa').innerHTML=hb(a);$('sd').innerHTML=hb(d);$('so').innerHTML=hb(o);$('tc').innerHTML=hb(tc);$('tg').innerHTML=hb(tg_);$('tr').innerHTML=hb(r);
@@ -301,7 +302,7 @@ function render(){
  if(!v.length){const[m]=prevMes(),tem=(J(K.c,{})[prevMes().join('_')]||[]).length;$('list').innerHTML=!l.length&&tem?`<div style="text-align:center;padding:22px 8px;border:1px dashed var(--g2);border-radius:16px;margin-top:12px"><p>Começando ${mes}? Reaproveite a lista de ${m}.</p><button class="g" onclick="copiar()">📋 Copiar de ${m}</button></div>`:'<p class="mut" style="text-align:center;padding:22px">Nenhum item. Adicione o primeiro acima.</p>';return}
  const gr={};v.forEach(i=>(gr[cat(i.nome)]=gr[cat(i.nome)]||[]).push(i));
  const ord=[...CATS.map(c=>c[0]),'🛒 Outros'].filter(c=>gr[c]);
- $('list').innerHTML=ord.map(c=>`<div class="cat">${c}</div>`+gr[c].map(i=>`<div class="it ${i.comprado?'ok':''}"><input type="checkbox" ${sel.has(i.id)?'checked':''} onchange="pick(${i.id},this.checked)"><button class="chk" onclick="tg(${i.id})">${i.comprado?'✓':''}</button><div class="mid" onclick="ed(${i.id})"><div class="nm">${esc(i.nome)}${i.ean?' <span class="mut">EAN</span>':''}</div><div class="mut">${brl(i.preco)} un.</div></div><div class="qs"><button onclick="qty(${i.id},-1)">−</button><b>${+i.qtd}</b><button onclick="qty(${i.id},1)">+</button></div><b style="min-width:70px;text-align:right">${brl(i.qtd*i.preco)}</b><button onclick="rm(${i.id})" class="mut">✕</button></div>`).join('')).join('')}
+ $('list').innerHTML=ord.map(c=>`<div class="cat">${c}</div>`+gr[c].map(i=>`<div class="it ${i.comprado?'ok':''}"><input type="checkbox" ${sel.has(i.id)?'checked':''} onchange="pick(${i.id},this.checked)"><button class="chk" onclick="tg(${i.id})">${i.comprado?'✓':''}</button><div class="mid" onclick="ed(${i.id});kpOpen('p')"><div class="nm">${esc(i.nome)}${i.ean?' <span class="mut">EAN</span>':''}</div><div class="mut">${i.preco?brl(i.preco)+' un.':'sem valor'}</div></div><div class="qs"><button onclick="qty(${i.id},-1)">−</button><b>${+i.qtd}</b><button onclick="qty(${i.id},1)">+</button></div><b style="min-width:70px;text-align:right">${i.preco?brl(i.qtd*i.preco):'—'}</b><button onclick="rm(${i.id})" class="mut">✕</button></div>`).join('')).join('')}
 
 /* ---------- Relatório ---------- */
 function relat(){const all=J(K.c,{}),t=M.map(m=>(all[m+'_'+ano]||[]).reduce((s,i)=>s+i.qtd*i.preco,0)),mx=Math.max(...t,1),tot=t.reduce((a,b)=>a+b,0);
@@ -358,13 +359,19 @@ async function processaFila(){const f=J(FILA,[]);if(fq||!f.length||!localStorage
 let rec;
 const vozManual=m=>{openM(`<h3>🎤 Adicionar por voz</h3><p class="mut" style="font-size:12px">${m} Toque no campo e use o microfone do teclado do celular, ou digite. Exemplo: arroz 2 12,50</p><input id="vt" placeholder="arroz 2 12,50" onkeydown="if(event.key=='Enter'){falar(this.value);closeM()}"><button class="g" onclick="falar($('vt').value);closeM()">Adicionar</button>`);setTimeout(()=>$('vt').focus(),150)};
 function voz(){if(rec){rec.stop();return}const R=window.SpeechRecognition||window.webkitSpeechRecognition;if(!R)return vozManual('Este navegador não tem reconhecimento de voz.');
- const r=rec=new R();r.lang='pt-BR';r.interimResults=false;r.maxAlternatives=1;let ok=0;
- r.onstart=()=>{$('mic').style.filter='brightness(1.3)';toast('Ouvindo… diga: arroz 2 12,50','🎤')};
- r.onresult=e=>{ok=1;falar(e.results[0][0].transcript)};
+ const r=rec=new R();r.lang='pt-BR';r.interimResults=false;r.continuous=MODO()=='casa';r.maxAlternatives=1;let ok=0;
+ r.onstart=()=>{$('mic').style.filter='brightness(1.3)';toast(MODO()=='casa'?'Ouvindo… diga os itens e as quantidades. Toque no 🎤 para parar':'Ouvindo… diga: arroz 2 12,50','🎤')};
+ r.onresult=e=>{ok=1;for(let i=e.resultIndex;i<e.results.length;i++)e.results[i].isFinal&&falar(e.results[i][0].transcript)};
  r.onerror=e=>{const m={'not-allowed':'O microfone está bloqueado ou não funciona com o arquivo aberto direto do aparelho.','service-not-allowed':'O reconhecimento de voz não funciona com o arquivo aberto direto do aparelho.','network':'A voz precisa de internet.','audio-capture':'Nenhum microfone encontrado.'}[e.error];ok=1;m?vozManual(m):toast('Não ouvi nada. Tente de novo.','🎤')};
  r.onend=()=>{rec=null;$('mic').style.filter='';ok||toast('Não captei a voz. Tente de novo.','🎤')};
  try{r.start()}catch{rec=null;vozManual('Não consegui ligar o microfone.')}}
-function falar(t){if(!t||!t.trim())return;const mp={um:1,uma:1,dois:2,duas:2,três:3,quatro:4,cinco:5,seis:6,sete:7,oito:8,nove:9,dez:10};const tk=t.toLowerCase().replace(/quantidade|reais|real|por/g,' ').split(/\s+/).filter(Boolean).map(p=>mp[p]||p).join(' ').replace(/(\d+),(\d+)/g,'$1.$2').split(' ');let nm=[],nu=[];tk.forEach(x=>/^\d+(\.\d+)?$/.test(x)?nu.push(+x):!nu.length&&nm.push(x));let n=nm.join(' ')||t;n=n[0].toUpperCase()+n.slice(1);const q=nu.length>1?nu[0]:1,p=nu.length>1?nu[1]:nu[0]||0,l=L();l.push({id:Date.now(),nome:n,qtd:q,preco:p||lastPrice(n),ean:null,comprado:AC()});SL(l);render();toast(`Adicionado: ${n} (${q}x ${brl(p)})`,'🎤')}
+const canon=n=>{const lo=n.toLowerCase(),c=[lo,lo.replace(/s$/,''),lo.replace(/es$/,'')],f=[...SUG,...Object.values(J(K.k,{}))].find(b=>c.includes(b.toLowerCase()));return f||n[0].toUpperCase()+n.slice(1)};
+function falar(t){if(!t||!t.trim())return;const mp={um:1,uma:1,dois:2,duas:2,três:3,tres:3,quatro:4,cinco:5,seis:6,sete:7,oito:8,nove:9,dez:10,onze:11,doze:12},isn=x=>/^\d+(\.\d+)?$/.test(String(x)),l=L(),add=[];
+ t.toLowerCase().split(/[,;]| e (?=\S)/).forEach((seg,k)=>{seg=seg.trim();if(!seg)return;const hasR=/reais|real|r\$/.test(seg),tk=seg.replace(/r\$|quantidade|reais|real|\bpor\b/g,' ').replace(/(\d+),(\d+)/g,'$1.$2').split(/\s+/).filter(Boolean).map(w=>mp[w]||w),nums=tk.filter(isn).map(Number),nome=tk.filter(x=>!isn(x)).join(' ');if(!nome)return;
+  let q=1,pr=0,qs=false;if(nums.length>=2){q=nums[0];pr=nums[1];qs=true}else if(nums.length==1){const v=nums[0];if(hasR||!Number.isInteger(v))pr=v;else if(isn(tk[0])||MODO()=='casa'){q=v;qs=true}else pr=v}
+  const nm=canon(nome),ex=l.find(i=>i.nome.toLowerCase()==nm.toLowerCase());
+  if(ex){qs&&(ex.qtd=q);pr&&(ex.preco=pr)}else l.push({id:Date.now()+k,nome:nm,qtd:q,preco:pr||lastPrice(nm),ean:null,comprado:MODO()=='mercado'&&AC()});add.push(nm+(q>1?' ×'+q:''))});
+ if(!add.length)return;SL(l);render();toast('Adicionado: '+add.join(', '),'🎤')}
 function zap(){const l=L();if(!l.length)return toast('Lista vazia','⚠️');const o=B('a')+B('d');let g=0,c=0;l.forEach(i=>{g+=i.qtd*i.preco;i.comprado&&(c+=i.qtd*i.preco)});window.open('https://wa.me/?text='+encodeURIComponent(`🛒 *Lista de Compras (${mes}/${ano})*\n\n`+l.map(i=>`${i.comprado?'✅':'▫️'} ${i.nome} (${i.qtd}x) - ${brl(i.qtd*i.preco)}`).join('\n')+`\n\n💰 *Previsto:* ${brl(g)}\n🧺 *Carrinho:* ${brl(c)}\n✨ *Restante:* ${brl(o-g)}`),'_blank')}
 
 /* ---------- Painel flutuante: some quando para ---------- */
@@ -383,15 +390,18 @@ function dragInit(){document.querySelectorAll('.hdl').forEach(h=>h.addEventListe
 
 /* ---------- Teclado numérico interno ---------- */
 let kf=null,fresh=true,kt,nt;
+const MODO=()=>localStorage.modo||'mercado';
+function modoUi(){const m=$('modo');if(!m)return;m.textContent=MODO()=='casa'?'🏠 Casa':'🛒 Mercado';$('p').placeholder=MODO()=='casa'?'Valor (depois)':'R$ 0,00'}
+function trocaModo(){localStorage.modo=MODO()=='casa'?'mercado':'casa';modoUi();toast(MODO()=='casa'?'Modo casa: monte a lista sem valores':'Modo mercado: toque no item e digite o valor','✨')}
 const AF=()=>localStorage.auto_fluxo!='0';
 const nomes=()=>[...new Set([...SUG,...Object.values(J(K.k,{}))])].map(x=>x.toLowerCase());
-function hits(){const v=$('n').value.trim().toLowerCase(),h=$('hit');if(!v||edit){h.classList.add('hidden');h.innerHTML='';return}const r=L().filter(i=>i.nome.toLowerCase().includes(v)).slice(0,4);h.classList.toggle('hidden',!r.length);h.innerHTML=r.map(i=>`<button type="button" class="hi" onclick="hit(${i.id})"><span class="nm">${esc(i.nome)}${i.comprado?' ✓':''}</span><span class="vl">${+i.qtd} × ${brl(i.preco)}</span></button>`).join('')}
+function hits(){const v=$('n').value.trim().toLowerCase(),h=$('hit');if(!v||edit){h.classList.add('hidden');h.innerHTML='';return}const r=L().filter(i=>i.nome.toLowerCase().includes(v)).sort((a,b)=>a.comprado-b.comprado).slice(0,4);h.classList.toggle('hidden',!r.length);h.innerHTML=r.map(i=>`<button type="button" class="hi" onclick="hit(${i.id})"><span class="nm">${esc(i.nome)}${i.comprado?' ✓':''}</span><span class="vl">${+i.qtd} × ${i.preco?brl(i.preco):'sem valor'}</span></button>`).join('')}
 function hit(id){ed(id);hits();kpOpen('p')}
-$('n').addEventListener('input',e=>{hits();clearTimeout(nt);if(!AF()||edit||(e.inputType||'').startsWith('delete'))return;const v=$('n').value.trim().toLowerCase();if(!v)return;nt=setTimeout(()=>{if($('n').value.trim().toLowerCase()!=v||document.activeElement!==$('n'))return;const ns=nomes();if(ns.includes(v)&&!ns.some(x=>x!=v&&x.startsWith(v))&&!L().some(i=>i.nome.toLowerCase()==v)){autoPreco();nx({key:'Enter',preventDefault(){}},'qt')}},450)});
+$('n').addEventListener('input',e=>{hits();clearTimeout(nt);if(!AF()||edit||(e.inputType||'').startsWith('delete'))return;const v=$('n').value.trim().toLowerCase();if(!v)return;nt=setTimeout(()=>{if($('n').value.trim().toLowerCase()!=v||document.activeElement!==$('n'))return;const ns=nomes(),ex=L().filter(i=>i.nome.toLowerCase()==v);if(MODO()=='mercado'&&ex.length){const t=ex.find(i=>!i.comprado);if(t)hit(t.id);return}if(ns.includes(v)&&!ns.some(x=>x!=v&&x.startsWith(v))&&!ex.length){autoPreco();nx({key:'Enter',preventDefault(){}},'qt')}},450)});
 const setHH=()=>{const h=document.querySelector('header');h&&h.offsetHeight&&document.documentElement.style.setProperty('--hh',h.offsetHeight+'px')};addEventListener('resize',setHH);
 const num=v=>+String(v).replace(',','.')||0;
 const hb=n=>'<small>R$</small>'+(+n||0).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});
-function kpShow(){$('kl').textContent=($('n').value||'Produto')+' · '+(kf=='qt'?'Quantidade':'Valor (R$)');$('kv').textContent=$(kf).value||'0';$('kgo').textContent=kf=='qt'?'Próximo ➜':'✔ Salvar'}
+function kpShow(){$('kl').textContent=($('n').value||'Produto')+' · '+(kf=='qt'?'Quantidade':'Valor (R$)');$('kv').textContent=$(kf).value||'0';$('kgo').textContent=kf=='qt'?(MODO()=='casa'?'✔ Adicionar':'Próximo ➜'):'✔ Salvar'}
 function kpOpen(id){if(kf==id&&$('kp').classList.contains('on'))return;kf=id;fresh=true;$('kp').classList.add('on');document.body.classList.add('kp');document.querySelectorAll('.fl').forEach(e=>e.classList.add('off'));kpShow();kpSee()}
 function kpSee(){const h=document.querySelector('.hero'),f=$('sf');if(!h||!f)return;const top=(parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--hh'))||52)+h.offsetHeight+8,r=f.getBoundingClientRect();if(r.top<top||r.bottom>innerHeight-($('kp').offsetHeight||300))scrollBy({top:r.top-top,behavior:'smooth'})}
 function kpHide(){clearTimeout(kt);kf=null;$('kp').classList.remove('on');document.body.classList.remove('kp');const a=document.activeElement;a&&/^(qt|p)$/.test(a.id)&&a.blur();wake()}
@@ -400,7 +410,8 @@ function kp(k){const el=$(kf);if(!el)return;let v=fresh?'':el.value;fresh=false;
  else if(k==','){if(!v.includes(','))v=(v||'0')+','}
  else{if(v.includes(',')&&v.split(',')[1].length>=2)return;v=v=='0'?k:v+k}
  el.value=v;kpShow();clearTimeout(kt);if(AF()&&k!='b'){if(kf=='qt'&&v)kt=setTimeout(()=>{kf=='qt'&&kpNext()},1300);if(kf=='p'&&/,\d\d$/.test(v))kt=setTimeout(()=>{kf=='p'&&kpNext()},700)};navigator.vibrate&&navigator.vibrate(15)}
-function kpNext(){clearTimeout(kt);if(kf=='qt'){if(!$('qt').value)$('qt').value='1';kf=null;kpOpen('p');$('p').focus()}else{if(!$('n').value.trim()){kpHide();$('n').focus();return toast('Digite o nome do produto','✏️')}kpHide();$('bs').click()}}
+function addGo(){if(!$('n').value.trim()){kpHide();$('n').focus();return toast('Digite o nome do produto','✏️')}kpHide();$('bs').click()}
+function kpNext(){clearTimeout(kt);if(kf=='qt'){if(!$('qt').value)$('qt').value='1';if(MODO()=='casa')return addGo();kf=null;kpOpen('p');$('p').focus()}else addGo()}
 
 applyOrder();dragInit();navigator.storage&&navigator.storage.persist&&navigator.storage.persist();applyF();addEventListener('resize',()=>{clearTimeout(rt);rt=setTimeout(()=>bgAnim(J('fundo',{}).anim),300)});
 sessionStorage.auth?enter():(innerWidth<768&&window.PublicKeyCredential&&setTimeout(bio,400));
